@@ -1,0 +1,13 @@
+sequenceDiagram
+    autonumber
+    participant U as Usuário (QR)
+    participant F as Next.js (Web)
+    participant B as NestJS API
+    participant DB as PostgreSQL
+
+    U->>F: Acessa /m/:company/:location/:table
+    F->>B: GET /public/menu/:company/:location/:table
+    B->>DB: SELECT menu by company/location/table
+    DB-->>B: Menu + categorias + itens
+    B-->>F: 200 OK (JSON)
+    F-->>U: Renderiza Menu

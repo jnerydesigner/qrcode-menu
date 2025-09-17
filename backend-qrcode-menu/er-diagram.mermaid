@@ -1,0 +1,56 @@
+erDiagram
+    COMPANY ||--o{ LOCATION : has
+    LOCATION ||--o{ TABLE : has
+    COMPANY ||--o{ MENU_CATEGORY : owns
+    MENU_CATEGORY ||--o{ MENU_ITEM : has
+    MENU_ITEM ||--o{ ITEM_OPTION : has
+
+    COMPANY {
+      uuid id
+      string name
+      string slug
+      date created_at
+    }
+
+    LOCATION {
+      uuid id
+      uuid company_id
+      string name
+      string slug
+      date created_at
+    }
+
+    TABLE {
+      uuid id
+      uuid location_id
+      string code
+      string display_name
+      boolean active
+    }
+
+    MENU_CATEGORY {
+      uuid id
+      uuid company_id
+      int sort_order
+      string name
+      boolean active
+    }
+
+    MENU_ITEM {
+      uuid id
+      uuid category_id
+      string name
+      string description
+      float price
+      boolean available
+      int sort_order
+      string image_url
+    }
+
+    ITEM_OPTION {
+      uuid id
+      uuid item_id
+      string name
+      float extra_price
+      boolean active
+    }
