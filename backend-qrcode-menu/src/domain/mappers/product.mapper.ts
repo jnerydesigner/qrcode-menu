@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import { ProductEntity } from '@domain/entities/product.entity';
 import { Products, Prisma } from '@prisma/client';
 
@@ -17,8 +16,28 @@ export class ProductMapper {
   }
 
   static toDomain(
-    product: Products & { category?: { name: string; slug: string } },
+    product: Products & {
+      category?: { name: string; slug: string };
+      productIngredient?: {
+        ingredient: {
+          id: string;
+          name: string;
+          emoji: string;
+          color: string;
+          slug: string;
+        };
+      }[];
+    },
   ): ProductEntity {
+    const ingredients =
+      product.productIngredient?.map((pi) => ({
+        id: pi.ingredient.id,
+        name: pi.ingredient.name,
+        emoji: pi.ingredient.emoji,
+        color: pi.ingredient.color,
+        slug: pi.ingredient.slug,
+      })) ?? [];
+
     return new ProductEntity(
       product.name,
       product.description,
@@ -29,6 +48,7 @@ export class ProductMapper {
       product.createdAt,
       product.slug,
       product.category,
+      ingredients,
     );
   }
 }

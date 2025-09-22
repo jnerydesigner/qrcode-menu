@@ -10,7 +10,6 @@ export class SlugEntity {
   }
 
   static create(text: string): SlugEntity {
-    console.log(text);
     if (!text || text.trim().length === 0) {
       throw new Error('Slug não pode ser vazio');
     }

@@ -4,6 +4,7 @@ export interface ProductRepository {
   save(product: ProductEntity): Promise<ProductEntity>;
   findProductBySlug(slug: string): Promise<boolean>;
   findOne(productId: string): Promise<ProductEntity>;
+  findOneSlug(slug: string): Promise<ProductEntity>;
   saveMany(products: ProductEntity[]): Promise<ProductEntity[]>;
   findAll(): Promise<ProductEntity[]>;
 }
