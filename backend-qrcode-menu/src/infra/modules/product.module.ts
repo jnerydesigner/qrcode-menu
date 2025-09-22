@@ -2,6 +2,7 @@ import { CreateManyProductUseCase } from '@application/use-case/product/create-m
 import { CreateProductUseCase } from '@application/use-case/product/create-product.usecase';
 import { FindAllProductUseCase } from '@application/use-case/product/find-all-product.usecase';
 import { FindOneProductUseCase } from '@application/use-case/product/find-one-products.usecase';
+import { FindOneSlugProductUseCase } from '@application/use-case/product/find-one-slug.usecase';
 import { Module } from '@nestjs/common';
 import { ProductController } from '@presenters/controllers/product/product.controller';
 
@@ -12,6 +13,7 @@ import { ProductController } from '@presenters/controllers/product/product.contr
     FindOneProductUseCase,
     CreateManyProductUseCase,
     FindAllProductUseCase,
+    FindOneSlugProductUseCase,
   ],
 })
 export class ProductModule {}

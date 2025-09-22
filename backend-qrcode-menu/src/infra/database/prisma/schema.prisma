@@ -35,8 +35,32 @@ model Products {
   slug        String
   createdAt   DateTime @default(now()) @map("created_at")
 
-  categoryId String   @map("category_id") @db.Uuid
-  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId        String              @map("category_id") @db.Uuid
+  category          Category            @relation(fields: [categoryId], references: [id])
+  productIngredient ProductIngredient[]
 
   @@map("products")
+}
+
+model Ingredient {
+  id                String              @id @default(uuid()) @db.Uuid
+  emoji             String
+  color             String
+  name              String
+  slug              String
+  createdAt         DateTime            @default(now()) @map("created_at")
+  productIngredient ProductIngredient[]
+
+  @@map("ingredients")
+}
+
+model ProductIngredient {
+  productId    String @map("product_id") @db.Uuid
+  ingredientId String @map("ingredient_id") @db.Uuid
+
+  product    Products   @relation(fields: [productId], references: [id])
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@id([productId, ingredientId])
+  @@map("products_ingredients")
 }

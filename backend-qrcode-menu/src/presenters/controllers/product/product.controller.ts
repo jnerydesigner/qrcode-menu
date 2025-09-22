@@ -5,6 +5,7 @@ import {
 } from '@application/use-case/product/create-product.usecase';
 import { FindAllProductUseCase } from '@application/use-case/product/find-all-product.usecase';
 import { FindOneProductUseCase } from '@application/use-case/product/find-one-products.usecase';
+import { FindOneSlugProductUseCase } from '@application/use-case/product/find-one-slug.usecase';
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 @Controller('products')
@@ -12,6 +13,7 @@ export class ProductController {
   constructor(
     private readonly createProductUseCase: CreateProductUseCase,
     private readonly findOneProductUseCase: FindOneProductUseCase,
+    private readonly findOneSlugProductUseCase: FindOneSlugProductUseCase,
     private readonly createManyProductUseCase: CreateManyProductUseCase,
     private readonly findAllProductsUseCase: FindAllProductUseCase,
   ) {}
@@ -34,5 +36,10 @@ export class ProductController {
   @Post('/many-products')
   createManyProducts(@Body() manyProducts: CreateProductInput[]) {
     return this.createManyProductUseCase.execute(manyProducts);
+  }
+
+  @Get('/slug/:slug')
+  findOneSlug(@Param('slug') slug: string) {
+    return this.findOneSlugProductUseCase.execute(slug);
   }
 }

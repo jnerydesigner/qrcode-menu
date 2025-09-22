@@ -1,17 +1,16 @@
 "use client";
-import React, { useRef } from "react";
+import { CategoryType } from "@/types/category.type";
+import React, { useEffect, useRef, useState } from "react";
 
-export const CategoryMenu = () => {
-  const categories = [
-    "Hamburger",
-    "Bebidas",
-    "Petiscos",
-    "Acompanhamentos",
-    "Sobremesas",
-    "Combos",
-  ];
+interface CategoryProps {
+  categories: CategoryType[];
+}
+
+export const CategoryMenu = ({ categories }: CategoryProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState<string>("");
 
+  // --- Drag Scroll ---
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollRef.current) return;
     const startX = e.pageX - scrollRef.current.offsetLeft;
@@ -19,7 +18,7 @@ export const CategoryMenu = () => {
 
     const onMouseMove = (e: MouseEvent) => {
       const x = e.pageX - scrollRef.current!.offsetLeft;
-      const walk = (x - startX) * 1.5; // velocidade do drag
+      const walk = (x - startX) * 1.5;
       scrollRef.current!.scrollLeft = scrollLeft - walk;
     };
 
@@ -32,23 +31,68 @@ export const CategoryMenu = () => {
     document.addEventListener("mouseup", onMouseUp);
   };
 
+  // --- Scroll até a categoria ---
+  const handleScrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  // --- Detectar categoria ativa ---
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+
+    categories.forEach((cat) => {
+      const el = document.getElementById(cat.id);
+      if (!el) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            setActive(cat.id);
+          }
+        },
+        {
+          threshold: 0.3,
+          rootMargin: "-30% 0px -60% 0px", // ajuda ao subir
+        }
+      );
+
+      observer.observe(el);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  }, [categories]);
+
   return (
-    <div className="px-4 mb-6 hover:cursor-pointer">
+    <div className="px-4 mb-2 select-none">
       <div
         ref={scrollRef}
         onMouseDown={handleMouseDown}
         className="flex gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide cursor-grab"
       >
-        {categories.map((category, index) => (
+        {categories.map((category) => (
           <button
-            key={category}
-            className={`px-4 py-2 rounded-full text-sm font-medium hover:cursor-pointer ${
-              index === 0
+            key={category.id}
+            onClick={() => handleScrollTo(category.id)}
+            ref={(el) => {
+              if (el && active === category.id) {
+                el.scrollIntoView({
+                  behavior: "smooth",
+                  inline: "center",
+                  block: "nearest",
+                });
+              }
+            }}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+              active === category.id
                 ? "bg-orange-500 text-white"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
-            {category}
+            {category.name}
           </button>
         ))}
       </div>

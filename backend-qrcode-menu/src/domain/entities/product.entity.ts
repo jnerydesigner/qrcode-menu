@@ -16,6 +16,14 @@ export class ProductEntity {
     slug: string;
   };
 
+  ingredients?: {
+    id: string;
+    name: string;
+    emoji: string;
+    color: string;
+    slug: string;
+  }[];
+
   constructor(
     name: string,
     description: string,
@@ -26,6 +34,13 @@ export class ProductEntity {
     createdAt: Date | null,
     slug: string,
     category?: { name: string; slug: string },
+    ingredients?: {
+      id: string;
+      name: string;
+      emoji: string;
+      color: string;
+      slug: string;
+    }[],
   ) {
     this.id = id !== null ? id : new UniqueEntityId().toString();
     this.name = name;
@@ -39,5 +54,6 @@ export class ProductEntity {
         : slug;
     this.createdAt = createdAt ? new Date(createdAt) : new Date();
     this.category = category;
+    this.ingredients = ingredients;
   }
 }

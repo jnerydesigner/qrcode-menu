@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { PrismaService } from '@application/services/prisma.service';
 import { ProductEntity } from '@domain/entities/product.entity';
 import { ProductMapper } from '@domain/mappers/product.mapper';
@@ -59,6 +58,31 @@ export class ProductPrismaRepository implements ProductRepository {
     return ProductMapper.toDomain(findOne);
   }
 
+  async findOneSlug(slug: string): Promise<ProductEntity> {
+    const findOne = await this.prisma.products.findFirst({
+      where: { slug },
+      orderBy: {
+        category: {
+          name: 'asc',
+        },
+      },
+      include: {
+        category: {
+          select: {
+            name: true,
+            slug: true,
+          },
+        },
+      },
+    });
+
+    if (!findOne) {
+      throw new NotFoundProductError(`Product slug ${slug} not exists`);
+    }
+
+    return ProductMapper.toDomain(findOne);
+  }
+
   async saveMany(products: ProductEntity[]): Promise<ProductEntity[]> {
     const productsSave: ProductEntity[] = [];
 
@@ -83,7 +107,17 @@ export class ProductPrismaRepository implements ProductRepository {
 
   async findAll(): Promise<ProductEntity[]> {
     const findAll = await this.prisma.products.findMany({
+      orderBy: {
+        category: {
+          name: 'asc',
+        },
+      },
       include: {
+        productIngredient: {
+          include: {
+            ingredient: true,
+          },
+        },
         category: {
           select: {
             name: true,
@@ -92,6 +126,11 @@ export class ProductPrismaRepository implements ProductRepository {
         },
       },
     });
+
+    console.log(
+      'findAll',
+      findAll.map((product) => console.log(product.productIngredient)),
+    );
 
     const productMany = findAll.map((product) =>
       ProductMapper.toDomain(product),

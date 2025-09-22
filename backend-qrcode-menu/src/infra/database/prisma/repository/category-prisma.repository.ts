@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 import { PrismaService } from '@application/services/prisma.service';
 import { CategoryEntity } from '@domain/entities/category.entity';
 import { CategoryMapper } from '@domain/mappers/category.mapper';
@@ -16,8 +16,6 @@ export class CategoryPrismaRepository implements CategoryRepository {
       data: createCategoryMapper,
     });
 
-    console.log(categoryCreate);
-
     return CategoryMapper.toDomain(categoryCreate);
   }
 
@@ -32,7 +30,6 @@ export class CategoryPrismaRepository implements CategoryRepository {
 
   async deleteCategory(categoryId: string): Promise<void> {
     const categoryDelete = await this.findCategory(categoryId);
-    console.log(categoryDelete);
 
     await this.prisma.category.delete({
       where: {
