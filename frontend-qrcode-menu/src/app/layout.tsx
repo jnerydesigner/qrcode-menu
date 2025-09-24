@@ -1,16 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import ReactQueryProvider from "@/components/ReactQueryProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-white min-h-screen text-gray-800">
-        <main className="min-h-screen">{children}</main>
+        <ReactQueryProvider>
+          <main className="min-h-screen">{children}</main>
+        </ReactQueryProvider>
       </body>
     </html>
   );
