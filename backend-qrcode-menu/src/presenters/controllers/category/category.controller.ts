@@ -1,9 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 import { type CreateCategoryInputDTO } from '@application/dtos/create-category-input.dto';
 import { CreateCategoryUsecase } from '@application/use-case/category/create-category.usecase';
 import { DeleteCategoryUseCase } from '@application/use-case/category/delete-category.usecase';
 import { FindAllCategoryUsecase } from '@application/use-case/category/find-all-category.usecase';
+import { UpdateCategoryUseCase } from '@application/use-case/category/update-category.usecase';
 
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Res,
+} from '@nestjs/common';
+import { type Response } from 'express';
 
 @Controller('categories')
 export class CategoryController {
@@ -11,6 +24,7 @@ export class CategoryController {
     private readonly createCategoryUsecase: CreateCategoryUsecase,
     private readonly findAllCategoryUsecase: FindAllCategoryUsecase,
     private readonly deleteCategoryUsecase: DeleteCategoryUseCase,
+    private readonly updateCategoryUseCase: UpdateCategoryUseCase,
   ) {}
 
   @Post()
@@ -24,7 +38,25 @@ export class CategoryController {
   }
 
   @Delete('/:categoryId')
-  deleteCategory(@Param('categoryId') categoryId: string) {
-    this.deleteCategoryUsecase.execute(categoryId);
+  async deleteCategory(
+    @Param('categoryId') categoryId: string,
+    @Res() res: Response,
+  ) {
+    const result = await this.deleteCategoryUsecase.execute(categoryId);
+
+    if (result && result.status !== HttpStatus.OK) {
+      return res.status(result.status).json({ message: result.message });
+    }
+
+    // sucesso → 204 No Content
+    return res.status(HttpStatus.NO_CONTENT).send();
+  }
+
+  @Patch('/:categoryId')
+  updateCategory(
+    @Param('categoryId') categoryId: string,
+    @Body() data: { name: string },
+  ) {
+    return this.updateCategoryUseCase.execute(categoryId, data.name);
   }
 }

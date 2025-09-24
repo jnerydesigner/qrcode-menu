@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-
+/* eslint-disable no-useless-catch */
+import { ErrorMessage } from '@application/dtos/error.message.dto';
 import { PrismaService } from '@application/services/prisma.service';
 import { CategoryEntity } from '@domain/entities/category.entity';
 import { CategoryMapper } from '@domain/mappers/category.mapper';
 import { CategoryRepository } from '@domain/repositories/category.repository';
-import { NotFoundException } from '@nestjs/common';
+import { HttpStatus, NotFoundException } from '@nestjs/common';
 import { Category } from '@prisma/client';
 
 export class CategoryPrismaRepository implements CategoryRepository {
@@ -28,16 +28,6 @@ export class CategoryPrismaRepository implements CategoryRepository {
     return responseCategories;
   }
 
-  async deleteCategory(categoryId: string): Promise<void> {
-    const categoryDelete = await this.findCategory(categoryId);
-
-    await this.prisma.category.delete({
-      where: {
-        id: categoryDelete.id,
-      },
-    });
-  }
-
   async findCategory(categoryId: string): Promise<Category> {
     const category = await this.prisma.category.findFirst({
       where: {
@@ -50,5 +40,54 @@ export class CategoryPrismaRepository implements CategoryRepository {
     }
 
     return category;
+  }
+
+  async deleteCategory(categoryId: string): Promise<void | ErrorMessage> {
+    try {
+      const isProductCategoryExists = await this.prisma.products.findFirst({
+        where: { categoryId },
+      });
+
+      if (isProductCategoryExists) {
+        return {
+          status: HttpStatus.EXPECTATION_FAILED,
+          message: 'Category is not empty',
+        };
+      }
+
+      const categoryDelete = await this.findCategory(categoryId);
+
+      await this.prisma.category.delete({
+        where: { id: categoryDelete.id },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateCategory(data: CategoryEntity): Promise<CategoryEntity> {
+    const findCategory = await this.prisma.category.findUnique({
+      where: {
+        id: data.id,
+      },
+    });
+
+    console.log(findCategory);
+
+    if (!findCategory) {
+      throw new NotFoundException('Category not exists');
+    }
+
+    const categoryUpdate = await this.prisma.category.update({
+      where: {
+        id: findCategory.id,
+      },
+      data: {
+        name: data.name,
+        slug: data.slug,
+      },
+    });
+
+    return CategoryMapper.toDomain(categoryUpdate);
   }
 }

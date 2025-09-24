@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 import ReactQueryProvider from "@/components/ReactQueryProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,6 +20,7 @@ export default function RootLayout({
         <ReactQueryProvider>
           <main className="min-h-screen">{children}</main>
         </ReactQueryProvider>
+        <Toaster position="top-center" />
       </body>
     </html>
   );

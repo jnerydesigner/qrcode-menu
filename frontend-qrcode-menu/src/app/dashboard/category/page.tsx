@@ -1,3 +1,4 @@
+import FormCategory from "@/components/FormCategory";
 import TableCategories from "@/components/TableCategories";
 import React from "react";
 
@@ -7,6 +8,7 @@ export default function PageCategory() {
       <h3 className="text-lg font-medium text-gray-900 mb-4">
         Bem-vindo a Category
       </h3>
+      <FormCategory />
       <TableCategories />
     </div>
   );
