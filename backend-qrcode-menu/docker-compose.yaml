@@ -16,15 +16,22 @@ services:
     restart: unless-stopped
 
   mongo:
-    image: mongo:4.4
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: mongo_online_menu
-    command:
-      [
-        "bash",
-        "-c",
-        'mongod --replSet rs0 --bind_ip_all & sleep 5 && mongo --eval ''rs.initiate({_id:"rs0", members:[{_id:0, host:"mongo:27017"}]})'' && tail -f /dev/null',
-      ]
+    environment:
+      MONGO_REPLICA_HOST: localhost
+      MONGO_REPLICA_PORT: 27017
+      MONGO_REPLICA_SET: rs0
     ports:
       - "27017:27017"
     volumes:
       - ./data/mongo:/data/db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--host", "localhost", "--port", "27017", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
