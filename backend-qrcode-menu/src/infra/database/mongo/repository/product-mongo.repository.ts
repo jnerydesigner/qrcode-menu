@@ -9,6 +9,7 @@ import { Model, Types } from 'mongoose';
 import { Product as ProductMongo } from '../schema/product.schema';
 import { Category as CategoryMongo } from '../schema/category.schema';
 import { Ingredient as IngredientMongo } from '../schema/ingredient.schema';
+import { toObjectId } from '@infra/utils/objectid-converter.util';
 
 type PopulatedProductMongo = ProductMongo & {
   created_at?: Date;
@@ -73,6 +74,12 @@ export class ProductMongoRepository implements ProductRepository {
       .populate('category')
       .populate('ingredients')
       .lean<PopulatedProductMongo>();
+
+    if (!populatedProduct) {
+      throw new NotFoundProductError(
+        `Produto salvo não encontrado após persistência.`,
+      );
+    }
 
     return ProductMapper.fromMongo(populatedProduct);
   }
@@ -140,6 +147,11 @@ export class ProductMongoRepository implements ProductRepository {
           .populate('ingredients')
           .lean<PopulatedProductMongo>();
 
+        if (!populatedProduct) {
+          throw new NotFoundProductError(
+            `Produto salvo não encontrado após persistência.`,
+          );
+        }
         savedProducts.push(ProductMapper.fromMongo(populatedProduct));
       }
     }
@@ -162,13 +174,14 @@ export class ProductMongoRepository implements ProductRepository {
 
   async updateProduct(product: ProductEntity): Promise<ProductEntity> {
     const mongoUpdateMapper = ProductMapper.toMongo(product);
+    console.log('Updating product with ID:', product.id);
+    const id = toObjectId(product.id);
 
-    const currentProduct = await this.productModel
-      .findById(product.id)
-      .lean();
+    const currentProduct = await this.productModel.findById(id).lean();
+    console.log('Current product data:', currentProduct);
 
     if (!currentProduct) {
-      throw new NotFoundProductError(`Product id ${product.id} not exists`);
+      throw new NotFoundProductError(`Product id ${id} not exists`);
     }
 
     const { _id, created_at, ...updatePayload } = mongoUpdateMapper;
