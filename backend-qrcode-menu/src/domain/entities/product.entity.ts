@@ -16,7 +16,7 @@ export class ProductEntity {
     slug: string;
   };
 
-  productIngredient?: {
+  ingredients?: {
     id: string;
     name: string;
     emoji: string;
@@ -47,13 +47,11 @@ export class ProductEntity {
     this.description = description;
     this.price = price;
     this.image = image;
-    this.categoryId = new UniqueEntityId(categoryId).toString();
+    this.categoryId = categoryId;
     this.slug =
-      slug !== undefined || slug === ''
-        ? SlugEntity.create(name).toString()
-        : slug;
+      slug && slug.length > 0 ? slug : SlugEntity.create(name).toString();
     this.createdAt = createdAt ? new Date(createdAt) : new Date();
     this.category = category;
-    this.productIngredient = ingredients;
+    this.ingredients = ingredients ?? [];
   }
 }

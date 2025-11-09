@@ -31,16 +31,31 @@ export class UpdateProductUseCase {
 
     const product = await this.productRepository.findOne(productId);
 
-    const update = {
-      ...product,
-      ...updateProductInput,
-      productIngredient:
-        productIngredientMany.length > 0 ? productIngredientMany : [],
-    };
+    const ingredients =
+      productIngredientMany.length > 0
+        ? productIngredientMany.map((ingredient) => ({
+            id: ingredient.id,
+            name: ingredient.name,
+            emoji: ingredient.emoji,
+            color: ingredient.color,
+            slug: ingredient.slug,
+          }))
+        : product.ingredients ?? [];
 
-    console.log('UPDATE:', update);
+    const updatedProduct = new ProductEntity(
+      updateProductInput.name ?? product.name,
+      updateProductInput.description ?? product.description,
+      updateProductInput.price ?? product.price,
+      updateProductInput.image ?? product.image,
+      updateProductInput.categoryId ?? product.categoryId,
+      product.id,
+      product.createdAt,
+      product.slug,
+      product.category,
+      ingredients,
+    );
 
-    return await this.productRepository.updateProduct(update as ProductEntity);
+    return await this.productRepository.updateProduct(updatedProduct);
   }
 }
 
