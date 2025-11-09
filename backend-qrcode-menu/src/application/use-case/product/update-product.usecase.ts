@@ -16,31 +16,54 @@ export class UpdateProductUseCase {
     private readonly ingredientRepository: IngredientRepository,
   ) {}
 
-  async execute(productId: string, updateProductInput: UpdateProductInput) {
-    const productIngredientMany = updateProductInput.productIngredient
-      ? await Promise.all(
-          updateProductInput.productIngredient.map(async (product) => {
-            const productIngredient = await this.ingredientRepository.findId(
-              product.ingredientId,
-            );
+  async execute(
+    productId: string,
+    updateProductInput: UpdateProductInput,
+  ): Promise<ProductEntity | null> {
+    const product = await this.findProductOrNull(productId);
 
-            return productIngredient;
-          }),
-        )
+    if (!product) {
+      return null;
+    }
+
+    const existingIngredients = product.ingredients ?? [];
+    const requestedIngredientIds =
+      updateProductInput.productIngredient?.map(
+        (product) => product.ingredientId,
+      ) ?? [];
+
+    const productIngredientMany = requestedIngredientIds.length
+      ? await this.ingredientRepository.findManyByIds(requestedIngredientIds)
       : [];
 
-    const product = await this.productRepository.findOne(productId);
+    const existingIngredientIds = new Set(
+      existingIngredients.map((ingredient) => ingredient.id),
+    );
 
-    const ingredients =
-      productIngredientMany.length > 0
-        ? productIngredientMany.map((ingredient) => ({
+    const additionalIngredients = requestedIngredientIds.length
+      ? requestedIngredientIds
+          .map((ingredientId) =>
+            productIngredientMany.find(
+              (ingredient) => ingredient.id === ingredientId,
+            ),
+          )
+          .filter((ingredient): ingredient is ProductIngredientView =>
+            Boolean(ingredient),
+          )
+          .filter((ingredient) => !existingIngredientIds.has(ingredient.id))
+          .map((ingredient) => ({
             id: ingredient.id,
             name: ingredient.name,
             emoji: ingredient.emoji,
             color: ingredient.color,
             slug: ingredient.slug,
           }))
-        : product.ingredients ?? [];
+      : [];
+
+    const ingredients =
+      additionalIngredients.length > 0
+        ? [...existingIngredients, ...additionalIngredients]
+        : existingIngredients;
 
     const updatedProduct = new ProductEntity(
       updateProductInput.name ?? product.name,
@@ -57,6 +80,34 @@ export class UpdateProductUseCase {
 
     return await this.productRepository.updateProduct(updatedProduct);
   }
+
+  private async findProductOrNull(
+    productId: string,
+  ): Promise<ProductEntity | null> {
+    try {
+      return await this.productRepository.findOne(productId);
+    } catch (error) {
+      if (this.isNotFoundError(error)) {
+        return null;
+      }
+
+      throw error;
+    }
+  }
+
+  private isNotFoundError(error: unknown): error is Error {
+    if (!(error instanceof Error)) {
+      return false;
+    }
+
+    const statusCode = (error as { statusCode?: number }).statusCode;
+
+    if (typeof statusCode === 'number') {
+      return statusCode === 404;
+    }
+
+    return error.name === 'NotFoundProductError';
+  }
 }
 
 export type UpdateProductInput = {
@@ -70,4 +121,12 @@ export type UpdateProductInput = {
 
 export type ProductIngredientInput = {
   ingredientId: string;
+};
+
+type ProductIngredientView = {
+  id: string;
+  name: string;
+  emoji: string;
+  color: string;
+  slug: string;
 };

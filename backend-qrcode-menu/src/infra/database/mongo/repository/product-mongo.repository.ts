@@ -133,8 +133,7 @@ export class ProductMongoRepository implements ProductRepository {
           { $addToSet: { products: saved._id } },
         );
 
-        const ingredientIds = (productMapper.ingredients ??
-          []) as Types.ObjectId[];
+        const ingredientIds = (productMapper.ingredients ?? []) as Types.ObjectId[];
         if (ingredientIds.length > 0) {
           await this.ingredientModel.updateMany(
             { _id: { $in: ingredientIds } },
@@ -187,20 +186,42 @@ export class ProductMongoRepository implements ProductRepository {
 
     const { _id, created_at, ...updatePayload } = mongoUpdateMapper;
 
+    const requestedIngredientIds = ((mongoUpdateMapper.ingredients ?? []) as (
+      | Types.ObjectId
+      | string
+    )[]).map((id) => (id instanceof Types.ObjectId ? id.toHexString() : id?.toString?.() ?? ''));
+
+    const currentIngredientIds = (currentProduct.ingredients ?? []).map((id) =>
+      id instanceof Types.ObjectId ? id.toHexString() : id?.toString?.() ?? '',
+    );
+
+    const mergedIngredientIds = Array.from(
+      new Set(
+        [...currentIngredientIds, ...requestedIngredientIds].filter(
+          (id): id is string => typeof id === 'string' && id.length > 0,
+        ),
+      ),
+    );
+
+    const mergedIngredientObjectIds = mergedIngredientIds.map(
+      (id) => new Types.ObjectId(id),
+    );
+
+    updatePayload.ingredients = mergedIngredientObjectIds;
+
     const updatedProduct = await this.productModel
-      .findByIdAndUpdate(id, updatePayload, { new: true })
+      .findByIdAndUpdate(product.id, updatePayload, { new: true })
       .populate('category')
       .populate('ingredients')
       .lean<PopulatedProductMongo>();
 
     if (!updatedProduct) {
-      throw new NotFoundProductError(`Product id ${id} not exists`);
+      throw new NotFoundProductError(`Product id ${product.id} not exists`);
     }
 
-    const currentCategoryId =
-      (currentProduct.category as Types.ObjectId)?.toHexString?.() ??
-      (currentProduct as any).categoryId ??
-      '';
+    const currentCategoryId = (currentProduct.category as Types.ObjectId)?.toHexString?.()
+      ?? (currentProduct as any).categoryId
+      ?? '';
     const nextCategoryId = product.categoryId;
 
     if (currentCategoryId && currentCategoryId !== nextCategoryId) {
@@ -215,32 +236,9 @@ export class ProductMongoRepository implements ProductRepository {
       { $addToSet: { products: new Types.ObjectId(product.id) } },
     );
 
-    const currentIngredientIds = (currentProduct.ingredients ?? []).map((id) =>
-      id instanceof Types.ObjectId
-        ? id.toHexString()
-        : (id?.toString?.() ?? ''),
-    );
-    const nextIngredientIds = (
-      (updatePayload.ingredients ?? []) as Types.ObjectId[]
-    ).map((id) => id.toHexString());
-
-    const ingredientIdsToRemove = currentIngredientIds.filter(
-      (id) => id && !nextIngredientIds.includes(id),
-    );
-    const ingredientIdsToAdd = nextIngredientIds.filter(
+    const ingredientIdsToAdd = requestedIngredientIds.filter(
       (id) => id && !currentIngredientIds.includes(id),
     );
-
-    if (ingredientIdsToRemove.length > 0) {
-      await this.ingredientModel.updateMany(
-        {
-          _id: {
-            $in: ingredientIdsToRemove.map((id) => new Types.ObjectId(id)),
-          },
-        },
-        { $pull: { products: new Types.ObjectId(product.id) } },
-      );
-    }
 
     if (ingredientIdsToAdd.length > 0) {
       await this.ingredientModel.updateMany(
