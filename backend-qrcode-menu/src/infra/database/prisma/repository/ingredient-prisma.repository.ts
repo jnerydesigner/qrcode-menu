@@ -5,6 +5,9 @@ import { IngredientRepository } from '@domain/repositories/ingredient.repository
 
 export class IngredientPrismaRepository implements IngredientRepository {
   constructor(private readonly prisma: PrismaService) {}
+  findId(ingredientId: string): Promise<IngredientEntity> {
+    throw new Error('Method not implemented.');
+  }
 
   async save(ingredient: IngredientEntity): Promise<IngredientEntity> {
     const ingredientExists = await this.prisma.ingredient.findFirst({

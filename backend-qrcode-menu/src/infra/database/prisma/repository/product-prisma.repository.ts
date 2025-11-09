@@ -7,6 +7,9 @@ import { NotFoundProductError } from '@infra/errors/notfound.error';
 
 export class ProductPrismaRepository implements ProductRepository {
   constructor(private readonly prisma: PrismaService) {}
+  updateProduct(product: ProductEntity): Promise<ProductEntity> {
+    throw new Error('Method not implemented.');
+  }
 
   async save(product: ProductEntity): Promise<ProductEntity> {
     const findProduct = await this.findProductBySlug(product.slug);

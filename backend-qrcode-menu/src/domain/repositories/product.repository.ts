@@ -7,6 +7,7 @@ export interface ProductRepository {
   findOneSlug(slug: string): Promise<ProductEntity>;
   saveMany(products: ProductEntity[]): Promise<ProductEntity[]>;
   findAll(): Promise<ProductEntity[]>;
+  updateProduct(product: ProductEntity): Promise<ProductEntity>;
 }
 
 export const PRODUCT_REPOSITORY = Symbol('PRODUCT_REPOSITORY');

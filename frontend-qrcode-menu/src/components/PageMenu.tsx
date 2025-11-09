@@ -47,7 +47,7 @@ export const PageMenu = ({
 
             return (
               <Link
-                href={`/hamproductia-sonho-meu/${product.slug}`}
+                href={`/cervejaria-vira-todas/${product.slug}`}
                 key={product.id}
                 id={
                   firstOfCategory || lastOfCategory

@@ -8,6 +8,15 @@ export interface Product {
   categoryId: string;
   createdAt: string;
   category: Category;
+  productIngredient: ProductIngredient[];
+}
+
+export interface ProductIngredient {
+  id: string;
+  name: string;
+  emoji: string;
+  color: string;
+  slug: string;
 }
 
 export interface Category {

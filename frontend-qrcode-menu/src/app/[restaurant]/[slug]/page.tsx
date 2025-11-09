@@ -9,8 +9,11 @@ type tParams = Promise<{ slug: string; restaurant: string }>;
 
 export default async function FoodDetails({ params }: { params: tParams }) {
   const { slug, restaurant } = await params;
+  console.log("Restaurant:", restaurant);
+  console.log("Slug:", slug);
   let data = await fetch(`http://localhost:3399/products/slug/${slug}`);
   let productFetch: Product = await data.json();
+  console.log("Product Fetch:", productFetch);
 
   const ingredients = [
     { name: "Pão", emoji: "🍞", color: "bg-amber-600" },
@@ -69,16 +72,16 @@ export default async function FoodDetails({ params }: { params: tParams }) {
             Ingredientes
           </h3>
           <div className="grid grid-cols-5 gap-4 justify-items-center">
-            {ingredients2.map((ingredient, index) => (
+            {productFetch.productIngredient.map((ingredient, index) => (
               <div
-                key={ingredient.name}
+                key={ingredient.id}
                 className="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-md hover:shadow-lg transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 cursor-pointer animate-slide-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div
                   className={`w-8 h-8 ${ingredient.color} rounded-full flex items-center justify-center text-white text-sm shadow-md`}
                 >
-                  {ingredient.icon}
+                  {ingredient.emoji}
                 </div>
                 <span className="text-xs text-gray-600 font-medium text-center">
                   {ingredient.name}

@@ -5,13 +5,12 @@ import { CategoryEntity } from '@domain/entities/category.entity';
 import { CategoryMapper } from '@domain/mappers/category.mapper';
 import { CategoryRepository } from '@domain/repositories/category.repository';
 import { HttpStatus, NotFoundException } from '@nestjs/common';
-import { Category } from '@prisma/client';
 
 export class CategoryPrismaRepository implements CategoryRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CategoryEntity): Promise<CategoryEntity> {
-    const createCategoryMapper: Category = CategoryMapper.toPersistent(data);
+    const createCategoryMapper = CategoryMapper.toPersistent(data);
     const categoryCreate = await this.prisma.category.create({
       data: createCategoryMapper,
     });
@@ -28,7 +27,7 @@ export class CategoryPrismaRepository implements CategoryRepository {
     return responseCategories;
   }
 
-  async findCategory(categoryId: string): Promise<Category> {
+  async findCategory(categoryId: string): Promise<CategoryEntity> {
     const category = await this.prisma.category.findFirst({
       where: {
         id: categoryId,
@@ -39,7 +38,7 @@ export class CategoryPrismaRepository implements CategoryRepository {
       throw new NotFoundException('Category Not Exists');
     }
 
-    return category;
+    return CategoryMapper.toDomain(category);
   }
 
   async deleteCategory(categoryId: string): Promise<void | ErrorMessage> {

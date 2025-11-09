@@ -70,6 +70,22 @@ $ mau deploy
 
 With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
+## Environment configuration
+
+The persistence layer can be switched between Prisma/PostgreSQL and Mongoose/MongoDB without touching the application code. Use the variables below to configure the runtime:
+
+- `DATABASE_PROVIDER` – set to `prisma` (default) or `mongo` to choose the backing store.
+- `DATABASE_URL` – PostgreSQL connection string used when `DATABASE_PROVIDER=prisma`.
+- `MONGODB_URI` – MongoDB connection string used when `DATABASE_PROVIDER=mongo`.
+
+Example `.env` snippet:
+
+```
+DATABASE_PROVIDER=prisma
+DATABASE_URL=postgresql://root:123456@localhost:5482/menu_online
+MONGODB_URI=mongodb://localhost:27017/qrcode_menu?directConnection=true
+```
+
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:

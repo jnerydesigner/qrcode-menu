@@ -9,7 +9,9 @@ export class FindAllProductUseCase {
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
   ) {}
-  execute() {
-    return this.productRepository.findAll();
+  async execute() {
+    const products = await this.productRepository.findAll();
+    console.log(products[0].category);
+    return products;
   }
 }

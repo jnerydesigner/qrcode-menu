@@ -14,10 +14,7 @@ export class CategoryEntity {
   ) {
     this.id = id !== null ? id : new UniqueEntityId().toString();
     this.name = name;
-    this.slug =
-      slug !== undefined || slug === ''
-        ? SlugEntity.create(name).toString()
-        : slug;
+    this.slug = slug && slug.length > 0 ? slug : SlugEntity.create(name).toString();
     this.createdAt = createdAt ? new Date(createdAt) : new Date();
   }
 }

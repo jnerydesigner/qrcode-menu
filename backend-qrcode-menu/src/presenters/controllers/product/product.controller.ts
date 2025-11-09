@@ -6,7 +6,11 @@ import {
 import { FindAllProductUseCase } from '@application/use-case/product/find-all-product.usecase';
 import { FindOneProductUseCase } from '@application/use-case/product/find-one-products.usecase';
 import { FindOneSlugProductUseCase } from '@application/use-case/product/find-one-slug.usecase';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  type UpdateProductInput,
+  UpdateProductUseCase,
+} from '@application/use-case/product/update-product.usecase';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 
 @Controller('products')
 export class ProductController {
@@ -16,6 +20,7 @@ export class ProductController {
     private readonly findOneSlugProductUseCase: FindOneSlugProductUseCase,
     private readonly createManyProductUseCase: CreateManyProductUseCase,
     private readonly findAllProductsUseCase: FindAllProductUseCase,
+    private readonly updateProductsUseCase: UpdateProductUseCase,
   ) {}
 
   @Post()
@@ -31,6 +36,14 @@ export class ProductController {
   @Get('/:productId')
   findOne(@Param('productId') productId: string) {
     return this.findOneProductUseCase.execute(productId);
+  }
+
+  @Patch('/:productId')
+  updateProduct(
+    @Param('productId') productId: string,
+    @Body() updateProductBody: UpdateProductInput,
+  ) {
+    return this.updateProductsUseCase.execute(productId, updateProductBody);
   }
 
   @Post('/many-products')

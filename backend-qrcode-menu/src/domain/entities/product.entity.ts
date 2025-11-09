@@ -16,7 +16,7 @@ export class ProductEntity {
     slug: string;
   };
 
-  ingredients?: {
+  productIngredient?: {
     id: string;
     name: string;
     emoji: string;
@@ -54,6 +54,6 @@ export class ProductEntity {
         : slug;
     this.createdAt = createdAt ? new Date(createdAt) : new Date();
     this.category = category;
-    this.ingredients = ingredients;
+    this.productIngredient = ingredients;
   }
 }

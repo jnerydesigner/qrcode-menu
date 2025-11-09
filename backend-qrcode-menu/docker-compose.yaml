@@ -1,4 +1,4 @@
-version: '3.5'
+version: "3.5"
 
 services:
   db:
@@ -12,5 +12,19 @@ services:
       POSTGRES_DB: menu_online
       PGDATA: /data/postgres
     ports:
-      - '5482:5432'
+      - "5482:5432"
     restart: unless-stopped
+
+  mongo:
+    image: mongo:4.4
+    container_name: mongo_online_menu
+    command:
+      [
+        "bash",
+        "-c",
+        'mongod --replSet rs0 --bind_ip_all & sleep 5 && mongo --eval ''rs.initiate({_id:"rs0", members:[{_id:0, host:"mongo:27017"}]})'' && tail -f /dev/null',
+      ]
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/mongo:/data/db
