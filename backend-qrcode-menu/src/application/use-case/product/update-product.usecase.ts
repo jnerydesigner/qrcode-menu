@@ -1,4 +1,6 @@
+import { Inject } from '@nestjs/common';
 import { ProductEntity } from '@domain/entities/product.entity';
+
 import {
   INGREDIENT_REPOSITORY,
   type IngredientRepository,
@@ -7,11 +9,13 @@ import {
   PRODUCT_REPOSITORY,
   type ProductRepository,
 } from '@domain/repositories/product.repository';
-import { Inject } from '@nestjs/common';
+import { toObjectId } from '@infra/utils/objectid-converter.util';
+
 export class UpdateProductUseCase {
   constructor(
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
+
     @Inject(INGREDIENT_REPOSITORY)
     private readonly ingredientRepository: IngredientRepository,
   ) {}
@@ -26,44 +30,25 @@ export class UpdateProductUseCase {
       return null;
     }
 
-    const existingIngredients = product.ingredients ?? [];
     const requestedIngredientIds =
-      updateProductInput.productIngredient?.map(
-        (product) => product.ingredientId,
-      ) ?? [];
+      updateProductInput.productIngredient?.map((p) => p.ingredientId) ?? [];
 
-    const productIngredientMany = requestedIngredientIds.length
-      ? await this.ingredientRepository.findManyByIds(requestedIngredientIds)
-      : [];
+    console.log('2️⃣ requestedIngredientIds', requestedIngredientIds);
 
-    const existingIngredientIds = new Set(
-      existingIngredients.map((ingredient) => ingredient.id),
+    const productIngredientMany = await Promise.all(
+      requestedIngredientIds.map(async (ingredientId) => {
+        const ingredient = await this.ingredientRepository.findId(ingredientId);
+
+        console.log('🔍 ingredient found:', ingredient);
+        if (!ingredient) {
+          throw new Error(`Ingrediente com ID ${ingredientId} não encontrado.`);
+        }
+
+        return ingredient;
+      }),
     );
 
-    const additionalIngredients = requestedIngredientIds.length
-      ? requestedIngredientIds
-          .map((ingredientId) =>
-            productIngredientMany.find(
-              (ingredient) => ingredient.id === ingredientId,
-            ),
-          )
-          .filter((ingredient): ingredient is ProductIngredientView =>
-            Boolean(ingredient),
-          )
-          .filter((ingredient) => !existingIngredientIds.has(ingredient.id))
-          .map((ingredient) => ({
-            id: ingredient.id,
-            name: ingredient.name,
-            emoji: ingredient.emoji,
-            color: ingredient.color,
-            slug: ingredient.slug,
-          }))
-      : [];
-
-    const ingredients =
-      additionalIngredients.length > 0
-        ? [...existingIngredients, ...additionalIngredients]
-        : existingIngredients;
+    console.log('3️⃣ productIngredientMany', productIngredientMany);
 
     const updatedProduct = new ProductEntity(
       updateProductInput.name ?? product.name,
@@ -75,9 +60,10 @@ export class UpdateProductUseCase {
       product.createdAt,
       product.slug,
       product.category,
-      ingredients,
+      productIngredientMany,
     );
 
+    // Atualiza no repositório
     return await this.productRepository.updateProduct(updatedProduct);
   }
 
@@ -85,9 +71,12 @@ export class UpdateProductUseCase {
     productId: string,
   ): Promise<ProductEntity | null> {
     try {
-      return await this.productRepository.findOne(productId);
+      const product = await this.productRepository.findOne(productId);
+      console.log('✅ Found product:', product);
+      return product;
     } catch (error) {
       if (this.isNotFoundError(error)) {
+        console.warn('⚠️ Product not found:', productId);
         return null;
       }
 
@@ -96,9 +85,7 @@ export class UpdateProductUseCase {
   }
 
   private isNotFoundError(error: unknown): error is Error {
-    if (!(error instanceof Error)) {
-      return false;
-    }
+    if (!(error instanceof Error)) return false;
 
     const statusCode = (error as { statusCode?: number }).statusCode;
 
@@ -110,20 +97,24 @@ export class UpdateProductUseCase {
   }
 }
 
+// ----------------------
+// 🧩 Tipos auxiliares
+// ----------------------
+
 export type UpdateProductInput = {
   name?: string;
   description?: string;
   price?: number;
   image?: string;
   categoryId?: string;
-  productIngredient?: ProductIngredientInput[]; // opcional
+  productIngredient?: ProductIngredientInput[];
 };
 
 export type ProductIngredientInput = {
   ingredientId: string;
 };
 
-type ProductIngredientView = {
+export type ProductIngredientView = {
   id: string;
   name: string;
   emoji: string;

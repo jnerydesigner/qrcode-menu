@@ -13,7 +13,6 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-
 import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,17 +30,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import type { CategoryType } from "@/types/category.type";
+import { useQuery } from "@tanstack/react-query";
+import { findAllCategory } from "@/api/category.fecth";
 
-// 🧩 Exemplo de dados temporários (pode substituir por API)
-const data: CategoryType[] = [
-  { id: "1", name: "Bebidas", slug: "bebidas" },
-  { id: "2", name: "Sobremesas", slug: "sobremesas" },
-  { id: "3", name: "Lanches", slug: "lanches" },
-];
-
-// 💡 Definição das colunas da tabela
 export const columns: ColumnDef<CategoryType>[] = [
   {
     accessorKey: "name",
@@ -76,7 +68,7 @@ export const columns: ColumnDef<CategoryType>[] = [
   },
 ];
 
-export function TableCategory() {
+export const TableCategory = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -85,8 +77,14 @@ export function TableCategory() {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => await findAllCategory(),
+  });
+
+  // ⚠️ Hook useReactTable também precisa vir antes de qualquer return
   const table = useReactTable({
-    data,
+    data: data ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -103,6 +101,15 @@ export function TableCategory() {
       rowSelection,
     },
   });
+
+  // 🧾 depois, os returns condicionais
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (isError) {
+    return <div>Erro ao carregar categorias.</div>;
+  }
 
   return (
     <div className="w-full">
@@ -214,4 +221,4 @@ export function TableCategory() {
       </div>
     </div>
   );
-}
+};

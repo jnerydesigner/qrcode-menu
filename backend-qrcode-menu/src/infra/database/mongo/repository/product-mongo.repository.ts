@@ -90,14 +90,15 @@ export class ProductMongoRepository implements ProductRepository {
   }
 
   async findOne(productId: string): Promise<ProductEntity> {
+    const prodId = toObjectId(productId);
     const product = await this.productModel
-      .findById(productId)
+      .findById(prodId)
       .populate('category')
       .populate('ingredients')
       .lean<PopulatedProductMongo>();
 
     if (!product) {
-      throw new NotFoundProductError(`Product id ${productId} not exists`);
+      throw new NotFoundProductError(`Product id ${prodId} not exists`);
     }
 
     return ProductMapper.fromMongo(product);
@@ -133,7 +134,8 @@ export class ProductMongoRepository implements ProductRepository {
           { $addToSet: { products: saved._id } },
         );
 
-        const ingredientIds = (productMapper.ingredients ?? []) as Types.ObjectId[];
+        const ingredientIds = (productMapper.ingredients ??
+          []) as Types.ObjectId[];
         if (ingredientIds.length > 0) {
           await this.ingredientModel.updateMany(
             { _id: { $in: ingredientIds } },
@@ -173,82 +175,78 @@ export class ProductMongoRepository implements ProductRepository {
   }
 
   async updateProduct(product: ProductEntity): Promise<ProductEntity> {
-    const mongoUpdateMapper = ProductMapper.toMongo(product);
-    console.log('Updating product with ID:', product.id);
-    const id = toObjectId(product.id);
+    const productResponseMongo = await this.productModel.findById(
+      toObjectId(product.id),
+    );
 
-    const currentProduct = await this.productModel.findById(id).lean();
-    console.log('Current product data:', currentProduct);
-
-    if (!currentProduct) {
-      throw new NotFoundProductError(`Product id ${id} not exists`);
+    if (!productResponseMongo) {
+      throw new NotFoundProductError(
+        `Produto com ID ${product.id} não encontrado para atualização.`,
+      );
     }
 
-    const { _id, created_at, ...updatePayload } = mongoUpdateMapper;
+    // 🔍 Extrai os IDs já existentes no banco
+    const existingIngredientIds = (
+      (productResponseMongo.ingredients as Types.ObjectId[]) ?? []
+    ).map((id) => id.toString());
 
-    const requestedIngredientIds = ((mongoUpdateMapper.ingredients ?? []) as (
-      | Types.ObjectId
-      | string
-    )[]).map((id) => (id instanceof Types.ObjectId ? id.toHexString() : id?.toString?.() ?? ''));
+    // 🔍 Extrai os IDs vindos do domínio
+    const incomingIngredientIds =
+      product.ingredients?.map((ing) => ing.id) ?? [];
 
-    const currentIngredientIds = (currentProduct.ingredients ?? []).map((id) =>
-      id instanceof Types.ObjectId ? id.toHexString() : id?.toString?.() ?? '',
-    );
+    console.log('💾 existingIngredientIds (mongo):', existingIngredientIds);
+    console.log('📦 incomingIngredientIds (domain):', incomingIngredientIds);
 
+    // 🧮 Combina ambos os arrays, removendo duplicatas
     const mergedIngredientIds = Array.from(
-      new Set(
-        [...currentIngredientIds, ...requestedIngredientIds].filter(
-          (id): id is string => typeof id === 'string' && id.length > 0,
-        ),
-      ),
+      new Set([...existingIngredientIds, ...incomingIngredientIds]),
     );
 
-    const mergedIngredientObjectIds = mergedIngredientIds.map(
+    // ⚙️ Converte de volta para ObjectId[]
+    const mergedObjectIds = mergedIngredientIds.map(
       (id) => new Types.ObjectId(id),
     );
 
-    updatePayload.ingredients = mergedIngredientObjectIds;
+    console.log('✅ mergedObjectIds (final):', mergedObjectIds);
 
-    const updatedProduct = await this.productModel
-      .findByIdAndUpdate(product.id, updatePayload, { new: true })
+    // 🚀 Atualiza apenas se houver diferença real
+    const shouldUpdateIngredients =
+      JSON.stringify(existingIngredientIds.sort()) !==
+      JSON.stringify(incomingIngredientIds.sort());
+
+    const updateData: Record<string, any> = {
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      image: product.image,
+      slug: product.slug,
+      category: new Types.ObjectId(product.categoryId),
+    };
+
+    if (shouldUpdateIngredients) {
+      updateData.ingredients = mergedObjectIds;
+      console.log('🧩 Updating ingredients...');
+    } else {
+      console.log('🟡 Ingredients unchanged — skipping field update');
+    }
+
+    await this.productModel.updateOne(
+      { _id: new Types.ObjectId(product.id) },
+      { $set: updateData },
+      { upsert: false },
+    );
+
+    // 🔁 Retorna o documento populado
+    const updated = await this.productModel
+      .findById(toObjectId(product.id))
       .populate('category')
       .populate('ingredients')
       .lean<PopulatedProductMongo>();
 
-    if (!updatedProduct) {
-      throw new NotFoundProductError(`Product id ${product.id} not exists`);
+    if (!updated) {
+      throw new Error(`Produto não encontrado após update`);
     }
 
-    const currentCategoryId = (currentProduct.category as Types.ObjectId)?.toHexString?.()
-      ?? (currentProduct as any).categoryId
-      ?? '';
-    const nextCategoryId = product.categoryId;
-
-    if (currentCategoryId && currentCategoryId !== nextCategoryId) {
-      await this.categoryModel.updateOne(
-        { _id: new Types.ObjectId(currentCategoryId) },
-        { $pull: { products: new Types.ObjectId(product.id) } },
-      );
-    }
-
-    await this.categoryModel.updateOne(
-      { _id: new Types.ObjectId(nextCategoryId) },
-      { $addToSet: { products: new Types.ObjectId(product.id) } },
-    );
-
-    const ingredientIdsToAdd = requestedIngredientIds.filter(
-      (id) => id && !currentIngredientIds.includes(id),
-    );
-
-    if (ingredientIdsToAdd.length > 0) {
-      await this.ingredientModel.updateMany(
-        {
-          _id: { $in: ingredientIdsToAdd.map((id) => new Types.ObjectId(id)) },
-        },
-        { $addToSet: { products: new Types.ObjectId(product.id) } },
-      );
-    }
-
-    return ProductMapper.fromMongo(updatedProduct);
+    return ProductMapper.fromMongo(updated);
   }
 }

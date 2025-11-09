@@ -32,11 +32,8 @@ export class Product extends Document {
   @Prop()
   created_at: Date;
 
-  @Prop({
-    type: [{ type: Types.ObjectId, ref: Ingredient.name }],
-    default: [],
-  })
-  ingredients: (Types.ObjectId | Ingredient)[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: Ingredient.name }], default: [] })
+  ingredients: Types.ObjectId[];
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

@@ -64,9 +64,10 @@ export class IngredientMongoRepository implements IngredientRepository {
     );
   }
 
+  // todo
   async findId(ingredientId: string): Promise<IngredientEntity> {
     const ingredientDoc = await this.ingredientModel
-      .findById(ingredientId)
+      .findById(toObjectId(ingredientId))
       .lean();
 
     if (!ingredientDoc) {
@@ -78,9 +79,7 @@ export class IngredientMongoRepository implements IngredientRepository {
     );
   }
 
-  async findManyByIds(
-    ingredientIds: string[],
-  ): Promise<IngredientEntity[]> {
+  async findManyByIds(ingredientIds: string[]): Promise<IngredientEntity[]> {
     if (ingredientIds.length === 0) {
       return [];
     }
@@ -88,6 +87,8 @@ export class IngredientMongoRepository implements IngredientRepository {
     const ingredientDocs = await this.ingredientModel
       .find({ _id: { $in: ingredientIds } })
       .lean();
+
+    console.log('✅ Found ingredients:', ingredientDocs);
 
     return ingredientDocs.map((ingredient) =>
       IngredientMapper.fromMongo(

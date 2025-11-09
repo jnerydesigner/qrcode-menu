@@ -95,12 +95,14 @@ export class ProductMapper {
   static fromMongo(
     productMongo: ProductMongo & {
       created_at?: Date;
-      category?: {
-        _id?: Types.ObjectId;
-        id?: string;
-        name: string;
-        slug: string;
-      };
+      category?:
+        | {
+            _id?: Types.ObjectId;
+            id?: string;
+            name: string;
+            slug: string;
+          }
+        | Types.ObjectId;
       ingredients?: (
         | {
             _id?: Types.ObjectId;
@@ -111,38 +113,62 @@ export class ProductMapper {
             slug: string;
           }
         | Types.ObjectId
+        | null
+        | undefined
       )[];
     },
   ): ProductEntity {
+    // 👇 Tipagem explícita para o elemento do map
     const ingredients = (productMongo.ingredients ?? [])
-      .map((ingredient) => {
-        if (
-          ingredient instanceof Types.ObjectId ||
-          ingredient === null ||
-          ingredient === undefined
-        ) {
-          return null;
-        }
+      .map(
+        (
+          ingredient:
+            | {
+                _id?: Types.ObjectId;
+                id?: string;
+                name: string;
+                emoji: string;
+                color: string;
+                slug: string;
+              }
+            | Types.ObjectId
+            | null
+            | undefined,
+        ): {
+          id: string;
+          name: string;
+          emoji: string;
+          color: string;
+          slug: string;
+        } | null => {
+          // Ignora nulos, undefined e ObjectId puro
+          if (!ingredient || ingredient instanceof Types.ObjectId) {
+            return null;
+          }
 
-        return {
-          id:
-            'id' in ingredient && ingredient.id
-              ? ingredient.id
-              : ingredient._id?.toString() ?? '',
-          name: ingredient.name,
-          emoji: ingredient.emoji,
-          color: ingredient.color,
-          slug: ingredient.slug,
-        };
-      })
-      .filter((ingredient): ingredient is {
-        id: string;
-        name: string;
-        emoji: string;
-        color: string;
-        slug: string;
-      } => Boolean(ingredient));
+          // Converte o objeto populado em ProductIngredientView
+          return {
+            id: (ingredient as any).id ?? ingredient._id?.toString() ?? '',
+            name: ingredient.name,
+            emoji: ingredient.emoji,
+            color: ingredient.color,
+            slug: ingredient.slug,
+          };
+        },
+      )
+      .filter(
+        (
+          ingredient,
+        ): ingredient is {
+          id: string;
+          name: string;
+          emoji: string;
+          color: string;
+          slug: string;
+        } => ingredient !== null,
+      );
 
+    // Categoria (populate ou ObjectId)
     const category = productMongo.category;
     const mappedCategory =
       category && !(category instanceof Types.ObjectId)
@@ -152,12 +178,17 @@ export class ProductMapper {
           }
         : undefined;
 
-    const categoryId = category instanceof Types.ObjectId
-      ? category.toHexString()
-      : category && 'id' in category && category.id
-        ? (category as { id: string }).id
-        : (productMongo as any).categoryId ?? category?._id?.toHexString() ?? '';
+    // ID da categoria (String)
+    const categoryId =
+      category instanceof Types.ObjectId
+        ? category.toHexString()
+        : category && 'id' in category && category.id
+          ? (category as { id: string }).id
+          : ((productMongo as any).categoryId ??
+            category?._id?.toHexString() ??
+            '');
 
+    // Cria a entidade de domínio
     return new ProductEntity(
       productMongo.name,
       productMongo.description,
