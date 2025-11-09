@@ -1,7 +1,9 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { TableCategory } from "@/components/table-categories";
+import { useMemo, useState } from "react";
 
-import { DataTableDemo } from "@/components/table-generics";
+import { AppSidebar, type DashboardSection } from "@/components/app-sidebar";
+import { TableCategory } from "@/components/table-categories";
+import { TableProducts } from "@/components/table-generics";
+import { TableIngredients } from "@/components/table-ingredients";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,9 +20,27 @@ import {
 } from "@/components/ui/sidebar";
 
 export default function Dashboard() {
+  const [activeSection, setActiveSection] = useState<DashboardSection>(
+    "products",
+  );
+
+  const breadcrumbLabel = useMemo(() => {
+    switch (activeSection) {
+      case "categories":
+        return "Lista de categorias";
+      case "ingredients":
+        return "Lista de ingredientes";
+      default:
+        return "Lista de produtos";
+    }
+  }, [activeSection]);
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar
+        activeSection={activeSection}
+        onSelectSection={setActiveSection}
+      />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
@@ -33,28 +53,59 @@ export default function Dashboard() {
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="#">
-                    Building Your Application
+                    Dashboard
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                  <BreadcrumbPage>{breadcrumbLabel}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-2">
-            <TableCategory />
-            <DataTableDemo />
-          </div>
-          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-          </div>
+        <div className="flex flex-1 flex-col gap-6 p-4 pt-0">
+          {activeSection === "products" && (
+            <section className="space-y-4">
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Lista de produtos
+                </h1>
+                <p className="text-muted-foreground text-sm">
+                  Consulte os itens cadastrados e realize ações rápidas.
+                </p>
+              </div>
+              <TableProducts />
+            </section>
+          )}
+
+          {activeSection === "categories" && (
+            <section className="space-y-4">
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Lista de categorias
+                </h1>
+                <p className="text-muted-foreground text-sm">
+                  Visualize as categorias disponíveis no cardápio.
+                </p>
+              </div>
+              <TableCategory />
+            </section>
+          )}
+
+          {activeSection === "ingredients" && (
+            <section className="space-y-4">
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Lista de ingredientes
+                </h1>
+                <p className="text-muted-foreground text-sm">
+                  Acompanhe os ingredientes e faça o controle de estoque.
+                </p>
+              </div>
+              <TableIngredients />
+            </section>
+          )}
         </div>
       </SidebarInset>
     </SidebarProvider>

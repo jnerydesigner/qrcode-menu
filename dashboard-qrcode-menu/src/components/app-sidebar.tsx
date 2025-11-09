@@ -3,15 +3,14 @@
 import * as React from "react";
 import {
   AudioWaveform,
-  BookOpen,
-  Bot,
   Command,
   Frame,
   GalleryVerticalEnd,
   Map,
   PieChart,
-  Settings2,
-  SquareTerminal,
+  Tags,
+  Utensils,
+  Wheat,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -27,6 +26,8 @@ import {
 } from "@/components/ui/sidebar";
 
 // This is sample data.
+export type DashboardSection = "products" | "categories" | "ingredients";
+
 const data = {
   user: {
     name: "shadcn",
@@ -52,89 +53,19 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
+      title: "Lista de produtos",
+      value: "products" satisfies DashboardSection,
+      icon: Utensils,
     },
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
+      title: "Lista de categorias",
+      value: "categories" satisfies DashboardSection,
+      icon: Tags,
     },
     {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
+      title: "Lista de ingredientes",
+      value: "ingredients" satisfies DashboardSection,
+      icon: Wheat,
     },
   ],
   projects: [
@@ -156,14 +87,27 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  activeSection: DashboardSection;
+  onSelectSection: (section: DashboardSection) => void;
+}
+
+export function AppSidebar({
+  activeSection,
+  onSelectSection,
+  ...props
+}: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain
+          items={data.navMain}
+          activeValue={activeSection}
+          onSelect={(value) => onSelectSection(value as DashboardSection)}
+        />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>

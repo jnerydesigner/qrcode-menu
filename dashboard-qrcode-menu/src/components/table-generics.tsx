@@ -33,45 +33,62 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-const data: Payment[] = [
+
+type ProductStatus = "available" | "unavailable" | "out-of-stock";
+
+type Product = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  status: ProductStatus;
+};
+
+const products: Product[] = [
   {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@example.com",
+    id: "prod-01",
+    name: "Hambúrguer Clássico",
+    category: "Lanches",
+    price: 29.9,
+    status: "available",
   },
   {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@example.com",
+    id: "prod-02",
+    name: "Pizza Margherita",
+    category: "Pizzas",
+    price: 42.5,
+    status: "available",
   },
   {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@example.com",
+    id: "prod-03",
+    name: "Ceviche de Tilápia",
+    category: "Entradas",
+    price: 35.0,
+    status: "out-of-stock",
   },
   {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@example.com",
+    id: "prod-04",
+    name: "Suco Detox",
+    category: "Bebidas",
+    price: 18.9,
+    status: "available",
   },
   {
-    id: "bhqecj4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@example.com",
+    id: "prod-05",
+    name: "Brownie com Sorvete",
+    category: "Sobremesas",
+    price: 22.9,
+    status: "unavailable",
   },
 ];
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
+
+const statusLabel: Record<ProductStatus, string> = {
+  available: "Disponível",
+  unavailable: "Indisponível",
+  "out-of-stock": "Esgotado",
 };
-export const columns: ColumnDef<Payment>[] = [
+
+export const columns: ColumnDef<Product>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -81,84 +98,93 @@ export const columns: ColumnDef<Payment>[] = [
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label="Selecionar todos"
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label="Selecionar linha"
       />
     ),
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "name",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Produto
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
+      <div className="font-medium">{row.getValue("name")}</div>
     ),
   },
   {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    accessorKey: "category",
+    header: "Categoria",
+    cell: ({ row }) => (
+      <div className="text-muted-foreground">{row.getValue("category")}</div>
+    ),
   },
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    accessorKey: "price",
+    header: () => <div className="text-right">Preço</div>,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
+      const amount = parseFloat(row.getValue("price"));
+      const formatted = new Intl.NumberFormat("pt-BR", {
         style: "currency",
-        currency: "USD",
+        currency: "BRL",
       }).format(amount);
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
   {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => (
+      <div className="text-muted-foreground">
+        {statusLabel[row.getValue("status") as ProductStatus]}
+      </div>
+    ),
+  },
+  {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original;
+      const product = row.original;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only">Abrir menu</span>
               <MoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Ações</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(product.id)}
             >
-              Copy payment ID
+              Copiar ID do produto
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>Editar produto</DropdownMenuItem>
+            <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
     },
   },
 ];
-export function DataTableDemo() {
+
+export function TableProducts() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -166,8 +192,9 @@ export function DataTableDemo() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
   const table = useReactTable({
-    data,
+    data: products,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -184,21 +211,22 @@ export function DataTableDemo() {
       rowSelection,
     },
   });
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filtrar por produto..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
+              Colunas <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -265,7 +293,7 @@ export function DataTableDemo() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Nenhum resultado encontrado.
                 </TableCell>
               </TableRow>
             )}
@@ -274,8 +302,8 @@ export function DataTableDemo() {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} de {" "}
+          {table.getFilteredRowModel().rows.length} linha(s) selecionadas.
         </div>
         <div className="space-x-2">
           <Button
@@ -284,7 +312,7 @@ export function DataTableDemo() {
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Previous
+            Anterior
           </Button>
           <Button
             variant="outline"
@@ -292,7 +320,7 @@ export function DataTableDemo() {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next
+            Próximo
           </Button>
         </div>
       </div>
