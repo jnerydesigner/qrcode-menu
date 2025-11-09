@@ -65,22 +65,33 @@ export class IngredientMongoRepository implements IngredientRepository {
 
   async findId(ingredientId: string): Promise<IngredientEntity> {
     const ingredientDoc = await this.ingredientModel
-      .findOne({ id: ingredientId })
+      .findById(ingredientId)
       .lean();
 
     if (!ingredientDoc) {
       throw new Error(`Ingredient with ID ${ingredientId} not found`);
     }
 
-    const ingredientEntity = new IngredientEntity(
-      ingredientDoc.emoji,
-      ingredientDoc.color,
-      ingredientDoc.name,
-      ingredientDoc.id,
-      ingredientDoc.created_at || new Date(),
-      ingredientDoc.slug,
+    return IngredientMapper.fromMongo(
+      ingredientDoc as IngredientMongo & { created_at?: Date },
     );
+  }
 
-    return ingredientEntity;
+  async findManyByIds(
+    ingredientIds: string[],
+  ): Promise<IngredientEntity[]> {
+    if (ingredientIds.length === 0) {
+      return [];
+    }
+
+    const ingredientDocs = await this.ingredientModel
+      .find({ _id: { $in: ingredientIds } })
+      .lean();
+
+    return ingredientDocs.map((ingredient) =>
+      IngredientMapper.fromMongo(
+        ingredient as IngredientMongo & { created_at?: Date },
+      ),
+    );
   }
 }

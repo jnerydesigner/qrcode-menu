@@ -58,4 +58,20 @@ export class IngredientPrismaRepository implements IngredientRepository {
       IngredientMapper.toDomain(ingredient),
     );
   }
+
+  async findManyByIds(ingredientIds: string[]): Promise<IngredientEntity[]> {
+    if (ingredientIds.length === 0) {
+      return [];
+    }
+
+    const ingredients = await this.prisma.ingredient.findMany({
+      where: {
+        id: {
+          in: ingredientIds,
+        },
+      },
+    });
+
+    return ingredients.map((ingredient) => IngredientMapper.toDomain(ingredient));
+  }
 }

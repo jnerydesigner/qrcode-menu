@@ -65,8 +65,18 @@ const repositoryProviders =
           useFactory: (
             productModel: Model<Product>,
             categoryModel: Model<Category>,
-          ) => new ProductMongoRepository(productModel, categoryModel),
-          inject: [getModelToken(Product.name), getModelToken(Category.name)],
+            ingredientModel: Model<Ingredient>,
+          ) =>
+            new ProductMongoRepository(
+              productModel,
+              categoryModel,
+              ingredientModel,
+            ),
+          inject: [
+            getModelToken(Product.name),
+            getModelToken(Category.name),
+            getModelToken(Ingredient.name),
+          ],
         },
         {
           provide: INGREDIENT_REPOSITORY,

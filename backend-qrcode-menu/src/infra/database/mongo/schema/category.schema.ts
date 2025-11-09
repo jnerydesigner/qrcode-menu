@@ -2,18 +2,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Product } from './product.schema';
-
 @Schema({
   collection: 'categories',
   timestamps: { createdAt: 'created_at', updatedAt: false },
 })
 export class Category extends Document {
-  @Prop({
-    type: String,
-    default: () => new Types.UUID().toString(),
-    unique: true,
-  })
+  @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
+  declare _id: Types.ObjectId;
+
   @Prop({ required: true })
   name: string;
 
@@ -23,8 +19,11 @@ export class Category extends Document {
   @Prop()
   created_at: Date;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Product' }] })
-  products: Product[];
+  @Prop({
+    type: [{ type: Types.ObjectId, ref: 'Product' }],
+    default: [],
+  })
+  products: Types.ObjectId[];
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

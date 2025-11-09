@@ -1,11 +1,12 @@
 import { UniqueEntityId } from '@domain/value-objects/unique-entity-id.value';
 
 describe('UniqueEntityId VO', () => {
-  it('deve gerar um novo UUID quando nenhum id for passado', () => {
+  it('deve gerar um novo ObjectId quando nenhum id for passado', () => {
     const id = new UniqueEntityId();
     expect(id.value).toBeDefined();
     expect(typeof id.value).toBe('string');
-    expect(id.value).toHaveLength(36);
+    expect(id.value).toHaveLength(24);
+    expect(id.value).toMatch(/^[a-f\d]{24}$/i);
   });
 
   it('deve aceitar um id existente', () => {
