@@ -22,7 +22,10 @@ export class CategoryMongoRepository implements CategoryRepository {
   }
 
   async findAll(): Promise<CategoryEntity[]> {
-    const categories = await this.categoryModel.find().sort(createdAt).lean();
+    const categories = await this.categoryModel
+      .find()
+      .sort({ created_at: -1 })
+      .lean();
     return categories.map((category) =>
       CategoryMapper.fromMongo(
         category as CategoryMongo & { created_at?: Date },
@@ -31,7 +34,7 @@ export class CategoryMongoRepository implements CategoryRepository {
   }
   async deleteCategory(categoryId: string): Promise<void | ErrorMessage> {
     const category = await this.categoryModel
-      .findOne({ id: categoryId })
+      .findById(categoryId)
       .lean();
 
     if (!category) {
@@ -49,11 +52,11 @@ export class CategoryMongoRepository implements CategoryRepository {
       };
     }
 
-    await this.categoryModel.deleteOne({ id: categoryId });
+    await this.categoryModel.deleteOne({ _id: categoryId });
   }
   async findCategory(categoryId: string): Promise<CategoryEntity> {
     const category = await this.categoryModel
-      .findOne({ id: categoryId })
+      .findById(categoryId)
       .lean();
 
     if (!category) {
@@ -66,8 +69,8 @@ export class CategoryMongoRepository implements CategoryRepository {
   }
   async updateCategory(data: CategoryEntity): Promise<CategoryEntity> {
     const updatedCategory = await this.categoryModel
-      .findOneAndUpdate(
-        { id: data.id },
+      .findByIdAndUpdate(
+        data.id,
         {
           $set: {
             name: data.name,

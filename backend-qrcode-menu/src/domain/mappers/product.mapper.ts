@@ -1,6 +1,7 @@
 import { ProductEntity } from '@domain/entities/product.entity';
 import { Products, Prisma } from '@prisma/client';
 import { Product as ProductMongo } from '@infra/database/mongo/schema/product.schema';
+import { Types } from 'mongoose';
 
 export class ProductMapper {
   static toPersistent(product: ProductEntity): Products {
@@ -53,61 +54,120 @@ export class ProductMapper {
     );
   }
 
-  static toMongo(product: ProductEntity): Partial<ProductMongo> {
-    const productIngredients = product.productIngredient ?? [];
+  static toMongo(
+    product: ProductEntity,
+  ): Partial<ProductMongo> & { _id?: Types.ObjectId } {
+    const ingredients = product.ingredients ?? [];
+    const categoryObjectId = Types.ObjectId.isValid(product.categoryId)
+      ? new Types.ObjectId(product.categoryId)
+      : null;
 
-    return {
-      id: product.id,
-      categoryId: product.categoryId,
+    if (!categoryObjectId) {
+      throw new Error(`Invalid category identifier: ${product.categoryId}`);
+    }
+
+    const ingredientObjectIds = ingredients.map((ingredient) => {
+      if (!Types.ObjectId.isValid(ingredient.id)) {
+        throw new Error(`Invalid ingredient identifier: ${ingredient.id}`);
+      }
+
+      return new Types.ObjectId(ingredient.id);
+    });
+
+    const payload: Partial<ProductMongo> & { _id?: Types.ObjectId } = {
       name: product.name,
       description: product.description,
       image: product.image,
       price: product.price,
       slug: product.slug,
       created_at: product.createdAt,
-
-      productIngredient: productIngredients.map((ingredient: any) => ({
-        id: ingredient.id,
-        name: ingredient.name,
-        emoji: ingredient.emoji,
-        color: ingredient.color,
-        slug: ingredient.slug,
-      })),
+      category: categoryObjectId,
+      ingredients: ingredientObjectIds,
     };
+
+    if (product.id) {
+      payload._id = new Types.ObjectId(product.id);
+    }
+
+    return payload;
   }
 
   static fromMongo(
     productMongo: ProductMongo & {
       created_at?: Date;
-      category?: { name: string; slug: string };
-      productIngredient?: {
+      category?: {
+        _id?: Types.ObjectId;
+        id?: string;
+        name: string;
+        slug: string;
+      };
+      ingredients?: (
+        | {
+            _id?: Types.ObjectId;
+            id?: string;
+            name: string;
+            emoji: string;
+            color: string;
+            slug: string;
+          }
+        | Types.ObjectId
+      )[];
+    },
+  ): ProductEntity {
+    const ingredients = (productMongo.ingredients ?? [])
+      .map((ingredient) => {
+        if (
+          ingredient instanceof Types.ObjectId ||
+          ingredient === null ||
+          ingredient === undefined
+        ) {
+          return null;
+        }
+
+        return {
+          id:
+            'id' in ingredient && ingredient.id
+              ? ingredient.id
+              : ingredient._id?.toString() ?? '',
+          name: ingredient.name,
+          emoji: ingredient.emoji,
+          color: ingredient.color,
+          slug: ingredient.slug,
+        };
+      })
+      .filter((ingredient): ingredient is {
         id: string;
         name: string;
         emoji: string;
         color: string;
         slug: string;
-      }[];
-    },
-  ): ProductEntity {
-    const ingredients =
-      productMongo.productIngredient?.map((pi) => ({
-        id: pi.id,
-        name: pi.name,
-        emoji: pi.emoji,
-        color: pi.color,
-        slug: pi.slug,
-      })) ?? [];
+      } => Boolean(ingredient));
+
+    const category = productMongo.category;
+    const mappedCategory =
+      category && !(category instanceof Types.ObjectId)
+        ? {
+            name: category.name,
+            slug: category.slug,
+          }
+        : undefined;
+
+    const categoryId = category instanceof Types.ObjectId
+      ? category.toHexString()
+      : category && 'id' in category && category.id
+        ? (category as { id: string }).id
+        : (productMongo as any).categoryId ?? category?._id?.toHexString() ?? '';
 
     return new ProductEntity(
       productMongo.name,
       productMongo.description,
       productMongo.price,
       productMongo.image,
-      productMongo.categoryId,
-      productMongo.id,
+      categoryId,
+      (productMongo as any)._id?.toString?.() ?? (productMongo as any).id,
       productMongo.created_at || new Date(),
       productMongo.slug,
-      productMongo.category,
+      mappedCategory,
       ingredients,
     );
   }

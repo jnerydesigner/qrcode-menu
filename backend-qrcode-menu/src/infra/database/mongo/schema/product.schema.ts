@@ -1,18 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Category } from './category.schema';
+import { Ingredient } from './ingredient.schema';
 
 @Schema({
   collection: 'products',
   timestamps: { createdAt: 'created_at', updatedAt: false },
 })
 export class Product extends Document {
-  @Prop({
-    type: String,
-    default: () => new Types.UUID().toString(),
-    unique: true,
-  })
-  declare id: string;
+  @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
+  declare _id: Types.ObjectId;
 
   @Prop({ required: true })
   name: string;
@@ -29,34 +26,17 @@ export class Product extends Document {
   @Prop({ required: true, unique: true })
   slug: string;
 
-  @Prop({ type: String, ref: 'Category', required: true })
-  categoryId: string;
-
-  @Prop({ type: Types.ObjectId, ref: 'Category' })
-  category: Category;
+  @Prop({ type: Types.ObjectId, ref: Category.name, required: true })
+  category: Types.ObjectId | Category;
 
   @Prop()
   created_at: Date;
 
   @Prop({
-    type: [
-      {
-        id: { type: String, required: true },
-        name: { type: String, required: true },
-        emoji: { type: String, required: true },
-        color: { type: String, required: true },
-        slug: { type: String, required: true },
-      },
-    ],
+    type: [{ type: Types.ObjectId, ref: Ingredient.name }],
     default: [],
   })
-  productIngredient: {
-    id: string;
-    name: string;
-    emoji: string;
-    color: string;
-    slug: string;
-  }[];
+  ingredients: (Types.ObjectId | Ingredient)[];
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

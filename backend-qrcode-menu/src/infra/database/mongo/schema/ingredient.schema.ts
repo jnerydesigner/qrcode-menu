@@ -1,18 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { ProductIngredient } from './product-ingredient.schema';
 
 @Schema({
   collection: 'ingredients',
   timestamps: { createdAt: 'created_at', updatedAt: false },
 })
 export class Ingredient extends Document {
-  @Prop({
-    type: String,
-    default: () => new Types.UUID().toString(),
-    unique: true,
-  })
-  declare id: string;
+  @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
+  declare _id: Types.ObjectId;
 
   @Prop({ required: true })
   emoji: string;
@@ -29,8 +24,11 @@ export class Ingredient extends Document {
   @Prop()
   created_at: Date;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'ProductIngredient' }] })
-  productIngredient: ProductIngredient[];
+  @Prop({
+    type: [{ type: Types.ObjectId, ref: 'Product' }],
+    default: [],
+  })
+  products: Types.ObjectId[];
 }
 
 export const IngredientSchema = SchemaFactory.createForClass(Ingredient);

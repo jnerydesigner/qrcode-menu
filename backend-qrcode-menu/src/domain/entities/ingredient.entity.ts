@@ -22,9 +22,7 @@ export class IngredientEntity {
     this.emoji = emoji;
     this.color = color;
     this.slug =
-      slug !== undefined || slug === ''
-        ? SlugEntity.create(name).toString()
-        : slug;
+      slug && slug.length > 0 ? slug : SlugEntity.create(name).toString();
     this.createdAt = createdAt ? new Date(createdAt) : new Date();
   }
 }

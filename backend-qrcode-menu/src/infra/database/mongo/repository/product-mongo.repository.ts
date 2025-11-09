@@ -5,9 +5,32 @@ import { ExistsProductError } from '@infra/errors/exists-product.error';
 import { NotFoundProductError } from '@infra/errors/notfound.error';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Product as ProductMongo } from '../schema/product.schema';
 import { Category as CategoryMongo } from '../schema/category.schema';
+import { Ingredient as IngredientMongo } from '../schema/ingredient.schema';
+import { toObjectId } from '@infra/utils/objectid-converter.util';
+
+type PopulatedProductMongo = ProductMongo & {
+  created_at?: Date;
+  category?: {
+    _id?: Types.ObjectId;
+    id?: string;
+    name: string;
+    slug: string;
+  };
+  ingredients?: (
+    | Types.ObjectId
+    | {
+        _id?: Types.ObjectId;
+        id?: string;
+        name: string;
+        emoji: string;
+        color: string;
+        slug: string;
+      }
+  )[];
+};
 
 @Injectable()
 export class ProductMongoRepository implements ProductRepository {
@@ -16,6 +39,8 @@ export class ProductMongoRepository implements ProductRepository {
     private readonly productModel: Model<ProductMongo>,
     @InjectModel(CategoryMongo.name)
     private readonly categoryModel: Model<CategoryMongo>,
+    @InjectModel(IngredientMongo.name)
+    private readonly ingredientModel: Model<IngredientMongo>,
   ) {}
 
   async save(product: ProductEntity): Promise<ProductEntity> {
@@ -31,7 +56,32 @@ export class ProductMongoRepository implements ProductRepository {
     const created = new this.productModel(productMapper);
     const saved = await created.save();
 
-    return ProductMapper.fromMongo(saved.toObject());
+    await this.categoryModel.updateOne(
+      { _id: productMapper.category as Types.ObjectId },
+      { $addToSet: { products: saved._id } },
+    );
+
+    const ingredientIds = (productMapper.ingredients ?? []) as Types.ObjectId[];
+    if (ingredientIds.length > 0) {
+      await this.ingredientModel.updateMany(
+        { _id: { $in: ingredientIds } },
+        { $addToSet: { products: saved._id } },
+      );
+    }
+
+    const populatedProduct = await this.productModel
+      .findById(saved._id)
+      .populate('category')
+      .populate('ingredients')
+      .lean<PopulatedProductMongo>();
+
+    if (!populatedProduct) {
+      throw new NotFoundProductError(
+        `Produto salvo não encontrado após persistência.`,
+      );
+    }
+
+    return ProductMapper.fromMongo(populatedProduct);
   }
 
   async findProductBySlug(slug: string): Promise<boolean> {
@@ -40,63 +90,31 @@ export class ProductMongoRepository implements ProductRepository {
   }
 
   async findOne(productId: string): Promise<ProductEntity> {
-    const product = await this.productModel.findOne({ id: productId }).lean();
-    console.log({ product });
+    const product = await this.productModel
+      .findById(productId)
+      .populate('category')
+      .populate('ingredients')
+      .lean<PopulatedProductMongo>();
 
     if (!product) {
       throw new NotFoundProductError(`Product id ${productId} not exists`);
     }
 
-    console.log(product);
-
-    return ProductMapper.fromMongo(
-      product as unknown as ProductMongo & {
-        created_at?: Date;
-        category?: { name: string; slug: string };
-        productIngredient?: {
-          id: string;
-          name: string;
-          emoji: string;
-          color: string;
-          slug: string;
-        }[];
-      },
-    );
+    return ProductMapper.fromMongo(product);
   }
 
   async findOneSlug(slug: string): Promise<ProductEntity> {
-    const product = await this.productModel.findOne({ slug }).lean();
+    const product = await this.productModel
+      .findOne({ slug })
+      .populate('category')
+      .populate('ingredients')
+      .lean<PopulatedProductMongo>();
 
     if (!product) {
       throw new NotFoundProductError(`Product slug ${slug} not exists`);
     }
 
-    const category = await this.categoryModel
-      .findOne({ id: product.categoryId })
-      .lean();
-
-    const mappedProduct = {
-      ...product,
-      category: {
-        id: category?.id ?? '',
-        name: category?.name ?? '',
-        slug: category?.slug ?? '',
-      },
-    };
-
-    return ProductMapper.fromMongo(
-      mappedProduct as unknown as ProductMongo & {
-        created_at?: Date;
-        category?: { id: string; name: string; slug: string };
-        productIngredient?: {
-          id: string;
-          name: string;
-          emoji: string;
-          color: string;
-          slug: string;
-        }[];
-      },
-    );
+    return ProductMapper.fromMongo(product);
   }
 
   async saveMany(products: ProductEntity[]): Promise<ProductEntity[]> {
@@ -110,7 +128,32 @@ export class ProductMongoRepository implements ProductRepository {
         const created = new this.productModel(productMapper);
         const saved = await created.save();
 
-        savedProducts.push(ProductMapper.fromMongo(saved.toObject()));
+        await this.categoryModel.updateOne(
+          { _id: productMapper.category as Types.ObjectId },
+          { $addToSet: { products: saved._id } },
+        );
+
+        const ingredientIds = (productMapper.ingredients ??
+          []) as Types.ObjectId[];
+        if (ingredientIds.length > 0) {
+          await this.ingredientModel.updateMany(
+            { _id: { $in: ingredientIds } },
+            { $addToSet: { products: saved._id } },
+          );
+        }
+
+        const populatedProduct = await this.productModel
+          .findById(saved._id)
+          .populate('category')
+          .populate('ingredients')
+          .lean<PopulatedProductMongo>();
+
+        if (!populatedProduct) {
+          throw new NotFoundProductError(
+            `Produto salvo não encontrado após persistência.`,
+          );
+        }
+        savedProducts.push(ProductMapper.fromMongo(populatedProduct));
       }
     }
 
@@ -120,74 +163,94 @@ export class ProductMongoRepository implements ProductRepository {
   async findAll(): Promise<ProductEntity[]> {
     const products = await this.productModel
       .find()
-      .sort({ createdAt: -1 })
+      .sort({ created_at: -1 })
+      .populate('category')
+      .populate('ingredients')
       .lean();
 
-    const mappedProducts = await Promise.all(
-      products.map(async (product) => {
-        const category = await this.categoryModel
-          .findOne({ id: product.categoryId })
-          .lean();
-
-        return {
-          ...product,
-          category: {
-            id: category?.id ?? '',
-            name: category?.name ?? '',
-            slug: category?.slug ?? '',
-          },
-        };
-      }),
-    );
-
-    console.log({ mappedProducts });
-
-    return mappedProducts.map((product) =>
-      ProductMapper.fromMongo(
-        product as unknown as ProductMongo & {
-          created_at?: Date;
-          category?: { name: string; slug: string };
-          productIngredient?: {
-            id: string;
-            name: string;
-            emoji: string;
-            color: string;
-            slug: string;
-          }[];
-        },
-      ),
+    return products.map((product) =>
+      ProductMapper.fromMongo(product as PopulatedProductMongo),
     );
   }
 
   async updateProduct(product: ProductEntity): Promise<ProductEntity> {
     const mongoUpdateMapper = ProductMapper.toMongo(product);
+    console.log('Updating product with ID:', product.id);
+    const id = toObjectId(product.id);
 
-    // 🔍 Busca o produto atual
-    const currentProduct = await this.productModel
-      .findOne({ id: product.id })
-      .lean();
+    const currentProduct = await this.productModel.findById(id).lean();
+    console.log('Current product data:', currentProduct);
+
     if (!currentProduct) {
-      throw new NotFoundProductError(`Product id ${product.id} not exists`);
+      throw new NotFoundProductError(`Product id ${id} not exists`);
     }
 
-    // 🔄 Faz o merge entre os ingredientes atuais e os novos
-    const mergedIngredients = [
-      ...(currentProduct.productIngredient ?? []),
-      ...(mongoUpdateMapper.productIngredient ?? []),
-    ];
-
-    // 🔧 Monta o objeto atualizado
-    const updateData = {
-      ...mongoUpdateMapper,
-      productIngredient: mergedIngredients,
-    };
+    const { _id, created_at, ...updatePayload } = mongoUpdateMapper;
 
     const updatedProduct = await this.productModel
-      .findOneAndUpdate({ id: product.id }, updateData, { new: true })
-      .lean();
+      .findByIdAndUpdate(id, updatePayload, { new: true })
+      .populate('category')
+      .populate('ingredients')
+      .lean<PopulatedProductMongo>();
 
-    return ProductMapper.fromMongo(
-      updatedProduct as unknown as ProductMongo & { created_at?: Date },
+    if (!updatedProduct) {
+      throw new NotFoundProductError(`Product id ${id} not exists`);
+    }
+
+    const currentCategoryId =
+      (currentProduct.category as Types.ObjectId)?.toHexString?.() ??
+      (currentProduct as any).categoryId ??
+      '';
+    const nextCategoryId = product.categoryId;
+
+    if (currentCategoryId && currentCategoryId !== nextCategoryId) {
+      await this.categoryModel.updateOne(
+        { _id: new Types.ObjectId(currentCategoryId) },
+        { $pull: { products: new Types.ObjectId(product.id) } },
+      );
+    }
+
+    await this.categoryModel.updateOne(
+      { _id: new Types.ObjectId(nextCategoryId) },
+      { $addToSet: { products: new Types.ObjectId(product.id) } },
     );
+
+    const currentIngredientIds = (currentProduct.ingredients ?? []).map((id) =>
+      id instanceof Types.ObjectId
+        ? id.toHexString()
+        : (id?.toString?.() ?? ''),
+    );
+    const nextIngredientIds = (
+      (updatePayload.ingredients ?? []) as Types.ObjectId[]
+    ).map((id) => id.toHexString());
+
+    const ingredientIdsToRemove = currentIngredientIds.filter(
+      (id) => id && !nextIngredientIds.includes(id),
+    );
+    const ingredientIdsToAdd = nextIngredientIds.filter(
+      (id) => id && !currentIngredientIds.includes(id),
+    );
+
+    if (ingredientIdsToRemove.length > 0) {
+      await this.ingredientModel.updateMany(
+        {
+          _id: {
+            $in: ingredientIdsToRemove.map((id) => new Types.ObjectId(id)),
+          },
+        },
+        { $pull: { products: new Types.ObjectId(product.id) } },
+      );
+    }
+
+    if (ingredientIdsToAdd.length > 0) {
+      await this.ingredientModel.updateMany(
+        {
+          _id: { $in: ingredientIdsToAdd.map((id) => new Types.ObjectId(id)) },
+        },
+        { $addToSet: { products: new Types.ObjectId(product.id) } },
+      );
+    }
+
+    return ProductMapper.fromMongo(updatedProduct);
   }
 }
