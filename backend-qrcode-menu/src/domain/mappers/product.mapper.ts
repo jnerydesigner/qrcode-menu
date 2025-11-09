@@ -95,7 +95,12 @@ export class ProductMapper {
   static fromMongo(
     productMongo: ProductMongo & {
       created_at?: Date;
-      category?: { _id?: Types.ObjectId; name: string; slug: string };
+      category?: {
+        _id?: Types.ObjectId;
+        id?: string;
+        name: string;
+        slug: string;
+      };
       ingredients?: (
         | {
             _id?: Types.ObjectId;

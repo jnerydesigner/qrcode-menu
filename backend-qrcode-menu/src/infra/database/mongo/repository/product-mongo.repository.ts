@@ -10,6 +10,27 @@ import { Product as ProductMongo } from '../schema/product.schema';
 import { Category as CategoryMongo } from '../schema/category.schema';
 import { Ingredient as IngredientMongo } from '../schema/ingredient.schema';
 
+type PopulatedProductMongo = ProductMongo & {
+  created_at?: Date;
+  category?: {
+    _id?: Types.ObjectId;
+    id?: string;
+    name: string;
+    slug: string;
+  };
+  ingredients?: (
+    | Types.ObjectId
+    | {
+        _id?: Types.ObjectId;
+        id?: string;
+        name: string;
+        emoji: string;
+        color: string;
+        slug: string;
+      }
+  )[];
+};
+
 @Injectable()
 export class ProductMongoRepository implements ProductRepository {
   constructor(
@@ -51,11 +72,9 @@ export class ProductMongoRepository implements ProductRepository {
       .findById(saved._id)
       .populate('category')
       .populate('ingredients')
-      .lean();
+      .lean<PopulatedProductMongo>();
 
-    return ProductMapper.fromMongo(
-      populatedProduct as unknown as ProductMongo & { created_at?: Date },
-    );
+    return ProductMapper.fromMongo(populatedProduct);
   }
 
   async findProductBySlug(slug: string): Promise<boolean> {
@@ -68,18 +87,13 @@ export class ProductMongoRepository implements ProductRepository {
       .findById(productId)
       .populate('category')
       .populate('ingredients')
-      .lean();
+      .lean<PopulatedProductMongo>();
 
     if (!product) {
       throw new NotFoundProductError(`Product id ${productId} not exists`);
     }
 
-    return ProductMapper.fromMongo(
-      product as unknown as ProductMongo & {
-        created_at?: Date;
-        category?: { name: string; slug: string };
-      },
-    );
+    return ProductMapper.fromMongo(product);
   }
 
   async findOneSlug(slug: string): Promise<ProductEntity> {
@@ -87,18 +101,13 @@ export class ProductMongoRepository implements ProductRepository {
       .findOne({ slug })
       .populate('category')
       .populate('ingredients')
-      .lean();
+      .lean<PopulatedProductMongo>();
 
     if (!product) {
       throw new NotFoundProductError(`Product slug ${slug} not exists`);
     }
 
-    return ProductMapper.fromMongo(
-      product as unknown as ProductMongo & {
-        created_at?: Date;
-        category?: { name: string; slug: string };
-      },
-    );
+    return ProductMapper.fromMongo(product);
   }
 
   async saveMany(products: ProductEntity[]): Promise<ProductEntity[]> {
@@ -129,13 +138,9 @@ export class ProductMongoRepository implements ProductRepository {
           .findById(saved._id)
           .populate('category')
           .populate('ingredients')
-          .lean();
+          .lean<PopulatedProductMongo>();
 
-        savedProducts.push(
-          ProductMapper.fromMongo(
-            populatedProduct as unknown as ProductMongo & { created_at?: Date },
-          ),
-        );
+        savedProducts.push(ProductMapper.fromMongo(populatedProduct));
       }
     }
 
@@ -151,12 +156,7 @@ export class ProductMongoRepository implements ProductRepository {
       .lean();
 
     return products.map((product) =>
-      ProductMapper.fromMongo(
-        product as unknown as ProductMongo & {
-          created_at?: Date;
-          category?: { name: string; slug: string };
-        },
-      ),
+      ProductMapper.fromMongo(product as PopulatedProductMongo),
     );
   }
 
@@ -177,7 +177,7 @@ export class ProductMongoRepository implements ProductRepository {
       .findByIdAndUpdate(product.id, updatePayload, { new: true })
       .populate('category')
       .populate('ingredients')
-      .lean();
+      .lean<PopulatedProductMongo>();
 
     if (!updatedProduct) {
       throw new NotFoundProductError(`Product id ${product.id} not exists`);
@@ -234,8 +234,6 @@ export class ProductMongoRepository implements ProductRepository {
       );
     }
 
-    return ProductMapper.fromMongo(
-      updatedProduct as unknown as ProductMongo & { created_at?: Date },
-    );
+    return ProductMapper.fromMongo(updatedProduct);
   }
 }
