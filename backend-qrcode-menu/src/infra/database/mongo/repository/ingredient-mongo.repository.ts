@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Ingredient as IngredientMongo } from '../schema/ingredient.schema';
+import { toObjectId } from '@infra/utils/objectid-converter.util';
 
 @Injectable()
 export class IngredientMongoRepository implements IngredientRepository {
@@ -64,9 +65,9 @@ export class IngredientMongoRepository implements IngredientRepository {
   }
 
   async findId(ingredientId: string): Promise<IngredientEntity> {
-    const ingredientDoc = await this.ingredientModel
-      .findById(ingredientId)
-      .lean();
+    const id = toObjectId(ingredientId);
+    console.log('Finding ingredient with ID:', id);
+    const ingredientDoc = await this.ingredientModel.findById(id).lean();
 
     if (!ingredientDoc) {
       throw new Error(`Ingredient with ID ${ingredientId} not found`);
