@@ -1,13 +1,14 @@
 "use client";
 
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import React from "react";
+import { useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createCategory } from "@/api/categories";
+import { createCategory, updateCategory } from "@/api/categories";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { CategoryType } from "@/types/category.type";
 
 export const categorySchema = z.object({
   name: z
@@ -18,7 +19,15 @@ export const categorySchema = z.object({
 
 export type CategoryFormData = z.infer<typeof categorySchema>;
 
-export default function FormCategory() {
+interface FormCategoryProps {
+  selectedCategory: CategoryType | null;
+  onClearSelection: () => void;
+}
+
+export default function FormCategory({
+  selectedCategory,
+  onClearSelection,
+}: FormCategoryProps) {
   const queryClient = useQueryClient();
   const {
     register,
@@ -29,7 +38,15 @@ export default function FormCategory() {
     resolver: zodResolver(categorySchema),
   });
 
-  const mutation = useMutation({
+  useEffect(() => {
+    if (selectedCategory) {
+      reset({ name: selectedCategory.name });
+    } else {
+      reset({ name: "" });
+    }
+  }, [selectedCategory, reset]);
+
+  const createMutation = useMutation({
     mutationFn: createCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
@@ -37,9 +54,38 @@ export default function FormCategory() {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({
+      categoryId,
+      data,
+    }: {
+      categoryId: string;
+      data: CategoryFormData;
+    }) => updateCategory(categoryId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      onClearSelection();
+      reset();
+    },
+  });
+
   const onSubmit = (data: CategoryFormData) => {
-    mutation.mutate(data);
+    if (selectedCategory) {
+      updateMutation.mutate({ categoryId: selectedCategory.id, data });
+      return;
+    }
+
+    createMutation.mutate(data);
   };
+
+  const isPending = createMutation.isPending || updateMutation.isPending;
+  const buttonLabel = selectedCategory
+    ? updateMutation.isPending
+      ? "Atualizando..."
+      : "Atualizar"
+    : createMutation.isPending
+    ? "Salvando..."
+    : "Adicionar";
 
   return (
     <form
@@ -60,10 +106,10 @@ export default function FormCategory() {
 
       <Button
         type="submit"
-        disabled={mutation.isPending}
+        disabled={isPending}
         className="bg-pink-500 text-white hover:bg-pink-600 disabled:bg-gray-400 cursor-pointer"
       >
-        {mutation.isPending ? "Salvando..." : "Adicionar"}
+        {buttonLabel}
       </Button>
     </form>
   );
