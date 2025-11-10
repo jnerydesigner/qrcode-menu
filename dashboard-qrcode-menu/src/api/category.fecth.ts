@@ -9,3 +9,10 @@ export const findAllCategory = async () => {
 
   return data;
 };
+
+export const createCategory = async (name: string, description: string) => {
+  const response = await api.post("/categories", { name, description });
+  const data: CategoryType = response.data;
+
+  return data;
+};
