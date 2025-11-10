@@ -33,8 +33,16 @@ import {
 import type { CategoryType } from "@/types/category.type";
 import { useQuery } from "@tanstack/react-query";
 import { findAllIngredients } from "@/api/ingredient.fetch";
+import { findAllProducts } from "@/api/products.fetch";
 
 export const columns: ColumnDef<CategoryType>[] = [
+  {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => (
+      <div className="text-xs text-muted-foreground">{row.getValue("id")}</div>
+    ),
+  },
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -51,11 +59,11 @@ export const columns: ColumnDef<CategoryType>[] = [
     ),
   },
   {
-    accessorKey: "emoji",
-    header: "Emoji",
+    accessorKey: "price",
+    header: "Preço",
     cell: ({ row }) => (
       <div className="text-muted-foreground lowercase">
-        {row.getValue("emoji")}
+        {row.getValue("price")}
       </div>
     ),
   },
@@ -64,13 +72,13 @@ export const columns: ColumnDef<CategoryType>[] = [
     header: "Slug",
     cell: ({ row }) => (
       <div className="text-xs text-muted-foreground">
-        {row.getValue("slug")}
+        {row.getValue("name")}
       </div>
     ),
   },
 ];
 
-export const TableIngredients = () => {
+export const TableProducts = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -80,8 +88,8 @@ export const TableIngredients = () => {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["ingredients"],
-    queryFn: async () => await findAllIngredients(),
+    queryKey: ["products"],
+    queryFn: async () => await findAllProducts(),
   });
 
   // ⚠️ Hook useReactTable também precisa vir antes de qualquer return

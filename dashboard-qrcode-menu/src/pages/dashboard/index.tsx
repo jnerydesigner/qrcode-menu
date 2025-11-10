@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import { AppSidebar, type DashboardSection } from "@/components/app-sidebar";
 import { TableCategory } from "@/components/table-categories";
-import { TableProducts } from "@/components/table-generics";
+import { TableProducts } from "@/components/table-products";
 import { TableIngredients } from "@/components/table-ingredients";
 import {
   Breadcrumb,
@@ -20,9 +20,8 @@ import {
 } from "@/components/ui/sidebar";
 
 export default function Dashboard() {
-  const [activeSection, setActiveSection] = useState<DashboardSection>(
-    "products",
-  );
+  const [activeSection, setActiveSection] =
+    useState<DashboardSection>("products");
 
   const breadcrumbLabel = useMemo(() => {
     switch (activeSection) {
@@ -52,9 +51,7 @@ export default function Dashboard() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Dashboard
-                  </BreadcrumbLink>
+                  <BreadcrumbLink href="#">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>

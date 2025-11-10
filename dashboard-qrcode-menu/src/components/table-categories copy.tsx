@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/table";
 import type { CategoryType } from "@/types/category.type";
 import { useQuery } from "@tanstack/react-query";
-import { findAllIngredients } from "@/api/ingredient.fetch";
+import { findAllCategory } from "@/api/category.fecth";
 
 export const columns: ColumnDef<CategoryType>[] = [
   {
@@ -51,26 +51,24 @@ export const columns: ColumnDef<CategoryType>[] = [
     ),
   },
   {
-    accessorKey: "emoji",
-    header: "Emoji",
-    cell: ({ row }) => (
-      <div className="text-muted-foreground lowercase">
-        {row.getValue("emoji")}
-      </div>
-    ),
-  },
-  {
     accessorKey: "slug",
     header: "Slug",
     cell: ({ row }) => (
-      <div className="text-xs text-muted-foreground">
+      <div className="text-muted-foreground lowercase">
         {row.getValue("slug")}
       </div>
     ),
   },
+  {
+    accessorKey: "id",
+    header: "ID",
+    cell: ({ row }) => (
+      <div className="text-xs text-muted-foreground">{row.getValue("id")}</div>
+    ),
+  },
 ];
 
-export const TableIngredients = () => {
+export const TableCategory = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -80,8 +78,8 @@ export const TableIngredients = () => {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["ingredients"],
-    queryFn: async () => await findAllIngredients(),
+    queryKey: ["categories"],
+    queryFn: async () => await findAllCategory(),
   });
 
   // ⚠️ Hook useReactTable também precisa vir antes de qualquer return
