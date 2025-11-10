@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 "use client";
 
 import * as React from "react";
@@ -24,8 +25,8 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useNavigate, useLocation } from "react-router"; // ✅ novo import
 
-// This is sample data.
 export type DashboardSection = "products" | "categories" | "ingredients";
 
 const data = {
@@ -88,15 +89,25 @@ const data = {
 };
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  activeSection: DashboardSection;
-  onSelectSection: (section: DashboardSection) => void;
+  activeSection: "products" | "categories" | "ingredients";
+  onSelectSection: (section: "products" | "categories" | "ingredients") => void;
 }
 
-export function AppSidebar({
-  activeSection,
-  onSelectSection,
-  ...props
-}: AppSidebarProps) {
+export function AppSidebar({ ...props }: AppSidebarProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const activeSection = React.useMemo(() => {
+    const path = location.pathname.replace("/", "");
+    return ["products", "categories", "ingredients"].includes(path)
+      ? (path as DashboardSection)
+      : "products";
+  }, [location.pathname]);
+
+  function handleNavigate(section: DashboardSection) {
+    navigate(`/${section}`);
+  }
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -106,7 +117,7 @@ export function AppSidebar({
         <NavMain
           items={data.navMain}
           activeValue={activeSection}
-          onSelect={(value) => onSelectSection(value as DashboardSection)}
+          onSelect={(value) => handleNavigate(value as DashboardSection)}
         />
         <NavProjects projects={data.projects} />
       </SidebarContent>

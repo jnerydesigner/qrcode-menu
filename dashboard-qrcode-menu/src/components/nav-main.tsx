@@ -1,4 +1,4 @@
-import { type LucideIcon } from "lucide-react"
+import { type LucideIcon } from "lucide-react";
 
 import {
   SidebarGroup,
@@ -6,19 +6,19 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 type NavMainItem = {
-  title: string
-  value: string
-  icon?: LucideIcon
-}
+  title: string;
+  value: string;
+  icon?: LucideIcon;
+};
 
 type NavMainProps = {
-  items: NavMainItem[]
-  activeValue?: string
-  onSelect?: (value: string) => void
-}
+  items: NavMainItem[];
+  activeValue?: string;
+  onSelect?: (value: string) => void;
+};
 
 export function NavMain({ items, activeValue, onSelect }: NavMainProps) {
   return (
@@ -31,6 +31,7 @@ export function NavMain({ items, activeValue, onSelect }: NavMainProps) {
               isActive={item.value === activeValue}
               onClick={() => onSelect?.(item.value)}
               tooltip={item.title}
+              className="cursor-pointer"
             >
               {item.icon && <item.icon />}
               <span>{item.title}</span>
@@ -39,5 +40,5 @@ export function NavMain({ items, activeValue, onSelect }: NavMainProps) {
         ))}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

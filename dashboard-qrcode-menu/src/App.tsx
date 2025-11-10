@@ -1,7 +1,5 @@
-import Dashboard from "./pages/dashboard";
+import { Outlet } from "react-router";
 
-function App() {
-  return <Dashboard />;
+export default function App() {
+  return <Outlet />;
 }
-
-export default App;
