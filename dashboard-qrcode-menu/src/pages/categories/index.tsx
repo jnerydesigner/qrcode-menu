@@ -72,14 +72,13 @@ export default function Categories() {
             className="grid gap-4 md:grid-cols-2"
           >
             <FormField
-              control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nome</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Bebidas"
+                      placeholder="Insira o nome da categoria"
                       autoComplete="off"
                       {...field}
                     />
@@ -88,8 +87,8 @@ export default function Categories() {
                 </FormItem>
               )}
             />
+
             <FormField
-              control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
@@ -105,24 +104,33 @@ export default function Categories() {
                 </FormItem>
               )}
             />
+
             <div className="md:col-span-2 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
               <div className="flex-1 text-sm text-muted-foreground">
                 Campos marcados são obrigatórios.
               </div>
-              <Button type="submit" disabled={createCategoryMutation.isPending}>
-                {createCategoryMutation.isPending ? "Salvando..." : "Salvar categoria"}
+              <Button
+                className="cursor-pointer"
+                type="submit"
+                disabled={createCategoryMutation.isPending}
+              >
+                {createCategoryMutation.isPending
+                  ? "Salvando..."
+                  : "Salvar categoria"}
               </Button>
             </div>
-            {createCategoryMutation.isError ? (
+
+            {createCategoryMutation.isError && (
               <p className="md:col-span-2 text-sm text-destructive">
                 Não foi possível criar a categoria. Tente novamente.
               </p>
-            ) : null}
-            {createCategoryMutation.isSuccess ? (
+            )}
+
+            {createCategoryMutation.isSuccess && (
               <p className="md:col-span-2 text-sm text-emerald-600">
                 Categoria criada com sucesso!
               </p>
-            ) : null}
+            )}
           </form>
         </Form>
       </div>
