@@ -6,8 +6,34 @@ import { ColumnDef } from "@tanstack/react-table";
 
 export const getColumnsCategory = (
   onEdit: (categoryId: string, data: { name: string }) => void,
-  onDelete: (id: string) => void
+  onDelete: (id: string) => void,
+  onSelect: (category: CategoryType) => void,
+  selectedCategoryId: string | null
 ): ColumnDef<CategoryType>[] => [
+  {
+    id: "select",
+    header: () => <div className="text-center w-full">Selecionar</div>,
+    cell: ({ row }) => {
+      const category = row.original;
+      return (
+        <div className="flex justify-center">
+          <input
+            type="radio"
+            name="categorySelect"
+            value={category.id}
+            checked={selectedCategoryId === category.id}
+            onChange={(event) => {
+              if (event.target.checked) {
+                onSelect(category);
+              }
+            }}
+            className="cursor-pointer"
+            aria-label={`Selecionar categoria ${category.name}`}
+          />
+        </div>
+      );
+    },
+  },
   {
     accessorKey: "name",
     header: () => <div className="text-center w-full">Nome</div>,

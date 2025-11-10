@@ -10,10 +10,19 @@ import { getColumnsCategory } from "@/app/dashboard/category/columns";
 import { DataTable } from "@/app/dashboard/category/data-table";
 import { CategoryType } from "@/types/category.type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import React from "react";
 import { toast } from "sonner";
 
-export default function TableCategories() {
+interface TableCategoriesProps {
+  onSelectCategory: (category: CategoryType) => void;
+  selectedCategoryId: string | null;
+  onClearSelection: () => void;
+}
+
+export default function TableCategories({
+  onSelectCategory,
+  selectedCategoryId,
+  onClearSelection,
+}: TableCategoriesProps) {
   const queryClient = useQueryClient();
   const {
     data,
@@ -26,7 +35,10 @@ export default function TableCategories() {
 
   const deleteMutation = useMutation({
     mutationFn: deleteCategory,
-    onSuccess: () => {
+    onSuccess: (_, deletedId) => {
+      if (selectedCategoryId === deletedId) {
+        onClearSelection();
+      }
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: (error: any) => {
@@ -68,7 +80,12 @@ export default function TableCategories() {
 
   return (
     <DataTable
-      columns={getColumnsCategory(handleEdit, handleDelete)}
+      columns={getColumnsCategory(
+        handleEdit,
+        handleDelete,
+        onSelectCategory,
+        selectedCategoryId
+      )}
       data={data ?? []}
     />
   );
