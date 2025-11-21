@@ -1,11 +1,20 @@
 ### 🧠 Atualizar produto (adicionar ingrediente)
-PATCH http://localhost:3399/products/6910c8887042b03fc68ba3cd
+PATCH http://localhost:3399/products/69207eff268022f685a56d76
 Content-Type: application/json
 
 {
   "productIngredient": [
     {
-      "ingredientId": "6910c8517042b03fc68ba390"
+      "ingredientId": "69173979d287ffec071f2935",
+    },
+    {
+      "ingredientId": "69173979d287ffec071f2936",
+    },
+     {
+      "ingredientId": "69173979d287ffec071f2937",
+    },
+     {
+      "ingredientId": "69173979d287ffec071f293a",
     }
   ]
 }

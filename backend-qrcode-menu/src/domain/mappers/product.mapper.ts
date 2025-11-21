@@ -126,6 +126,8 @@ export class ProductMapper {
         } => ingredient !== null,
       );
 
+      console.log("From Mongo Mapper", JSON.stringify(ingredients))
+
     // Categoria (populate ou ObjectId)
     const category = productMongo.category;
     const c = productMongo.company as any;
@@ -137,6 +139,8 @@ export class ProductMapper {
       c.slug,
       c.image,
     );
+
+    console.log("From Mongo Mapper", JSON.stringify(companyEntity))
     const mappedCategory =
       category && !(category instanceof Types.ObjectId)
         ? {

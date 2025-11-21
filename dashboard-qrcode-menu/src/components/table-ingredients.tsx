@@ -30,11 +30,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { CategoryType } from "@/types/category.type";
+import type { IngredientType } from "@/types/ingredients.type";
 import { useQuery } from "@tanstack/react-query";
 import { findAllIngredients } from "@/api/ingredient.fetch";
 
-export const columns: ColumnDef<CategoryType>[] = [
+export const columns: ColumnDef<IngredientType>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -172,7 +172,12 @@ export const TableIngredients = () => {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => alert(row.original.id)}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(

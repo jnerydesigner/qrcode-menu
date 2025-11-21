@@ -41,7 +41,6 @@ export class ProductController {
   @ApiOperation({ summary: 'Cria um novo produto' })
   @ApiBody({ type: CreateProductRequest })
   createProduct(@Body() product: CreateProductInput) {
-    console.log('Create product', product);
     return this.createProductUseCase.execute(product);
   }
 
@@ -62,6 +61,9 @@ export class ProductController {
     @Param('productId') productId: string,
     @Body() updateProductBody: UpdateProductInput,
   ) {
+
+     console.log('Create product',productId);
+     console.log('Create product',updateProductBody);
     return this.updateProductsUseCase.execute(productId, updateProductBody);
   }
 

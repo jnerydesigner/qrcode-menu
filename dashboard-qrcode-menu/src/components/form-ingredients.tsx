@@ -13,6 +13,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { toast } from "sonner";
+import type { IngredientType } from "@/types/ingredients.type";
 
 const ingredientSchema = z.object({
   name: z.string().min(1, "Informe o nome do ingrediente."),
@@ -41,7 +43,15 @@ export const FormIngredients = () => {
       const response = await api.post("/ingredients", values);
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (ingredientCreated: IngredientType) => {
+      toast(
+        <div className="flex flex-col">
+          <strong>Ingrediente criado!</strong>
+          <span>
+            {`${ingredientCreated.name} - ${ingredientCreated.emoji}`}
+          </span>
+        </div>
+      );
       form.reset({
         name: "",
         emoji: "",

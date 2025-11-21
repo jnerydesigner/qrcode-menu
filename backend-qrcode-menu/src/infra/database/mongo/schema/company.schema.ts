@@ -6,12 +6,8 @@ import { Document, Types } from 'mongoose';
   timestamps: { createdAt: 'created_at', updatedAt: false },
 })
 export class Company extends Document {
-  @Prop({
-    type: String,
-    default: () => new Types.UUID().toString(),
-    unique: true,
-  })
-  declare id: string;
+  @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
+  declare _id: Types.ObjectId;
 
   @Prop({ required: true })
   name: string;

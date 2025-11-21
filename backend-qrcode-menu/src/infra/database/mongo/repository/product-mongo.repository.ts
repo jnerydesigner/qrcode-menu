@@ -184,11 +184,14 @@ export class ProductMongoRepository implements ProductRepository {
       .populate('ingredients')
       .lean();
 
+  console.log('find all', products)
+
     const productsMapper = products.map((product) =>
       ProductMapper.fromMongo(product as PopulatedProductMongo),
     );
 
     this.logger.log(productsMapper);
+    console.log('find all', productsMapper)
 
     return productsMapper;
   }
