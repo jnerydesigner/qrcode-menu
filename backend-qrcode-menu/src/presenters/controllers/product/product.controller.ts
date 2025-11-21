@@ -1,5 +1,6 @@
 import { CreateProductRequest } from '@application/dtos/create-product.request';
 import { UpdateProductIngredientRequest } from '@application/dtos/update-product-ingredient.request';
+import { S3UploadService } from '@application/services/s3-upload.service';
 import { CreateManyProductUseCase } from '@application/use-case/product/create-many-product.usecase';
 import {
   type CreateProductInput,
@@ -9,6 +10,7 @@ import { FindAllProductUseCase } from '@application/use-case/product/find-all-pr
 import { FindOneProductUseCase } from '@application/use-case/product/find-one-products.usecase';
 import { FindOneSlugProductUseCase } from '@application/use-case/product/find-one-slug.usecase';
 import { RemoveIngredientProductUseCase } from '@application/use-case/product/remove-ingredient-product.usecase';
+import { UpdateImageProductUseCase } from '@application/use-case/product/update-image.use-case';
 import {
   type UpdateProductInput,
   UpdateProductUseCase,
@@ -21,7 +23,10 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('products')
@@ -35,7 +40,9 @@ export class ProductController {
     private readonly findAllProductsUseCase: FindAllProductUseCase,
     private readonly updateProductsUseCase: UpdateProductUseCase,
     private readonly removeIngredientProductsUseCase: RemoveIngredientProductUseCase,
-  ) {}
+    private readonly uploadService: S3UploadService,
+    private readonly updateImageProductUseCase: UpdateImageProductUseCase,
+  ) { }
 
   @Post()
   @ApiOperation({ summary: 'Cria um novo produto' })
@@ -62,8 +69,8 @@ export class ProductController {
     @Body() updateProductBody: UpdateProductInput,
   ) {
 
-     console.log('Create product',productId);
-     console.log('Create product',updateProductBody);
+    console.log('Create product', productId);
+    console.log('Create product', updateProductBody);
     return this.updateProductsUseCase.execute(productId, updateProductBody);
   }
 
@@ -86,5 +93,11 @@ export class ProductController {
       productId,
       ingredientId,
     );
+  }
+
+  @Patch('/upload/:productId')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile(@UploadedFile() file: Express.Multer.File, @Param('productId') productId: string) {
+    return this.updateImageProductUseCase.execute(productId, file);
   }
 }

@@ -1,14 +1,42 @@
-import { findOneProduct } from "@/api/products.fetch";
+import { findOneProduct, updateProductImage } from "@/api/products.fetch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Edit } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Edit, Upload, Loader2, CloudUpload } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "sonner";
+import { useState } from "react";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+const imageUploadSchema = z.object({
+    file: z
+        .instanceof(FileList)
+        .refine((files) => files.length > 0, "Por favor, selecione uma imagem.")
+        .refine(
+            (files) => files[0]?.size <= MAX_FILE_SIZE,
+            "A imagem deve ter no máximo 5MB."
+        )
+        .refine(
+            (files) => ACCEPTED_IMAGE_TYPES.includes(files[0]?.type),
+            "Apenas arquivos .jpg, .jpeg, .png e .webp são aceitos."
+        ),
+});
+
+type ImageUploadFormData = z.infer<typeof imageUploadSchema>;
 
 export default function ProductPage() {
     const { productId } = useParams();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const [isUploadMode, setIsUploadMode] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const {
         data: product,
@@ -20,6 +48,42 @@ export default function ProductPage() {
         enabled: !!productId,
         staleTime: 1000 * 60 * 5, // 5 minutes
     });
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+    } = useForm<ImageUploadFormData>({
+        resolver: zodResolver(imageUploadSchema),
+    });
+
+    const uploadMutation = useMutation({
+        mutationFn: ({ productId, file }: { productId: string; file: File }) =>
+            updateProductImage(productId, file),
+        onSuccess: () => {
+            toast.success("Imagem atualizada com sucesso!");
+            queryClient.invalidateQueries({ queryKey: ["product", productId] });
+            reset();
+            setSelectedFile(null);
+            setIsUploadMode(false);
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || "Erro ao atualizar imagem.");
+        },
+    });
+
+    const onSubmit = (data: ImageUploadFormData) => {
+        if (!productId || !selectedFile) return;
+        uploadMutation.mutate({ productId, file: selectedFile });
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+        }
+    };
 
     if (isLoading) {
         return <div>Carregando...</div>;
@@ -63,14 +127,80 @@ export default function ProductPage() {
                         </div>
                     )}
                 </div>
-                <Button
-                    variant="outline"
-                    className="cursor-pointer"
-                    onClick={() => alert(`Editar imagem do produto: ${product.id}`)}
-                >
-                    <Edit className="mr-2 h-4 w-4" />
-                    Alterar Imagem
-                </Button>
+
+                {!isUploadMode ? (
+                    <Button
+                        variant="outline"
+                        className="cursor-pointer"
+                        onClick={() => setIsUploadMode(true)}
+                    >
+                        <Edit className="mr-2 h-4 w-4" />
+                        Alterar Imagem
+                    </Button>
+                ) : (
+                    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-2xl">
+                        <div className="flex justify-center items-center gap-3">
+                            <Label
+                                htmlFor="file"
+                                className="flex items-center gap-2 px-4 py-2 border border-input rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
+                            >
+                                <input
+                                    id="file"
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                                    {...register("file")}
+                                    onChange={(e) => {
+                                        register("file").onChange(e);
+                                        handleFileChange(e);
+                                    }}
+                                    disabled={uploadMutation.isPending}
+                                    className="hidden"
+                                />
+                                <CloudUpload className="h-5 w-5" />
+                                <span className="text-sm font-medium">
+                                    {selectedFile ? selectedFile.name : "Escolher arquivo"}
+                                </span>
+                            </Label>
+
+                            <Button
+                                type="submit"
+                                disabled={uploadMutation.isPending || !selectedFile}
+                                className="cursor-pointer"
+                            >
+                                {uploadMutation.isPending ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Enviando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Upload className="mr-2 h-4 w-4" />
+                                        Enviar
+                                    </>
+                                )}
+                            </Button>
+
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                    setIsUploadMode(false);
+                                    setSelectedFile(null);
+                                    reset();
+                                }}
+                                disabled={uploadMutation.isPending}
+                                className="cursor-pointer"
+                            >
+                                Cancelar
+                            </Button>
+                        </div>
+                        {errors.file && (
+                            <p className="text-sm text-red-500 mt-2">
+                                {errors.file.message?.toString()}
+                            </p>
+                        )}
+                    </form>
+                )}
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">

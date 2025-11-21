@@ -9,6 +9,7 @@ import { ProductModule } from './product.module';
 import { IngredientModule } from './ingredient.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SeedModule } from './seed.module';
+import { UploadModule } from './upload.module';
 
 @Module({
   imports: [
@@ -31,8 +32,9 @@ import { SeedModule } from './seed.module';
     ProductModule,
     IngredientModule,
     SeedModule,
+    UploadModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -12,6 +12,8 @@ export interface ProductRepository {
     productId: string,
     ingredientId: string,
   ): Promise<ProductEntity>;
+
+  updateImage(productId: string, image: string): Promise<ProductEntity>;
 }
 
 export const PRODUCT_REPOSITORY = Symbol('PRODUCT_REPOSITORY');

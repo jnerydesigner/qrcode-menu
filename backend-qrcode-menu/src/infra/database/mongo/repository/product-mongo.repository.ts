@@ -318,4 +318,24 @@ export class ProductMongoRepository implements ProductRepository {
 
     return ProductMapper.fromMongo(updatedProduct);
   }
+
+  async updateImage(productId: string, image: string): Promise<ProductEntity> {
+    const updatedProduct = await this.productModel
+      .findByIdAndUpdate(
+        toObjectId(productId),
+        { $set: { image } },
+        { new: true },
+      )
+      .populate('category')
+      .populate('ingredients')
+      .lean<PopulatedProductMongo>();
+
+    if (!updatedProduct) {
+      throw new NotFoundProductError(
+        `Produto com ID ${productId} não encontrado para atualização de imagem.`,
+      );
+    }
+
+    return ProductMapper.fromMongo(updatedProduct);
+  }
 }

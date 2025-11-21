@@ -23,3 +23,17 @@ export const findOneProduct = async (productId: string) => {
 
   return data;
 };
+
+export const updateProductImage = async (productId: string, file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await api.patch(`/products/upload/${productId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  const data: ProductType = response.data;
+  return data;
+};
