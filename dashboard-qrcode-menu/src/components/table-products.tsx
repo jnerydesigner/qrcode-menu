@@ -30,12 +30,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { CategoryType } from "@/types/category.type";
+import type { ProductType } from "@/types/product.type";
 import { useQuery } from "@tanstack/react-query";
-import { findAllIngredients } from "@/api/ingredient.fetch";
 import { findAllProducts } from "@/api/products.fetch";
 
-export const columns: ColumnDef<CategoryType>[] = [
+export const columns: ColumnDef<ProductType>[] = [
   {
     accessorKey: "id",
     header: "ID",
@@ -78,6 +77,8 @@ export const columns: ColumnDef<CategoryType>[] = [
   },
 ];
 
+import { useNavigate } from "react-router";
+
 export const TableProducts = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -86,6 +87,7 @@ export const TableProducts = () => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const navigate = useNavigate();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["products"],
@@ -169,9 +171,9 @@ export const TableProducts = () => {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -180,7 +182,14 @@ export const TableProducts = () => {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    navigate(`/products/${row.original.id}`);
+                  }}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(

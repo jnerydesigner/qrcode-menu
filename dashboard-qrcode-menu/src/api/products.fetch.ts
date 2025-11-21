@@ -16,3 +16,10 @@ export const createProduct = async (product: CreateProductType) => {
 
   return data;
 };
+
+export const findOneProduct = async (productId: string) => {
+  const response = await api.get(`/products/${productId}`);
+  const data: ProductType = response.data;
+
+  return data;
+};

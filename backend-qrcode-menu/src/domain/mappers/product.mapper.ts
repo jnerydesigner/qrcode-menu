@@ -54,22 +54,22 @@ export class ProductMapper {
     productMongo: ProductMongo & {
       created_at?: Date;
       category?:
-        | {
-            _id?: Types.ObjectId;
-            id?: string;
-            name: string;
-            slug: string;
-          }
-        | Types.ObjectId;
+      | {
+        _id?: Types.ObjectId;
+        id?: string;
+        name: string;
+        slug: string;
+      }
+      | Types.ObjectId;
       ingredients?: (
         | {
-            _id?: Types.ObjectId;
-            id?: string;
-            name: string;
-            emoji: string;
-            color: string;
-            slug: string;
-          }
+          _id?: Types.ObjectId;
+          id?: string;
+          name: string;
+          emoji: string;
+          color: string;
+          slug: string;
+        }
         | Types.ObjectId
         | null
         | undefined
@@ -82,13 +82,13 @@ export class ProductMapper {
         (
           ingredient:
             | {
-                _id?: Types.ObjectId;
-                id?: string;
-                name: string;
-                emoji: string;
-                color: string;
-                slug: string;
-              }
+              _id?: Types.ObjectId;
+              id?: string;
+              name: string;
+              emoji: string;
+              color: string;
+              slug: string;
+            }
             | Types.ObjectId
             | null
             | undefined,
@@ -126,9 +126,6 @@ export class ProductMapper {
         } => ingredient !== null,
       );
 
-      console.log("From Mongo Mapper", JSON.stringify(ingredients))
-
-    // Categoria (populate ou ObjectId)
     const category = productMongo.category;
     const c = productMongo.company as any;
 
@@ -140,13 +137,14 @@ export class ProductMapper {
       c.image,
     );
 
-    console.log("From Mongo Mapper", JSON.stringify(companyEntity))
+
+
     const mappedCategory =
       category && !(category instanceof Types.ObjectId)
         ? {
-            name: category.name,
-            slug: category.slug,
-          }
+          name: category.name,
+          slug: category.slug,
+        }
         : undefined;
 
     // ID da categoria (String)
@@ -164,7 +162,7 @@ export class ProductMapper {
       (productMongo.company as any)?.id ??
       productMongo.company?.toString?.();
 
-    console.log('Company Mapper', companyEntity);
+    console.log("From Mongo Mapper: Company", companyEntity);
     // Cria a entidade de domínio
     return new ProductEntity(
       productMongo.name,

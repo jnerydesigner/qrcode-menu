@@ -22,13 +22,13 @@ type PopulatedProductMongo = ProductMongo & {
   ingredients?: (
     | Types.ObjectId
     | {
-        _id?: Types.ObjectId;
-        id?: string;
-        name: string;
-        emoji: string;
-        color: string;
-        slug: string;
-      }
+      _id?: Types.ObjectId;
+      id?: string;
+      name: string;
+      emoji: string;
+      color: string;
+      slug: string;
+    }
   )[];
 };
 
@@ -42,11 +42,10 @@ export class ProductMongoRepository implements ProductRepository {
     private readonly categoryModel: Model<CategoryMongo>,
     @InjectModel(IngredientMongo.name)
     private readonly ingredientModel: Model<IngredientMongo>,
-  ) {}
+  ) { }
 
   async save(product: ProductEntity): Promise<ProductEntity> {
     const exists = await this.productModel.exists({ slug: product.slug });
-    console.log(exists);
 
     if (exists) {
       throw new ExistsProductError(
@@ -99,9 +98,20 @@ export class ProductMongoRepository implements ProductRepository {
     const prodId = toObjectId(productId);
     const product = await this.productModel
       .findById(prodId)
-      .populate('category')
+      .populate({
+        path: 'category',
+        select: 'name slug created_at',
+        options: { virtuals: false },
+      })
+      .populate({
+        path: 'company',
+        select: 'name slug created_at',
+        options: { virtuals: false },
+      })
       .populate('ingredients')
       .lean<PopulatedProductMongo>();
+
+    console.log('Product found One:', product);
 
     if (!product) {
       throw new NotFoundProductError(`Product id ${prodId} not exists`);
@@ -113,10 +123,20 @@ export class ProductMongoRepository implements ProductRepository {
   async findOneSlug(slug: string): Promise<ProductEntity> {
     const product = await this.productModel
       .findOne({ slug })
-      .populate('category')
+      .populate({
+        path: 'category',
+        select: 'name slug created_at',
+        options: { virtuals: false },
+      })
+      .populate({
+        path: 'company',
+        select: 'name slug created_at',
+        options: { virtuals: false },
+      })
       .populate('ingredients')
       .lean<PopulatedProductMongo>();
 
+    console.log('Product found One:', product);
     if (!product) {
       throw new NotFoundProductError(`Product slug ${slug} not exists`);
     }
@@ -184,7 +204,7 @@ export class ProductMongoRepository implements ProductRepository {
       .populate('ingredients')
       .lean();
 
-  console.log('find all', products)
+    console.log('find all', products)
 
     const productsMapper = products.map((product) =>
       ProductMapper.fromMongo(product as PopulatedProductMongo),

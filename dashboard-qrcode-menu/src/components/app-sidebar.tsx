@@ -3,19 +3,15 @@
 
 import * as React from "react";
 import {
-  AudioWaveform,
-  Command,
-  Frame,
+
   GalleryVerticalEnd,
-  Map,
-  PieChart,
   Tags,
   Utensils,
   Wheat,
+  House
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
@@ -25,9 +21,9 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { useNavigate, useLocation } from "react-router"; // ✅ novo import
+import { useNavigate, useLocation } from "react-router";
 
-export type DashboardSection = "products" | "categories" | "ingredients";
+export type DashboardSection = "/" | "products" | "categories" | "ingredients";
 
 const data = {
   user: {
@@ -40,19 +36,14 @@ const data = {
       name: "Cervejaria Devassa",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
+    }
   ],
   navMain: [
+    {
+      title: "Home",
+      value: "/" satisfies DashboardSection,
+      icon: House,
+    },
     {
       title: "Lista de produtos",
       value: "products" satisfies DashboardSection,
@@ -68,29 +59,12 @@ const data = {
       value: "ingredients" satisfies DashboardSection,
       icon: Wheat,
     },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
+  ]
 };
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  activeSection: "products" | "categories" | "ingredients";
-  onSelectSection: (section: "products" | "categories" | "ingredients") => void;
+  activeSection: "/" | "products" | "categories" | "ingredients";
+  onSelectSection: (section: "/" | "products" | "categories" | "ingredients") => void;
 }
 
 export function AppSidebar({ ...props }: AppSidebarProps) {
@@ -99,12 +73,16 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
 
   const activeSection = React.useMemo(() => {
     const path = location.pathname.replace("/", "");
-    return ["products", "categories", "ingredients"].includes(path)
+    return ["/", "products", "categories", "ingredients"].includes(path)
       ? (path as DashboardSection)
       : "products";
   }, [location.pathname]);
 
   function handleNavigate(section: DashboardSection) {
+    if (section === "/") {
+      navigate("/");
+      return;
+    }
     navigate(`/${section}`);
   }
 
@@ -119,7 +97,6 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
           activeValue={activeSection}
           onSelect={(value) => handleNavigate(value as DashboardSection)}
         />
-        <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
