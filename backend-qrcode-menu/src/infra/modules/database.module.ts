@@ -1,12 +1,7 @@
-import { PrismaService } from '@application/services/prisma.service';
 import { CATEGORY_REPOSITORY } from '@domain/repositories/category.repository';
 import { COMPANY_REPOSITORY } from '@domain/repositories/company.repository';
 import { INGREDIENT_REPOSITORY } from '@domain/repositories/ingredient.repository';
 import { PRODUCT_REPOSITORY } from '@domain/repositories/product.repository';
-import { CategoryPrismaRepository } from '@infra/database/prisma/repository/category-prisma.repository';
-import { CompanyPrismaRepository } from '@infra/database/prisma/repository/company-prisma.repository';
-import { IngredientPrismaRepository } from '@infra/database/prisma/repository/ingredient-prisma.repository';
-import { ProductPrismaRepository } from '@infra/database/prisma/repository/product-prisma.repository';
 import { CategoryMongoRepository } from '@infra/database/mongo/repository/category-mongo.repository';
 import { CompanyMongoRepository } from '@infra/database/mongo/repository/company-mongo.repository';
 import { IngredientMongoRepository } from '@infra/database/mongo/repository/ingredient-mongo.repository';
@@ -31,95 +26,61 @@ import { Global, Module } from '@nestjs/common';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-const databaseProvider = process.env.DATABASE_PROVIDER ?? 'prisma';
+const mongooseFeatureModules = [
+  MongooseModule.forFeature([
+    { name: Category.name, schema: CategorySchema },
+    { name: Company.name, schema: CompanySchema },
+    { name: Ingredient.name, schema: IngredientSchema },
+    { name: Product.name, schema: ProductSchema },
+  ]),
+];
 
-const mongooseFeatureModules =
-  databaseProvider === 'mongo'
-    ? [
-        MongooseModule.forFeature([
-          { name: Category.name, schema: CategorySchema },
-          { name: Company.name, schema: CompanySchema },
-          { name: Ingredient.name, schema: IngredientSchema },
-          { name: Product.name, schema: ProductSchema },
-        ]),
-      ]
-    : [];
-
-const repositoryProviders =
-  databaseProvider === 'mongo'
-    ? [
-        {
-          provide: COMPANY_REPOSITORY,
-          useFactory: (companyModel: Model<Company>) =>
-            new CompanyMongoRepository(companyModel),
-          inject: [getModelToken(Company.name)],
-        },
-        {
-          provide: CATEGORY_REPOSITORY,
-          useFactory: (
-            categoryModel: Model<Category>,
-            productModel: Model<Product>,
-          ) => new CategoryMongoRepository(categoryModel, productModel),
-          inject: [getModelToken(Category.name)],
-        },
-        {
-          provide: PRODUCT_REPOSITORY,
-          useFactory: (
-            productModel: Model<Product>,
-            categoryModel: Model<Category>,
-            ingredientModel: Model<Ingredient>,
-          ) =>
-            new ProductMongoRepository(
-              productModel,
-              categoryModel,
-              ingredientModel,
-            ),
-          inject: [
-            getModelToken(Product.name),
-            getModelToken(Category.name),
-            getModelToken(Ingredient.name),
-          ],
-        },
-        {
-          provide: INGREDIENT_REPOSITORY,
-          useFactory: (ingredientModel: Model<Ingredient>) =>
-            new IngredientMongoRepository(ingredientModel),
-          inject: [getModelToken(Ingredient.name)],
-        },
-      ]
-    : [
-        {
-          provide: COMPANY_REPOSITORY,
-          useFactory: (prisma: PrismaService) =>
-            new CompanyPrismaRepository(prisma),
-          inject: [PrismaService],
-        },
-        {
-          provide: CATEGORY_REPOSITORY,
-          useFactory: (prisma: PrismaService) =>
-            new CategoryPrismaRepository(prisma),
-          inject: [PrismaService],
-        },
-        {
-          provide: PRODUCT_REPOSITORY,
-          useFactory: (prisma: PrismaService) =>
-            new ProductPrismaRepository(prisma),
-          inject: [PrismaService],
-        },
-        {
-          provide: INGREDIENT_REPOSITORY,
-          useFactory: (prisma: PrismaService) =>
-            new IngredientPrismaRepository(prisma),
-          inject: [PrismaService],
-        },
-      ];
+const repositoryProviders = [
+  {
+    provide: COMPANY_REPOSITORY,
+    useFactory: (companyModel: Model<Company>) =>
+      new CompanyMongoRepository(companyModel),
+    inject: [getModelToken(Company.name)],
+  },
+  {
+    provide: CATEGORY_REPOSITORY,
+    useFactory: (
+      categoryModel: Model<Category>,
+      productModel: Model<Product>,
+    ) => new CategoryMongoRepository(categoryModel, productModel),
+    inject: [getModelToken(Category.name)],
+  },
+  {
+    provide: PRODUCT_REPOSITORY,
+    useFactory: (
+      productModel: Model<Product>,
+      categoryModel: Model<Category>,
+      ingredientModel: Model<Ingredient>,
+    ) =>
+      new ProductMongoRepository(
+        productModel,
+        categoryModel,
+        ingredientModel,
+      ),
+    inject: [
+      getModelToken(Product.name),
+      getModelToken(Category.name),
+      getModelToken(Ingredient.name),
+    ],
+  },
+  {
+    provide: INGREDIENT_REPOSITORY,
+    useFactory: (ingredientModel: Model<Ingredient>) =>
+      new IngredientMongoRepository(ingredientModel),
+    inject: [getModelToken(Ingredient.name)],
+  },
+];
 
 @Global()
 @Module({
   imports: [...mongooseFeatureModules],
-  providers: [PrismaService, ...repositoryProviders],
+  providers: [...repositoryProviders],
   exports: [
-    PrismaService,
     COMPANY_REPOSITORY,
     CATEGORY_REPOSITORY,
     PRODUCT_REPOSITORY,
