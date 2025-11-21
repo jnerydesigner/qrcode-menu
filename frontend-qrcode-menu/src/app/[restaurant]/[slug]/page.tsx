@@ -72,7 +72,7 @@ export default async function FoodDetails({ params }: { params: tParams }) {
             Ingredientes
           </h3>
           <div className="grid grid-cols-5 gap-4 justify-items-center">
-            {productFetch.productIngredient.map((ingredient, index) => (
+            {productFetch.ingredients.map((ingredient, index) => (
               <div
                 key={ingredient.id}
                 className="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-md hover:shadow-lg transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 cursor-pointer animate-slide-up"

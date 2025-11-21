@@ -28,6 +28,7 @@ export class CompanyMapper {
       id: company.id,
       name: company.name,
       slug,
+      image: '',
     };
   }
 

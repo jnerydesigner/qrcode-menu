@@ -7,6 +7,12 @@ import { NotFoundProductError } from '@infra/errors/notfound.error';
 
 export class ProductPrismaRepository implements ProductRepository {
   constructor(private readonly prisma: PrismaService) {}
+  removeIngredient(
+    productId: string,
+    ingredientId: string,
+  ): Promise<ProductEntity> {
+    throw new Error('Method not implemented.');
+  }
   updateProduct(product: ProductEntity): Promise<ProductEntity> {
     throw new Error('Method not implemented.');
   }

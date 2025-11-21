@@ -5,6 +5,7 @@ import { Product } from "@/types/product.type";
 export default async function Home() {
   const dataProducts = await fetch("http://localhost:3399/products");
   const products: Product[] = await dataProducts.json();
+  console.log("Products:", products);
 
   const dataCategories = await fetch("http://localhost:3399/categories");
   const categories: CategoryType[] = await dataCategories.json();

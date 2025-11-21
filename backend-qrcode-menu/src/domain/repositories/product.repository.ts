@@ -8,6 +8,10 @@ export interface ProductRepository {
   saveMany(products: ProductEntity[]): Promise<ProductEntity[]>;
   findAll(): Promise<ProductEntity[]>;
   updateProduct(product: ProductEntity): Promise<ProductEntity>;
+  removeIngredient(
+    productId: string,
+    ingredientId: string,
+  ): Promise<ProductEntity>;
 }
 
 export const PRODUCT_REPOSITORY = Symbol('PRODUCT_REPOSITORY');

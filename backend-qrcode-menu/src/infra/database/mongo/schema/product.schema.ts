@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Category } from './category.schema';
 import { Ingredient } from './ingredient.schema';
+import { Company } from './company.schema';
 
 @Schema({
   collection: 'products',
@@ -10,6 +11,9 @@ import { Ingredient } from './ingredient.schema';
 export class Product extends Document {
   @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
   declare _id: Types.ObjectId;
+
+  @Prop({ type: String, required: true, unique: true })
+  declare id: string;
 
   @Prop({ required: true })
   name: string;
@@ -34,6 +38,9 @@ export class Product extends Document {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: Ingredient.name }], default: [] })
   ingredients: Types.ObjectId[];
+
+  @Prop({ type: Types.ObjectId, ref: Company.name, required: true })
+  company: Types.ObjectId | Company;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

@@ -6,12 +6,16 @@ import { Category as CategoryMongo } from '../schema/category.schema';
 import { Model } from 'mongoose';
 import { CategoryMapper } from '@domain/mappers/category.mapper';
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Product as ProductMongo } from '../schema/product.schema';
 
 @Injectable()
 export class CategoryMongoRepository implements CategoryRepository {
   constructor(
     @InjectModel(CategoryMongo.name)
     private readonly categoryModel: Model<CategoryMongo>,
+
+    @InjectModel(ProductMongo.name)
+    private readonly productModel: Model<ProductMongo>,
   ) {}
 
   async create(data: CategoryEntity): Promise<any> {
@@ -33,17 +37,14 @@ export class CategoryMongoRepository implements CategoryRepository {
     );
   }
   async deleteCategory(categoryId: string): Promise<void | ErrorMessage> {
-    const category = await this.categoryModel
-      .findById(categoryId)
-      .lean();
+    const category = await this.categoryModel.findById(categoryId).lean();
 
     if (!category) {
       throw new NotFoundException('Category Not Exists');
     }
-
-    const hasProducts = Array.isArray(category.products)
-      ? category.products.length > 0
-      : false;
+    const hasProducts = await this.productModel.exists({
+      category: categoryId,
+    });
 
     if (hasProducts) {
       return {
@@ -55,9 +56,7 @@ export class CategoryMongoRepository implements CategoryRepository {
     await this.categoryModel.deleteOne({ _id: categoryId });
   }
   async findCategory(categoryId: string): Promise<CategoryEntity> {
-    const category = await this.categoryModel
-      .findById(categoryId)
-      .lean();
+    const category = await this.categoryModel.findById(categoryId).lean();
 
     if (!category) {
       throw new NotFoundException('Category Not Exists');

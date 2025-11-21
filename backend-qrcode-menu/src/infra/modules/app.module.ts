@@ -8,6 +8,7 @@ import { CategoryModule } from './category.module';
 import { ProductModule } from './product.module';
 import { IngredientModule } from './ingredient.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { SeedModule } from './seed.module';
 
 const databaseProvider = process.env.DATABASE_PROVIDER ?? 'prisma';
 const mongooseImports =
@@ -37,6 +38,7 @@ const mongooseImports =
     ProductModule,
     IngredientModule,
     ...mongooseImports,
+    SeedModule,
   ],
   controllers: [AppController],
   providers: [AppService],

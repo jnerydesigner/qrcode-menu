@@ -2,16 +2,17 @@ import {
   PRODUCT_REPOSITORY,
   type ProductRepository,
 } from '@domain/repositories/product.repository';
-import { Inject } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 
 export class FindAllProductUseCase {
+  private logger = new Logger('FindAllProductUseCase');
   constructor(
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
   ) {}
   async execute() {
     const products = await this.productRepository.findAll();
-    console.log(products[0].category);
+    this.logger.log(products);
     return products;
   }
 }

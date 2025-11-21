@@ -5,6 +5,8 @@ import * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
 import {
   Controller,
+  type ControllerFieldState,
+  type ControllerRenderProps,
   type FieldPath,
   type FieldValues,
   FormProvider,
@@ -21,10 +23,8 @@ interface FormFieldProps<
 > {
   name: TName;
   render: (props: {
-    field: ReturnType<typeof useFormContext<TFieldValues>>["register"];
-    fieldState: ReturnType<
-      typeof useFormContext<TFieldValues>
-    >["formState"]["errors"][TName];
+    field: ControllerRenderProps<TFieldValues, TName>;
+    fieldState: ControllerFieldState;
   }) => React.ReactNode;
 }
 

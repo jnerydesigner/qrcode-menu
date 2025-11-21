@@ -16,11 +16,13 @@ export class CreateManyProductUseCase {
         product.name,
         product.description,
         product.price,
-        product.image,
-        product.categoryId,
-        null,
-        null,
         '',
+        product.categoryId,
+        '',
+        null,
+        product.company,
+        null,
+        [],
       );
     });
 
@@ -34,4 +36,5 @@ export type CreateProductInput = {
   price: number;
   image: string;
   categoryId: string;
+  company: string;
 };

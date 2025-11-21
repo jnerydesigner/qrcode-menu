@@ -13,3 +13,10 @@ export interface ProductType {
   category: CategoryType;
   ingredients: IngredientType[];
 }
+
+export interface CreateProductType {
+  name: string;
+  description: string;
+  price: number;
+  categoryId: string;
+}

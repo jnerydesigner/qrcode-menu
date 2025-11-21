@@ -1,7 +1,16 @@
-import { FormCategories } from "@/components/form-caregories";
+import { FormCategories } from "@/components/form-categories";
 import { TableCategory } from "@/components/table-categories";
+import type { CategoryType } from "@/types/category.type";
+import { useState } from "react";
 
 export default function Categories() {
+  const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(
+    null
+  );
+
+  const handleSelectCategory = (category: CategoryType | null) => {
+    setSelectedCategory(category);
+  };
   return (
     <section className="space-y-6">
       <div>
@@ -19,9 +28,12 @@ export default function Categories() {
             Informe os dados abaixo para criar uma nova categoria.
           </p>
         </div>
-        <FormCategories />
+        <FormCategories
+          selectedCategory={selectedCategory}
+          onClearSelection={() => setSelectedCategory(null)}
+        />
       </div>
-      <TableCategory />
+      <TableCategory onSelectCategory={handleSelectCategory} />
     </section>
   );
 }

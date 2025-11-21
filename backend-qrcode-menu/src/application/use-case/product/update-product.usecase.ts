@@ -56,11 +56,12 @@ export class UpdateProductUseCase {
       updateProductInput.price ?? product.price,
       updateProductInput.image ?? product.image,
       updateProductInput.categoryId ?? product.categoryId,
-      product.id,
-      product.createdAt,
       product.slug,
+      product.createdAt,
+      product.company,
       product.category,
       productIngredientMany,
+      product.id ?? '',
     );
 
     // Atualiza no repositório

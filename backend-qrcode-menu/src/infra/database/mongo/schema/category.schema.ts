@@ -18,12 +18,15 @@ export class Category extends Document {
 
   @Prop()
   created_at: Date;
-
-  @Prop({
-    type: [{ type: Types.ObjectId, ref: 'Product' }],
-    default: [],
-  })
-  products: Types.ObjectId[];
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
+
+CategorySchema.virtual('products', {
+  ref: 'Product',
+  localField: '_id',
+  foreignField: 'category',
+});
+
+CategorySchema.set('toJSON', { virtuals: false });
+CategorySchema.set('toObject', { virtuals: false });

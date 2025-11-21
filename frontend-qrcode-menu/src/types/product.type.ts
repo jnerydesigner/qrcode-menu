@@ -8,7 +8,7 @@ export interface Product {
   categoryId: string;
   createdAt: string;
   category: Category;
-  productIngredient: ProductIngredient[];
+  ingredients: ProductIngredient[];
 }
 
 export interface ProductIngredient {

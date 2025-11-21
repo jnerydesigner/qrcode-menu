@@ -15,12 +15,16 @@ export class CreateProductUseCase {
       createProductInput.name,
       createProductInput.description,
       createProductInput.price,
-      createProductInput.image,
-      createProductInput.categoryId,
-      null,
-      null,
       '',
+      createProductInput.categoryId,
+      '',
+      null,
+      createProductInput.company,
+      null,
+      [],
     );
+
+    console.log('Product Entity', productEntity);
 
     return this.productRepository.save(productEntity);
   }
@@ -32,4 +36,5 @@ export type CreateProductInput = {
   price: number;
   image: string;
   categoryId: string;
+  company: string;
 };

@@ -56,8 +56,10 @@ const repositoryProviders =
         },
         {
           provide: CATEGORY_REPOSITORY,
-          useFactory: (categoryModel: Model<Category>) =>
-            new CategoryMongoRepository(categoryModel),
+          useFactory: (
+            categoryModel: Model<Category>,
+            productModel: Model<Product>,
+          ) => new CategoryMongoRepository(categoryModel, productModel),
           inject: [getModelToken(Category.name)],
         },
         {

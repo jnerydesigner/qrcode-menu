@@ -1,15 +1,17 @@
+/* eslint-disable @typescript-eslint/no-base-to-string */
 import { ProductEntity } from '@domain/entities/product.entity';
 import { Products, Prisma } from '@prisma/client';
 import { Product as ProductMongo } from '@infra/database/mongo/schema/product.schema';
 import { Types } from 'mongoose';
+import { Company } from '@domain/entities/company.entity';
 
 export class ProductMapper {
   static toPersistent(product: ProductEntity): Products {
     return {
-      id: product.id,
-      categoryId: product.categoryId,
       name: product.name,
+      id: product.id ?? '',
       description: product.description,
+      categoryId: product.categoryId,
       image: product.image,
       price: new Prisma.Decimal(product.price),
       slug: product.slug,
@@ -40,17 +42,23 @@ export class ProductMapper {
         slug: pi.ingredient.slug,
       })) ?? [];
 
+    const category = {
+      name: '',
+      slug: '',
+    };
+
     return new ProductEntity(
       product.name,
       product.description,
       product.price.toNumber(),
       product.image,
       product.categoryId,
-      product.id,
-      product.createdAt,
       product.slug,
-      product.category,
+      product.createdAt,
+      '',
+      category,
       ingredients,
+      product.id,
     );
   }
 
@@ -74,13 +82,20 @@ export class ProductMapper {
       return new Types.ObjectId(ingredient.id);
     });
 
+    const companyObjectId =
+      product.company && Types.ObjectId.isValid(product.company)
+        ? new Types.ObjectId(product.company)
+        : undefined;
+
     const payload: Partial<ProductMongo> & { _id?: Types.ObjectId } = {
+      id: product.id,
       name: product.name,
       description: product.description,
       image: product.image,
       price: product.price,
       slug: product.slug,
       created_at: product.createdAt,
+      company: companyObjectId,
       category: categoryObjectId,
       ingredients: ingredientObjectIds,
     };
@@ -170,6 +185,15 @@ export class ProductMapper {
 
     // Categoria (populate ou ObjectId)
     const category = productMongo.category;
+    const c = productMongo.company as any;
+
+    const companyEntity = new Company(
+      c.name,
+      c.id ?? c._id?.toString() ?? null,
+      c.created_at,
+      c.slug,
+      c.image,
+    );
     const mappedCategory =
       category && !(category instanceof Types.ObjectId)
         ? {
@@ -188,6 +212,12 @@ export class ProductMapper {
             category?._id?.toHexString() ??
             '');
 
+    const companyId =
+      (productMongo.company as any)?._id?.toString?.() ??
+      (productMongo.company as any)?.id ??
+      productMongo.company?.toString?.();
+
+    console.log('Company Mapper', companyEntity);
     // Cria a entidade de domínio
     return new ProductEntity(
       productMongo.name,
@@ -195,11 +225,14 @@ export class ProductMapper {
       productMongo.price,
       productMongo.image,
       categoryId,
-      (productMongo as any)._id?.toString?.() ?? (productMongo as any).id,
-      productMongo.created_at || new Date(),
       productMongo.slug,
+      productMongo.created_at || new Date(),
+      companyId,
       mappedCategory,
       ingredients,
+      (productMongo as any)._id?.toString?.() ?? (productMongo as any).id,
+
+      companyEntity,
     );
   }
 }

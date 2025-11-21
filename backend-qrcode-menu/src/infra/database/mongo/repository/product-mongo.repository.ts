@@ -3,7 +3,7 @@ import { ProductMapper } from '@domain/mappers/product.mapper';
 import { ProductRepository } from '@domain/repositories/product.repository';
 import { ExistsProductError } from '@infra/errors/exists-product.error';
 import { NotFoundProductError } from '@infra/errors/notfound.error';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Product as ProductMongo } from '../schema/product.schema';
@@ -34,6 +34,7 @@ type PopulatedProductMongo = ProductMongo & {
 
 @Injectable()
 export class ProductMongoRepository implements ProductRepository {
+  private logger = new Logger('ProductMongoRepository');
   constructor(
     @InjectModel(ProductMongo.name)
     private readonly productModel: Model<ProductMongo>,
@@ -45,6 +46,7 @@ export class ProductMongoRepository implements ProductRepository {
 
   async save(product: ProductEntity): Promise<ProductEntity> {
     const exists = await this.productModel.exists({ slug: product.slug });
+    console.log(exists);
 
     if (exists) {
       throw new ExistsProductError(
@@ -53,8 +55,12 @@ export class ProductMongoRepository implements ProductRepository {
     }
 
     const productMapper = ProductMapper.toMongo(product);
+
+    console.log('Product Mapper', productMapper);
     const created = new this.productModel(productMapper);
     const saved = await created.save();
+
+    console.log('Saved Product:', saved);
 
     await this.categoryModel.updateOne(
       { _id: productMapper.category as Types.ObjectId },
@@ -165,16 +171,33 @@ export class ProductMongoRepository implements ProductRepository {
     const products = await this.productModel
       .find()
       .sort({ created_at: -1 })
-      .populate('category')
+      .populate({
+        path: 'category',
+        select: 'name slug created_at',
+        options: { virtuals: false },
+      })
+      .populate({
+        path: 'company',
+        select: 'name slug created_at',
+        options: { virtuals: false },
+      })
       .populate('ingredients')
       .lean();
 
-    return products.map((product) =>
+    const productsMapper = products.map((product) =>
       ProductMapper.fromMongo(product as PopulatedProductMongo),
     );
+
+    this.logger.log(productsMapper);
+
+    return productsMapper;
   }
 
   async updateProduct(product: ProductEntity): Promise<ProductEntity> {
+    if (!product.id) {
+      throw new NotFoundException('Id não existe');
+    }
+
     const productResponseMongo = await this.productModel.findById(
       toObjectId(product.id),
     );
@@ -248,5 +271,28 @@ export class ProductMongoRepository implements ProductRepository {
     }
 
     return ProductMapper.fromMongo(updated);
+  }
+
+  async removeIngredient(
+    productId: string,
+    ingredientId: string,
+  ): Promise<ProductEntity> {
+    const updatedProduct = await this.productModel
+      .findByIdAndUpdate(
+        toObjectId(productId),
+        { $pull: { ingredients: toObjectId(ingredientId) } },
+        { new: true },
+      )
+      .lean();
+
+    if (!updatedProduct) {
+      throw new NotFoundProductError(
+        `Produto com ID ${productId} não encontrado para remoção de ingrediente.`,
+      );
+    }
+
+    console.log(`✅ Ingrediente ${ingredientId} removido com sucesso.`);
+
+    return ProductMapper.fromMongo(updatedProduct);
   }
 }

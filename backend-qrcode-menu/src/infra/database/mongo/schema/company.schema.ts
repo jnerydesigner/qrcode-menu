@@ -19,8 +19,17 @@ export class Company extends Document {
   @Prop({ required: true, unique: true })
   slug: string;
 
+  @Prop({ required: false })
+  image: string;
+
   @Prop()
   created_at: Date;
+
+  @Prop({
+    type: [{ type: Types.ObjectId, ref: 'Product' }],
+    default: [],
+  })
+  products: Types.ObjectId[];
 }
 
 export const CompanySchema = SchemaFactory.createForClass(Company);
