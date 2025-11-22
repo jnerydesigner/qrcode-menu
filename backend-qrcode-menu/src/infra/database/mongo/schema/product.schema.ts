@@ -3,6 +3,7 @@ import { Document, Types } from 'mongoose';
 import { Category } from './category.schema';
 import { Ingredient } from './ingredient.schema';
 import { Company } from './company.schema';
+import { ProductImage } from './product_image.schema';
 
 @Schema({
   collection: 'products',
@@ -11,9 +12,6 @@ import { Company } from './company.schema';
 export class Product extends Document {
   @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
   declare _id: Types.ObjectId;
-
-  // Field 'id' was removed. This comment forces a reload.
-
 
   @Prop({ required: true })
   name: string;
@@ -41,6 +39,9 @@ export class Product extends Document {
 
   @Prop({ type: Types.ObjectId, ref: Company.name, required: true })
   company: Types.ObjectId | Company;
+
+  @Prop({ type: Types.ObjectId, ref: ProductImage.name, default: [] })
+  images: Types.ObjectId[];
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
