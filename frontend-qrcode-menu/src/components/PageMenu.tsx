@@ -58,7 +58,7 @@ export const PageMenu = ({
               >
                 <div className="relative w-40 h-full flex-shrink-0">
                   <Image
-                    src={`/${product.image}`}
+                    src={`${product.image}`}
                     alt={product.name}
                     fill
                     className="object-cover"

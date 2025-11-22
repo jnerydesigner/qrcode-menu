@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "img.freepik.com",
       },
+      {
+        protocol: "https",
+        hostname: "qr-code-menu-seligadev.s3.us-east-1.amazonaws.com",
+      }
     ],
   },
 };

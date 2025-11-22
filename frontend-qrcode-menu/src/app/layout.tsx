@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-white min-h-screen text-gray-800">
         <ReactQueryProvider>
-          <main className="min-h-screen">{children}</main>
+          <main className="min-h-screen bg-red-200">{children}</main>
         </ReactQueryProvider>
         <Toaster position="top-center" />
       </body>
