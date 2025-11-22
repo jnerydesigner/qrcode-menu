@@ -37,3 +37,13 @@ export const updateProductImage = async (productId: string, file: File) => {
   const data: ProductType = response.data;
   return data;
 };
+
+export const updateProduct = async (
+  productId: string,
+  product: Partial<CreateProductType> & { productIngredient?: { ingredientId: string }[] }
+) => {
+  const response = await api.patch(`/products/${productId}`, product);
+  const data: ProductType = response.data;
+
+  return data;
+};

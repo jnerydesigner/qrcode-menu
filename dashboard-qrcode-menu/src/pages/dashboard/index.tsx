@@ -21,24 +21,28 @@ export default function Dashboard() {
   const location = useLocation();
 
   const currentPath =
-    location.pathname.split("/").filter(Boolean).pop() ?? "products";
+    location.pathname.split("/").filter(Boolean).pop() ?? "home"; // Changed default to "home"
 
   const breadcrumbLabel = useMemo(() => {
     switch (currentPath) {
+      case "home":
+        return "Tela Inicial";
+      case "products":
+        return "Lista de produtos";
       case "categories":
         return "Lista de categorias";
       case "ingredients":
         return "Lista de ingredientes";
       default:
-        return "Lista de produtos";
+        return "Tela Inicial";
     }
   }, [currentPath]);
 
   return (
     <SidebarProvider>
       <AppSidebar
-        activeSection={currentPath as "products" | "categories" | "ingredients"}
-        onSelectSection={() => {}}
+        activeSection={(currentPath === "home" ? "/" : currentPath) as "/" | "products" | "categories" | "ingredients"}
+        onSelectSection={() => { }}
       />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
@@ -51,7 +55,7 @@ export default function Dashboard() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">Dashboard</BreadcrumbLink>
+                  <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>

@@ -1,6 +1,6 @@
 import Categories from "@/pages/categories";
 import Dashboard from "@/pages/dashboard";
-import Home from "@/pages/home";
+import DashboardHome from "@/pages/dashboard/home";
 import Ingredients from "@/pages/ingredients";
 import Products from "@/pages/products";
 import ProductPage from "@/pages/products/[productId]";
@@ -11,7 +11,7 @@ export const router = createBrowserRouter([
     path: "/",
     element: <Dashboard />,
     children: [
-      { index: true, element: <Home /> },
+      { index: true, element: <DashboardHome /> },
       { path: "products", element: <Products /> },
       { path: "products/:productId", element: <ProductPage /> },
       { path: "categories", element: <Categories /> },

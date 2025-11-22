@@ -1,4 +1,5 @@
 import { findOneProduct, updateProductImage } from "@/api/products.fetch";
+import { ProductIngredientsSheet } from "@/components/product-ingredients-sheet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -128,6 +129,8 @@ export default function ProductPage() {
                     )}
                 </div>
 
+
+
                 {!isUploadMode ? (
                     <Button
                         variant="outline"
@@ -245,7 +248,13 @@ export default function ProductPage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Ingredientes</CardTitle>
+                        <CardTitle className="text-center">Ingredientes</CardTitle>
+                        <ProductIngredientsSheet product={product}>
+                            <Button variant="outline" className="cursor-pointer">
+                                <Edit className="mr-2 h-4 w-4" />
+                                Gerenciar Ingredientes
+                            </Button>
+                        </ProductIngredientsSheet>
                     </CardHeader>
                     <CardContent>
                         <div className="flex flex-wrap gap-2">
