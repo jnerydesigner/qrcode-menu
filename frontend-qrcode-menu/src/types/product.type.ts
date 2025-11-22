@@ -25,6 +25,7 @@ export interface Category {
   slug: string;
 }
 
+
 export interface Company {
   id: string;
   name: string;
@@ -32,5 +33,6 @@ export interface Company {
   createdAt: string;
   image: string;
 }
+
 
 

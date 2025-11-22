@@ -38,9 +38,9 @@ const mongooseFeatureModules = [
 const repositoryProviders = [
   {
     provide: COMPANY_REPOSITORY,
-    useFactory: (companyModel: Model<Company>) =>
-      new CompanyMongoRepository(companyModel),
-    inject: [getModelToken(Company.name)],
+    useFactory: (companyModel: Model<Company>, productModel: Model<Product>) =>
+      new CompanyMongoRepository(companyModel, productModel),
+    inject: [getModelToken(Company.name), getModelToken(Product.name)],
   },
   {
     provide: CATEGORY_REPOSITORY,
@@ -87,4 +87,4 @@ const repositoryProviders = [
     INGREDIENT_REPOSITORY,
   ],
 })
-export class DatabaseModule {}
+export class DatabaseModule { }

@@ -4,7 +4,8 @@ import {
   CreateCompanyUseCase,
 } from '@application/use-case/company/create-company.usecase';
 import { FindAllCompanyUseCase } from '@application/use-case/company/find-all-company.usecase';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { FindCompanyBySlugUseCase } from '@application/use-case/company/find-company-by-slug.use-case';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 @Controller('company')
@@ -13,7 +14,8 @@ export class CompanyController {
   constructor(
     private readonly createCompanyUseCase: CreateCompanyUseCase,
     private readonly findAllCompanyUseCase: FindAllCompanyUseCase,
-  ) {}
+    private readonly findCompanyBySlugUseCase: FindCompanyBySlugUseCase,
+  ) { }
 
   @Post()
   @ApiTags('Create Company')
@@ -25,5 +27,10 @@ export class CompanyController {
   @Get()
   findAll() {
     return this.findAllCompanyUseCase.findAll();
+  }
+
+  @Get("/:companySlug")
+  findCompanyBySlug(@Param("companySlug") companySlug: string) {
+    return this.findCompanyBySlugUseCase.execute(companySlug);
   }
 }

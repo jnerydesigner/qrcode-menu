@@ -18,9 +18,11 @@ export class CompanyMapper {
   ): Company {
     return new Company(
       companyMongo.name,
-      companyMongo.id,
+      companyMongo._id.toString(),
       companyMongo.created_at || new Date(),
       companyMongo.slug,
+      companyMongo.image,
+      companyMongo.products || [],
     );
   }
 }

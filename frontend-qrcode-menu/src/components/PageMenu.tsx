@@ -7,15 +7,18 @@ import { products } from "@/data/products";
 import { Product } from "@/types/product.type";
 import { convertMoney, TypeMoney } from "@/helper/convert-money";
 import { CategoryType } from "@/types/category.type";
+import { CompanyType } from "@/types/company.type";
 
 interface ProductsProps {
   products: Product[];
   categories: CategoryType[];
+  company: CompanyType
 }
 
 export const PageMenu = ({
   products: productsNew,
   categories,
+  company
 }: ProductsProps) => {
   return (
     <div className="min-h-screen bg-[#fdf5e6] flex justify-center">
@@ -23,8 +26,8 @@ export const PageMenu = ({
         <div className="sticky top-0 bg-[#fdf5e6] z-20 mb-6">
           <div className="flex flex-col items-center py-4">
             <Image
-              src="/logo.png"
-              alt="Buck's Burgers"
+              src={company.image}
+              alt={company.name}
               width={200}
               height={160}
               priority
@@ -47,7 +50,7 @@ export const PageMenu = ({
 
             return (
               <Link
-                href={`/cervejaria-vira-todas/${product.slug}`}
+                href={`/${company.slug}/${product.slug}`}
                 key={product.id}
                 id={
                   firstOfCategory || lastOfCategory

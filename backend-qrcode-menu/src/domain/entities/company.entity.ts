@@ -7,6 +7,7 @@ export class Company {
   slug: string;
   createdAt: Date;
   image: string;
+  products?: any[]; // Array de produtos relacionados
 
   constructor(
     name: string,
@@ -14,11 +15,13 @@ export class Company {
     created_at?: Date,
     slug?: string,
     image?: string | null,
+    products?: any[],
   ) {
     this.id = id !== null ? id : new UniqueEntityId().toString();
     this.name = name;
     this.slug = slug !== undefined ? SlugEntity.create(name).toString() : '';
     this.createdAt = created_at ?? new Date();
     this.image = image !== null && image !== undefined ? image : '';
+    this.products = products ?? [];
   }
 }
