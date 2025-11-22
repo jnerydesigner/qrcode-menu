@@ -1,4 +1,4 @@
-import { PutObjectCommand, DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand, DeleteObjectCommand, S3Client, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { S3ConfigService } from "@infra/config/s3.config";
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { randomUUID } from "node:crypto";
@@ -58,15 +58,32 @@ export class S3UploadService {
         }
     }
 
-    async deleteFile(fileKey: string): Promise<void> {
+    async deleteFile(fileKey: string): Promise<boolean> {
         const params = {
             Bucket: this.bucketName,
             Key: fileKey,
         };
 
+        // First, check if file exists
         try {
-            const command = new DeleteObjectCommand(params);
-            await this.s3Client.send(command);
+            const headCommand = new HeadObjectCommand(params);
+            await this.s3Client.send(headCommand);
+        } catch (error) {
+            // If error is NotFound (404), file doesn't exist
+            if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+                console.log(`⚠️ File ${fileKey} not found in S3, skipping deletion`);
+                return false;
+            }
+            // For other errors during check, throw exception
+            console.error('S3 Head Error:', error);
+        }
+
+        // File exists, proceed with deletion
+        try {
+            const deleteCommand = new DeleteObjectCommand(params);
+            await this.s3Client.send(deleteCommand);
+            console.log(`✅ File ${fileKey} deleted successfully from S3`);
+            return true;
         } catch (error) {
             console.error('S3 Delete Error:', error);
             throw new InternalServerErrorException('Error deleting file from S3');

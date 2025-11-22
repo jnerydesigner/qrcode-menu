@@ -5,7 +5,6 @@ export const findAllIngredients = async () => {
   const response = await api.get("/ingredients");
   const data: IngredientType[] = response.data;
 
-  console.log(data);
 
   return data;
 };

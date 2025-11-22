@@ -19,4 +19,5 @@ export interface CreateProductType {
   description: string;
   price: number;
   categoryId: string;
+  company: string;
 }

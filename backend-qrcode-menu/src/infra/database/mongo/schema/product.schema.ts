@@ -12,8 +12,8 @@ export class Product extends Document {
   @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
   declare _id: Types.ObjectId;
 
-  @Prop({ type: String, required: true, unique: true })
-  declare id: string;
+  // Field 'id' was removed. This comment forces a reload.
+
 
   @Prop({ required: true })
   name: string;

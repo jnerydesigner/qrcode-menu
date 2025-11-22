@@ -18,13 +18,16 @@ export class UpdateProductUseCase {
 
     @Inject(INGREDIENT_REPOSITORY)
     private readonly ingredientRepository: IngredientRepository,
-  ) {}
+  ) { }
 
   async execute(
     productId: string,
     updateProductInput: UpdateProductInput,
   ): Promise<ProductEntity | null> {
+    console.log(updateProductInput)
     const product = await this.findProductOrNull(productId);
+
+    console.log(product)
 
     if (!product) {
       return null;
@@ -32,14 +35,10 @@ export class UpdateProductUseCase {
 
     const requestedIngredientIds =
       updateProductInput.productIngredient?.map((p) => p.ingredientId) ?? [];
-
-    console.log('2️⃣ requestedIngredientIds', requestedIngredientIds);
-
     const productIngredientMany = await Promise.all(
       requestedIngredientIds.map(async (ingredientId) => {
         const ingredient = await this.ingredientRepository.findId(ingredientId);
 
-        console.log('🔍 ingredient found:', ingredient);
         if (!ingredient) {
           throw new Error(`Ingrediente com ID ${ingredientId} não encontrado.`);
         }
@@ -47,8 +46,6 @@ export class UpdateProductUseCase {
         return ingredient;
       }),
     );
-
-    console.log('3️⃣ productIngredientMany', productIngredientMany);
 
     const updatedProduct = new ProductEntity(
       updateProductInput.name ?? product.name,
@@ -73,7 +70,6 @@ export class UpdateProductUseCase {
   ): Promise<ProductEntity | null> {
     try {
       const product = await this.productRepository.findOne(productId);
-      console.log('✅ Found product:', product);
       return product;
     } catch (error) {
       if (this.isNotFoundError(error)) {

@@ -57,6 +57,7 @@ export const FormProducts = () => {
         description: values.description,
         categoryId: values.categoryId,
         price: values.price,
+        company: "691773f1e9d874ef5df98477"
       });
       return response;
     },
@@ -74,6 +75,7 @@ export const FormProducts = () => {
   const onSubmit: SubmitHandler<ProductFormValues> = (values) => {
     const newProduct = {
       ...values,
+      company: '691773f1e9d874ef5df98477',
       price: Number(values.price.replace(",", ".")),
     };
     createProductMutation.mutate(newProduct);

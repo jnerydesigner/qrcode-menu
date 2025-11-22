@@ -8,6 +8,7 @@ import { Product } from "@/types/product.type";
 import { convertMoney, TypeMoney } from "@/helper/convert-money";
 import { CategoryType } from "@/types/category.type";
 import { CompanyType } from "@/types/company.type";
+import { FaArrowCircleLeft } from "react-icons/fa";
 
 interface ProductsProps {
   products: Product[];
@@ -24,7 +25,13 @@ export const PageMenu = ({
     <div className="min-h-screen bg-[#fdf5e6] flex justify-center">
       <div className="w-full max-w-md">
         <div className="sticky top-0 bg-[#fdf5e6] z-20 mb-6">
-          <div className="flex flex-col items-center py-4">
+          <div className="flex flex-col items-center py-4 relative">
+            <Link
+              href="/"
+              className="absolute top-4 left-4 w-10 h-10 bg-white/80 backdrop-blur-md rounded-full text-gray-800 hover:bg-white transition-all duration-300 hover:scale-110 z-10 cursor-pointer flex justify-center items-center shadow-md"
+            >
+              <FaArrowCircleLeft className="w-6 h-6" />
+            </Link>
             <Image
               src={company.image}
               alt={company.name}
@@ -42,22 +49,16 @@ export const PageMenu = ({
               index ===
               productsNew.findIndex((p) => p.categoryId === product.categoryId);
 
-            const lastOfCategory =
-              index ===
-              productsNew.findLastIndex(
-                (p) => p.categoryId === product.categoryId
-              );
-
             return (
               <Link
                 href={`/${company.slug}/${product.slug}`}
                 key={product.id}
                 id={
-                  firstOfCategory || lastOfCategory
+                  firstOfCategory
                     ? product.categoryId
                     : undefined
                 }
-                className="flex h-40 shadow-sm"
+                className="flex h-40 shadow-sm scroll-mt-64"
               >
                 <div className="relative w-40 h-full flex-shrink-0">
                   <Image

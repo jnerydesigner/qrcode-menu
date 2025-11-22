@@ -5,7 +5,7 @@ export const findAllCategory = async () => {
   const response = await api.get("/categories");
   const data: CategoryType[] = response.data;
 
-  console.log(data);
+
 
   return data;
 };

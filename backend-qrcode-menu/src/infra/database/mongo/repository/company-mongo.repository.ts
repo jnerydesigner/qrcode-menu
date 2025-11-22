@@ -19,7 +19,6 @@ export class CompanyMongoRepository implements CompanyRepository {
 
   async create(data: Company): Promise<Company> {
     const companyMapper = CompanyMapper.toMongo(data);
-    console.log({ companyMapper });
     const created = new this.companyModel(companyMapper);
     const saved = await created.save();
 
@@ -48,25 +47,37 @@ export class CompanyMongoRepository implements CompanyRepository {
       .findOne({ slug })
       .lean();
 
+
+
     if (!company) {
       throw new Error('Company not found');
     }
 
-    // Buscar produtos que pertencem a essa company
+    console.log("Company:", company);
+
     const products = await this.productModel
       .find({ company: company._id })
-      .populate('category')
-      .populate('ingredients')
+      .populate({
+        path: 'category',
+        select: 'name slug created_at',
+        options: { virtuals: false },
+      })
+      .populate({
+        path: 'ingredients',
+        select: 'name slug emoji color created_at',
+        options: { virtuals: false },
+      })
       .lean();
 
-    console.log("Company Mongo", company);
-    console.log("Products found:", products.length);
 
-    // Adicionar os produtos ao objeto company
+
+
     const companyWithProducts = {
       ...company,
       products: products
     };
+
+    console.log("Company with products:", companyWithProducts);
 
     return CompanyMapper.fromMongo(companyWithProducts as any as CompanyMongo & { created_at?: Date });
   }

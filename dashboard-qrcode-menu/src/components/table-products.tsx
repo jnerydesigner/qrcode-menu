@@ -75,6 +75,15 @@ export const columns: ColumnDef<ProductType>[] = [
       </div>
     ),
   },
+  {
+    accessorKey: "image",
+    header: "Imagem",
+    cell: ({ row }) => (
+      <div className="w-15 h-15  flex justify-center items-center">
+        <img src={row.getValue("image")} alt="" />
+      </div>
+    ),
+  },
 ];
 
 import { useNavigate } from "react-router";

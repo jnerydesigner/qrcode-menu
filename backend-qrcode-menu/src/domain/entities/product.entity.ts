@@ -54,7 +54,7 @@ export class ProductEntity {
     this.price = price;
     this.slug =
       slug && slug.length > 0 ? slug : SlugEntity.create(name).toString();
-    this.image = image;
+    this.image = image || 'https://qr-code-menu-seligadev.s3.us-east-1.amazonaws.com/image-not-found-compressed.png';
     this.categoryId = categoryId;
     this.company = company ?? '';
 
@@ -62,9 +62,9 @@ export class ProductEntity {
     this.category =
       category === null
         ? {
-            name: '',
-            slug: '',
-          }
+          name: '',
+          slug: '',
+        }
         : category;
     this.ingredients = ingredients ?? [];
     this.companyEntity = companyEntity ? companyEntity : undefined;

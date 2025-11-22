@@ -33,6 +33,7 @@ export const CategoryMenu = ({ categories }: CategoryProps) => {
 
   // --- Scroll até a categoria ---
   const handleScrollTo = (id: string) => {
+    setActive(id);
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -55,7 +56,7 @@ export const CategoryMenu = ({ categories }: CategoryProps) => {
         },
         {
           threshold: 0.3,
-          rootMargin: "-30% 0px -60% 0px", // ajuda ao subir
+          rootMargin: "-150px 0px -50% 0px", // compensa o header grande
         }
       );
 
@@ -86,11 +87,10 @@ export const CategoryMenu = ({ categories }: CategoryProps) => {
                 });
               }
             }}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-              active === category.id
-                ? "bg-orange-500 text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
+            className={`cursor-pointer px-4 py-2 rounded-full text-sm font-medium transition ${active === category.id
+              ? "bg-orange-500 text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
           >
             {category.name}
           </button>

@@ -9,7 +9,7 @@ export class CreateProductUseCase {
   constructor(
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
-  ) {}
+  ) { }
   execute(createProductInput: CreateProductInput) {
     const productEntity = new ProductEntity(
       createProductInput.name,
@@ -23,8 +23,6 @@ export class CreateProductUseCase {
       null,
       [],
     );
-
-    console.log('Product Entity', productEntity);
 
     return this.productRepository.save(productEntity);
   }

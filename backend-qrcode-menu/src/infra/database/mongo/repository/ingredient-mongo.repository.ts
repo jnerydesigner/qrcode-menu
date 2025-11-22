@@ -12,7 +12,7 @@ export class IngredientMongoRepository implements IngredientRepository {
   constructor(
     @InjectModel(IngredientMongo.name)
     private readonly ingredientModel: Model<IngredientMongo>,
-  ) {}
+  ) { }
 
   async save(ingredient: IngredientEntity): Promise<IngredientEntity> {
     const existingIngredient = await this.ingredientModel
@@ -88,7 +88,6 @@ export class IngredientMongoRepository implements IngredientRepository {
       .find({ _id: { $in: ingredientIds } })
       .lean();
 
-    console.log('✅ Found ingredients:', ingredientDocs);
 
     return ingredientDocs.map((ingredient) =>
       IngredientMapper.fromMongo(

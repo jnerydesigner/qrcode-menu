@@ -54,12 +54,8 @@ export class ProductMongoRepository implements ProductRepository {
     }
 
     const productMapper = ProductMapper.toMongo(product);
-
-    console.log('Product Mapper', productMapper);
     const created = new this.productModel(productMapper);
     const saved = await created.save();
-
-    console.log('Saved Product:', saved);
 
     await this.categoryModel.updateOne(
       { _id: productMapper.category as Types.ObjectId },
@@ -111,8 +107,6 @@ export class ProductMongoRepository implements ProductRepository {
       .populate('ingredients')
       .lean<PopulatedProductMongo>();
 
-    console.log('Product found One:', product);
-
     if (!product) {
       throw new NotFoundProductError(`Product id ${prodId} not exists`);
     }
@@ -136,7 +130,6 @@ export class ProductMongoRepository implements ProductRepository {
       .populate('ingredients')
       .lean<PopulatedProductMongo>();
 
-    console.log('Product found One:', product);
     if (!product) {
       throw new NotFoundProductError(`Product slug ${slug} not exists`);
     }
@@ -204,14 +197,11 @@ export class ProductMongoRepository implements ProductRepository {
       .populate('ingredients')
       .lean();
 
-    console.log('find all', products)
-
     const productsMapper = products.map((product) =>
       ProductMapper.fromMongo(product as PopulatedProductMongo),
     );
 
     this.logger.log(productsMapper);
-    console.log('find all', productsMapper)
 
     return productsMapper;
   }
@@ -240,9 +230,6 @@ export class ProductMongoRepository implements ProductRepository {
     const incomingIngredientIds =
       product.ingredients?.map((ing) => ing.id) ?? [];
 
-    console.log('💾 existingIngredientIds (mongo):', existingIngredientIds);
-    console.log('📦 incomingIngredientIds (domain):', incomingIngredientIds);
-
     // 🧮 Combina ambos os arrays, removendo duplicatas
     const mergedIngredientIds = Array.from(
       new Set([...existingIngredientIds, ...incomingIngredientIds]),
@@ -252,8 +239,6 @@ export class ProductMongoRepository implements ProductRepository {
     const mergedObjectIds = mergedIngredientIds.map(
       (id) => new Types.ObjectId(id),
     );
-
-    console.log('✅ mergedObjectIds (final):', mergedObjectIds);
 
     // 🚀 Atualiza apenas se houver diferença real
     const shouldUpdateIngredients =
@@ -271,9 +256,6 @@ export class ProductMongoRepository implements ProductRepository {
 
     if (shouldUpdateIngredients) {
       updateData.ingredients = mergedObjectIds;
-      console.log('🧩 Updating ingredients...');
-    } else {
-      console.log('🟡 Ingredients unchanged — skipping field update');
     }
 
     await this.productModel.updateOne(
@@ -313,8 +295,6 @@ export class ProductMongoRepository implements ProductRepository {
         `Produto com ID ${productId} não encontrado para remoção de ingrediente.`,
       );
     }
-
-    console.log(`✅ Ingrediente ${ingredientId} removido com sucesso.`);
 
     return ProductMapper.fromMongo(updatedProduct);
   }

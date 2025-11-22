@@ -1,4 +1,3 @@
-import { products } from "@/data/products";
 import { convertMoney, TypeMoney } from "@/helper/convert-money";
 import { Product } from "@/types/product.type";
 import Image from "next/image";
@@ -9,28 +8,13 @@ type tParams = Promise<{ slug: string; restaurant: string }>;
 
 export default async function FoodDetails({ params }: { params: tParams }) {
   const { slug, restaurant } = await params;
-  console.log("Restaurant:", restaurant);
-  console.log("Slug:", slug);
+
   let data = await fetch(`http://localhost:3399/products/slug/${slug}`);
   let productFetch: Product = await data.json();
-  console.log("Product Fetch:", productFetch);
 
-  const ingredients = [
-    { name: "Pão", emoji: "🍞", color: "bg-amber-600" },
-    { name: "Carne", emoji: "🥩", color: "bg-amber-900" },
-    { name: "Tomate", emoji: "🍅", color: "bg-red-500" },
-    { name: "Queijo", emoji: "🧀", color: "bg-yellow-400" },
-    { name: "Alface", emoji: "🥬", color: "bg-teal-400" },
-  ];
 
-  const ingredients2 = [
-    { name: "Batata", icon: "🍟", color: "bg-amber-600" },
-    { name: "Sal", icon: "🧂", color: "bg-amber-900" },
-    { name: "Queijo", icon: "🧀", color: "bg-yellow-400" },
-  ];
   return (
     <section className="h-screen w-full max-w-md mx-auto bg-white shadow-2xl overflow-hidden animate-fade-in flex flex-col relative">
-      {/* Header fixo com imagem */}
       <div className="sticky top-0 z-20 bg-white">
         <div className="relative h-48 w-full overflow-hidden">
           <Image
@@ -42,7 +26,7 @@ export default async function FoodDetails({ params }: { params: tParams }) {
           />
 
           <Link
-            href="/"
+            href={`/${restaurant}`}
             className="absolute top-5 left-5 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full text-white text-lg hover:bg-white/30 transition-all duration-300 hover:scale-110 z-10 cursor-pointer flex justify-center items-center"
           >
             <FaArrowCircleLeft className="w-8 h-8 text-black" />
@@ -50,11 +34,10 @@ export default async function FoodDetails({ params }: { params: tParams }) {
         </div>
       </div>
 
-      {/* Badge da categoria - posicionado sobre a imagem */}
       <div className="w-auto h-12 bg-gradient-to-r from-indigo-500 to-purple-600 px-4 flex justify-center items-center absolute z-40 top-[11rem] right-0">
         <p className="font-bold">{productFetch?.category.name}</p>
       </div>
-      {/* Conteúdo scrollável */}
+
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
         <div className="p-8 relative pt-10">
           <h1 className="text-3xl font-bold text-gray-800 text-center mb-2">
@@ -100,7 +83,6 @@ export default async function FoodDetails({ params }: { params: tParams }) {
         </div>
       </div>
 
-      {/* Footer fixo com preço */}
       <div className="sticky bottom-0 z-30 bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 text-center">
         <div className="text-4xl font-bold mb-1">
           {convertMoney(productFetch.price, TypeMoney.PT_BR)}

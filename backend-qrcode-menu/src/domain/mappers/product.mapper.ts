@@ -162,8 +162,6 @@ export class ProductMapper {
       (productMongo.company as any)?.id ??
       productMongo.company?.toString?.();
 
-    console.log("From Mongo Mapper: Company", companyEntity);
-    // Cria a entidade de domínio
     return new ProductEntity(
       productMongo.name,
       productMongo.description,

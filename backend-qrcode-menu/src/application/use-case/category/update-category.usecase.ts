@@ -10,9 +10,8 @@ export class UpdateCategoryUseCase {
   constructor(
     @Inject(CATEGORY_REPOSITORY)
     private readonly categoryRepository: CategoryRepository,
-  ) {}
+  ) { }
   execute(categoryId: string, name: string) {
-    console.log(name);
     const category = new CategoryEntity(name, categoryId, null, '');
     return this.categoryRepository.updateCategory(category);
   }
