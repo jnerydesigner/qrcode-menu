@@ -10,6 +10,9 @@ import { IngredientModule } from './ingredient.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SeedModule } from './seed.module';
 import { UploadModule } from './upload.module';
+import { AuthModule } from './auth.module';
+import { UsersModule } from './users.module';
+
 
 @Module({
   imports: [
@@ -32,7 +35,9 @@ import { UploadModule } from './upload.module';
     ProductModule,
     IngredientModule,
     SeedModule,
-    UploadModule
+    UploadModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
