@@ -4,6 +4,13 @@ import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { randomUUID } from "node:crypto";
 import "multer";
 
+export interface FileType {
+    buffer: Buffer;
+    filename: string;
+    mimetype: string;
+    originalname: string
+}
+
 @Injectable()
 export class S3UploadService {
     private readonly s3Client: S3Client;
@@ -35,12 +42,15 @@ export class S3UploadService {
         });
     }
 
-    async uploadFile(file: Express.Multer.File, nameFileNew: string): Promise<{ url: string }> {
+    async uploadFile(file: FileType, slug: string, sizeTag?: string): Promise<{ url: string }> {
         const fileExtension = file.originalname.split('.').pop();
-        const uniqueFileName = `${nameFileNew}-${randomUUID()}-${Date.now()}.${fileExtension}`;
+        const tag = sizeTag ? `_${sizeTag}` : ""; // "_small", "_medium", "_full"
+
+        const uniqueFileName = `${slug}${tag}-${randomUUID()}-${Date.now()}.${fileExtension}`;
+
         const params = {
             Bucket: this.bucketName,
-            Key: uniqueFileName,
+            Key: `${slug}/${uniqueFileName}`,
             Body: file.buffer,
             ContentType: file.mimetype,
         };
@@ -50,7 +60,7 @@ export class S3UploadService {
             await this.s3Client.send(command);
 
             return {
-                url: `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${uniqueFileName}`,
+                url: `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${slug}/${uniqueFileName}`,
             };
         } catch (error) {
             console.error('S3 Upload Error:', error);
@@ -58,7 +68,14 @@ export class S3UploadService {
         }
     }
 
+
     async deleteFile(fileKey: string): Promise<boolean> {
+        // Extract key if full URL is provided
+        const bucketUrl = `https://${this.bucketName}.s3.${this.region}.amazonaws.com/`;
+        if (fileKey.startsWith(bucketUrl)) {
+            fileKey = fileKey.replace(bucketUrl, '');
+        }
+
         const params = {
             Bucket: this.bucketName,
             Key: fileKey,

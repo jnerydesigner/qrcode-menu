@@ -12,6 +12,11 @@ export interface ProductType {
   createdAt: string;
   category: CategoryType;
   ingredients: IngredientType[];
+  images?: {
+    image_full: string;
+    image_medium: string;
+    image_small: string;
+  };
 }
 
 export interface CreateProductType {
@@ -21,3 +26,4 @@ export interface CreateProductType {
   categoryId: string;
   company: string;
 }
+

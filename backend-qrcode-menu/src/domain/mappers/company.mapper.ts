@@ -10,6 +10,7 @@ export class CompanyMapper {
       name: company.name,
       slug,
       image: '',
+      image_small: '',
     };
   }
 
@@ -22,6 +23,7 @@ export class CompanyMapper {
       companyMongo.created_at || new Date(),
       companyMongo.slug,
       companyMongo.image,
+      companyMongo.image_small,
       companyMongo.products || [],
     );
   }

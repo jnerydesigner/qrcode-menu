@@ -1,5 +1,5 @@
 import { ProductEntity } from '@domain/entities/product.entity';
-import { ProductMapper } from '@domain/mappers/product.mapper';
+import { ProductImage, ProductMapper } from '@domain/mappers/product.mapper';
 import { ProductRepository } from '@domain/repositories/product.repository';
 import { ExistsProductError } from '@infra/errors/exists-product.error';
 import { NotFoundProductError } from '@infra/errors/notfound.error';
@@ -9,6 +9,7 @@ import { Model, Types } from 'mongoose';
 import { Product as ProductMongo } from '../schema/product.schema';
 import { Category as CategoryMongo } from '../schema/category.schema';
 import { Ingredient as IngredientMongo } from '../schema/ingredient.schema';
+import { ProductImage as ProductImageMongo } from '../schema/product_image.schema';
 import { toObjectId } from '@infra/utils/objectid-converter.util';
 
 type PopulatedProductMongo = ProductMongo & {
@@ -30,6 +31,15 @@ type PopulatedProductMongo = ProductMongo & {
       slug: string;
     }
   )[];
+  images?: (
+    | Types.ObjectId
+    | {
+      _id?: Types.ObjectId;
+      image_full: string;
+      image_medium: string;
+      image_small: string;
+    }
+  )[];
 };
 
 @Injectable()
@@ -42,6 +52,8 @@ export class ProductMongoRepository implements ProductRepository {
     private readonly categoryModel: Model<CategoryMongo>,
     @InjectModel(IngredientMongo.name)
     private readonly ingredientModel: Model<IngredientMongo>,
+    @InjectModel(ProductImageMongo.name)
+    private readonly productImageModel: Model<ProductImageMongo>,
   ) { }
 
   async save(product: ProductEntity): Promise<ProductEntity> {
@@ -105,6 +117,7 @@ export class ProductMongoRepository implements ProductRepository {
         options: { virtuals: false },
       })
       .populate('ingredients')
+      .populate('images')
       .lean<PopulatedProductMongo>();
 
     if (!product) {
@@ -128,6 +141,7 @@ export class ProductMongoRepository implements ProductRepository {
         options: { virtuals: false },
       })
       .populate('ingredients')
+      .populate('images')
       .lean<PopulatedProductMongo>();
 
     if (!product) {
@@ -195,6 +209,7 @@ export class ProductMongoRepository implements ProductRepository {
         options: { virtuals: false },
       })
       .populate('ingredients')
+      .populate('images')
       .lean();
 
     const productsMapper = products.map((product) =>
@@ -299,16 +314,34 @@ export class ProductMongoRepository implements ProductRepository {
     return ProductMapper.fromMongo(updatedProduct);
   }
 
-  async updateImage(productId: string, image: string): Promise<ProductEntity> {
+  async updateImage(productId: string, image: string, imageMedium: string, imageSmall: string): Promise<ProductEntity> {
+    const productImage = await this.productImageModel.findOneAndUpdate(
+      { product: toObjectId(productId) },
+      {
+        $set: {
+          image_full: image,
+          image_small: imageSmall,
+          image_medium: imageMedium,
+        },
+      },
+      { upsert: true, new: true },
+    );
+
     const updatedProduct = await this.productModel
       .findByIdAndUpdate(
         toObjectId(productId),
-        { $set: { image } },
+        {
+          $set: { image },
+          $addToSet: { images: productImage._id },
+        },
         { new: true },
       )
       .populate('category')
       .populate('ingredients')
+      .populate('images')
       .lean<PopulatedProductMongo>();
+
+    console.log("updatedProduct", updatedProduct)
 
     if (!updatedProduct) {
       throw new NotFoundProductError(
@@ -317,5 +350,19 @@ export class ProductMongoRepository implements ProductRepository {
     }
 
     return ProductMapper.fromMongo(updatedProduct);
+  }
+
+  async verifyExistsImagesproduct(productId: string): Promise<ProductImage | null> {
+    const productImage = await this.productImageModel.findOne({ product: toObjectId(productId) });
+
+
+    console.log(productImage)
+    if (!productImage) {
+      return null
+    }
+    const productImageMapper = ProductMapper.fromImageProductMongo(productImage);
+
+
+    return productImageMapper;
   }
 }

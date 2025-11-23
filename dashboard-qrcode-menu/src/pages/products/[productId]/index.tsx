@@ -63,6 +63,7 @@ export default function ProductPage() {
         mutationFn: ({ productId, file }: { productId: string; file: File }) =>
             updateProductImage(productId, file),
         onSuccess: () => {
+            console.log()
             toast.success("Imagem atualizada com sucesso!");
             queryClient.invalidateQueries({ queryKey: ["product", productId] });
             reset();
@@ -94,6 +95,8 @@ export default function ProductPage() {
         return <div>Erro ao carregar produto.</div>;
     }
 
+    console.log("Product", product)
+
     return (
         <section className="space-y-6">
             <div className="flex items-center gap-4">
@@ -118,7 +121,7 @@ export default function ProductPage() {
                 <div className="flex w-full items-center justify-center bg-muted/20 py-4 rounded-lg">
                     {product.image ? (
                         <img
-                            src={product.image}
+                            src={product.images?.image_small}
                             alt={product.name}
                             className="h-[250px] w-auto object-contain rounded-md"
                         />

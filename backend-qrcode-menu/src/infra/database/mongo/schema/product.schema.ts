@@ -40,7 +40,7 @@ export class Product extends Document {
   @Prop({ type: Types.ObjectId, ref: Company.name, required: true })
   company: Types.ObjectId | Company;
 
-  @Prop({ type: Types.ObjectId, ref: ProductImage.name, default: [] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: ProductImage.name }], default: [] })
   images: Types.ObjectId[];
 }
 

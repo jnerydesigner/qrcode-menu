@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-base-to-string */
 import { ProductEntity } from '@domain/entities/product.entity';
 import { Product as ProductMongo } from '@infra/database/mongo/schema/product.schema';
+import { ProductImage as ProductImageMongo } from '@infra/database/mongo/schema/product_image.schema';
 import { Types } from 'mongoose';
 import { Company } from '@domain/entities/company.entity';
 
@@ -61,6 +62,17 @@ export class ProductMapper {
         slug: string;
       }
       | Types.ObjectId;
+      images?:
+      | (
+        | {
+          _id?: Types.ObjectId;
+          image_full: string;
+          image_medium: string;
+          image_small: string;
+        }
+        | Types.ObjectId
+      )
+      | Types.ObjectId[];
       ingredients?: (
         | {
           _id?: Types.ObjectId;
@@ -162,6 +174,22 @@ export class ProductMapper {
       (productMongo.company as any)?.id ??
       productMongo.company?.toString?.();
 
+    const imagesData = productMongo.images;
+    console.log('ProductMapper imagesData:', JSON.stringify(imagesData, null, 2));
+    let mappedImages: { image_full: string; image_medium: string; image_small: string } | undefined;
+
+    if (Array.isArray(imagesData) && imagesData.length > 0) {
+      const firstImage = imagesData[0];
+      if (firstImage && !(firstImage instanceof Types.ObjectId) && 'image_full' in (firstImage as any)) {
+        const img = firstImage as any;
+        mappedImages = {
+          image_full: img.image_full,
+          image_medium: img.image_medium,
+          image_small: img.image_small,
+        };
+      }
+    }
+
     return new ProductEntity(
       productMongo.name,
       productMongo.description,
@@ -174,8 +202,25 @@ export class ProductMapper {
       mappedCategory,
       ingredients,
       (productMongo as any)._id?.toString?.() ?? (productMongo as any).id,
-
       companyEntity,
+      mappedImages,
     );
   }
+
+  static fromImageProductMongo(image: ProductImageMongo): ProductImage {
+    return {
+      id: image._id?.toString?.() ?? image.id,
+      image: image.image_full,
+      imageSmall: image.image_small,
+      imageMedium: image.image_medium,
+    }
+  }
+}
+
+
+export interface ProductImage {
+  id: string;
+  image: string;
+  imageSmall: string;
+  imageMedium: string;
 }

@@ -10,6 +10,7 @@ export default async function CompanyMenu({ params }: { params: tParams }) {
     const { restaurant } = await params;
 
     const company = await findCompanyBySlug<CompanyType>(restaurant);
+    console.log(company);
 
     // Extract unique categories from products
     const categoryMap = Array.from(

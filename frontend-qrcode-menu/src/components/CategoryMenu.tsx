@@ -68,7 +68,7 @@ export const CategoryMenu = ({ categories }: CategoryProps) => {
   }, [categories]);
 
   return (
-    <div className="px-4 mb-2 select-none">
+    <div className="px-4 mb-2 select-none p-2">
       <div
         ref={scrollRef}
         onMouseDown={handleMouseDown}

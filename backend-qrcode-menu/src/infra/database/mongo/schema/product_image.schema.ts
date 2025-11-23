@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Product } from './product.schema';
 
 @Schema({
     collection: 'product_images',
@@ -10,8 +9,8 @@ export class ProductImage extends Document {
     @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
     declare _id: Types.ObjectId;
 
-    @Prop({ type: Types.ObjectId, ref: Product.name, required: true })
-    product: Types.ObjectId | Product;
+    @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
+    product: Types.ObjectId;
 
     @Prop({ required: true })
     image_full: string;

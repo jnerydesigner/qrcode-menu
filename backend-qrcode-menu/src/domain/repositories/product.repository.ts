@@ -1,4 +1,5 @@
 import { ProductEntity } from '@domain/entities/product.entity';
+import { ProductImage } from '@domain/mappers/product.mapper';
 
 export interface ProductRepository {
   save(product: ProductEntity): Promise<ProductEntity>;
@@ -13,7 +14,8 @@ export interface ProductRepository {
     ingredientId: string,
   ): Promise<ProductEntity>;
 
-  updateImage(productId: string, image: string): Promise<ProductEntity>;
+  updateImage(productId: string, image: string, imageSmall: string, imageMedium: string): Promise<ProductEntity>;
+  verifyExistsImagesproduct(productId: string): Promise<ProductImage | null>;
 }
 
 export const PRODUCT_REPOSITORY = Symbol('PRODUCT_REPOSITORY');

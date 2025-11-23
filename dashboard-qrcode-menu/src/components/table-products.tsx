@@ -76,11 +76,12 @@ export const columns: ColumnDef<ProductType>[] = [
     ),
   },
   {
-    accessorKey: "image",
+    accessorKey: "images.image_small",
+    id: "image_small",
     header: "Imagem",
     cell: ({ row }) => (
       <div className="w-15 h-15  flex justify-center items-center">
-        <img src={row.getValue("image")} alt="" />
+        <img src={row.getValue("image_small")} alt="" className="max-w-full max-h-full object-cover" />
       </div>
     ),
   },
@@ -131,6 +132,7 @@ export const TableProducts = () => {
   if (isError) {
     return <div>Erro ao carregar categorias.</div>;
   }
+
 
   return (
     <div className="w-full">

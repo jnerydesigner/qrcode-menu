@@ -15,20 +15,8 @@ import { Input } from "@/components/ui/input";
 import { api } from "@/api";
 import { useEffect } from "react";
 import type { CategoryType } from "@/types/category.type";
-import { SelectApp } from "./select";
 
-const Categories: CategoryType[] = [
-  {
-    id: "1",
-    name: "Bebidas",
-    slug: "bebidas",
-  },
-  {
-    id: "2",
-    name: "Comidas",
-    slug: "comidas",
-  },
-];
+
 
 const categorySchema = z.object({
   name: z.string().min(1, "Informe o nome da categoria."),
@@ -142,8 +130,8 @@ export const FormCategories = ({
                 {createCategoryMutation.isPending
                   ? "Salvando..."
                   : selectedCategory
-                  ? "Atualizar categoria"
-                  : "Salvar categoria"}
+                    ? "Atualizar categoria"
+                    : "Salvar categoria"}
               </Button>
             </div>
           </div>

@@ -4,6 +4,7 @@ export interface CompanyType {
     slug: string;
     createdAt: string;
     image: string;
+    image_small: string;
     products: ProductType[];
 }
 

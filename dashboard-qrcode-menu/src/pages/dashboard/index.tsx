@@ -16,8 +16,16 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { findCompany } from "@/api/companies.fetch";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard() {
+  const { data: company, isLoading, isError } = useQuery({
+    queryKey: ["company"],
+    queryFn: () => findCompany("hamburgueria-da-vila"),
+  });
+
+  console.log("Company Principal", company)
   const location = useLocation();
 
   const currentPath =
@@ -38,11 +46,19 @@ export default function Dashboard() {
     }
   }, [currentPath]);
 
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (isError) {
+    return <div>Erro ao carregar categorias.</div>;
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar
+        company={company}
         activeSection={(currentPath === "home" ? "/" : currentPath) as "/" | "products" | "categories" | "ingredients"}
-        onSelectSection={() => { }}
       />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">

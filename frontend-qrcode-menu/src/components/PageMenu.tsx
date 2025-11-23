@@ -33,7 +33,7 @@ export const PageMenu = ({
               <FaArrowCircleLeft className="w-6 h-6" />
             </Link>
             <Image
-              src={company.image}
+              src={company.image_small}
               alt={company.name}
               width={200}
               height={160}

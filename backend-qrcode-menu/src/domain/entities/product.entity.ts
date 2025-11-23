@@ -26,7 +26,15 @@ export class ProductEntity {
     slug: string;
   }[];
 
+
+
   companyEntity?: Company;
+
+  images?: {
+    image_full: string;
+    image_medium: string;
+    image_small: string;
+  };
 
   constructor(
     name: string,
@@ -47,6 +55,11 @@ export class ProductEntity {
     }[],
     id?: string | null,
     companyEntity?: Company,
+    images?: {
+      image_full: string;
+      image_medium: string;
+      image_small: string;
+    },
   ) {
     this.id = id ?? new UniqueEntityId().toString();
     this.name = name;
@@ -68,5 +81,6 @@ export class ProductEntity {
         : category;
     this.ingredients = ingredients ?? [];
     this.companyEntity = companyEntity ? companyEntity : undefined;
+    this.images = images ? images : undefined;
   }
 }

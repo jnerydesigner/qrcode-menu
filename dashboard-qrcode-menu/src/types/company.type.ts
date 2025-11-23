@@ -3,6 +3,7 @@ export interface CompanyType {
     name: string;
     slug: string;
     image?: string;
+    image_small?: string;
     createdAt: string;
     updatedAt: string;
 }

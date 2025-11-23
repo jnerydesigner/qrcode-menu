@@ -18,6 +18,10 @@ export class Company extends Document {
   @Prop({ required: false })
   image: string;
 
+  @Prop({ required: false })
+  image_small: string;
+
+
   @Prop()
   created_at: Date;
 

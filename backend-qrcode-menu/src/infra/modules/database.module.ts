@@ -22,6 +22,7 @@ import {
   Product,
   ProductSchema,
 } from '@infra/database/mongo/schema/product.schema';
+import { ProductImage, ProductImageSchema } from '@infra/database/mongo/schema/product_image.schema';
 import { Global, Module } from '@nestjs/common';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -32,6 +33,7 @@ const mongooseFeatureModules = [
     { name: Company.name, schema: CompanySchema },
     { name: Ingredient.name, schema: IngredientSchema },
     { name: Product.name, schema: ProductSchema },
+    { name: ProductImage.name, schema: ProductImageSchema },
   ]),
 ];
 
@@ -56,16 +58,19 @@ const repositoryProviders = [
       productModel: Model<Product>,
       categoryModel: Model<Category>,
       ingredientModel: Model<Ingredient>,
+      productImageModel: Model<ProductImage>,
     ) =>
       new ProductMongoRepository(
         productModel,
         categoryModel,
         ingredientModel,
+        productImageModel,
       ),
     inject: [
       getModelToken(Product.name),
       getModelToken(Category.name),
       getModelToken(Ingredient.name),
+      getModelToken(ProductImage.name),
     ],
   },
   {
