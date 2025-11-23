@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { findCompany } from "@/api/companies.fetch";
 import { useQuery } from "@tanstack/react-query";
+import { MenuBar } from "@/components/menu-bar";
 
 export default function Dashboard() {
   const { data: company, isLoading, isError } = useQuery({
@@ -61,7 +62,7 @@ export default function Dashboard() {
         activeSection={(currentPath === "home" ? "/" : currentPath) as "/" | "products" | "categories" | "ingredients"}
       />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 w-full">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator
@@ -79,6 +80,9 @@ export default function Dashboard() {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
+
+
+
           </div>
         </header>
 

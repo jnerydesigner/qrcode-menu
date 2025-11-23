@@ -27,11 +27,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { Link } from "react-router"
 
 export function NavUser({
-  user,
+  user = {
+    name: "Jander Nery",
+    email: "jander.nery@gmail.com",
+    avatar: "https://github.com/jnerydesigner.png",
+  },
 }: {
-  user: {
+  user?: {
     name: string
     email: string
     avatar: string
@@ -102,7 +107,9 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <LogOut />
-              Log out
+              <Link to="/">
+                Log out
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

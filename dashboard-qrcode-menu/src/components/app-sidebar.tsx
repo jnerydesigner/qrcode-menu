@@ -35,11 +35,6 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 export function AppSidebar({ company, activeSection, ...props }: AppSidebarProps) {
 
   const data = {
-    user: {
-      name: "shadcn",
-      email: "m@example.com",
-      avatar: "/avatars/shadcn.jpg",
-    },
     teams: [
       {
         name: company?.name ?? "Carregando...",
@@ -93,7 +88,7 @@ export function AppSidebar({ company, activeSection, ...props }: AppSidebarProps
         />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
