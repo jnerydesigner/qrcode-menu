@@ -8,7 +8,8 @@ import {
   Tags,
   Utensils,
   Wheat,
-  House
+  House,
+  QrCode
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -24,12 +25,12 @@ import {
 import { useNavigate } from "react-router";
 import type { CompanyType } from "@/types/company.type";
 
-export type DashboardSection = "/" | "products" | "categories" | "ingredients";
+export type DashboardSection = "/" | "products" | "categories" | "ingredients" | "qrcode";
 
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   company: CompanyType | undefined
-  activeSection: "/" | "products" | "categories" | "ingredients";
+  activeSection: "/" | "products" | "categories" | "ingredients" | "qrcode";
 }
 
 export function AppSidebar({ company, activeSection, ...props }: AppSidebarProps) {
@@ -63,16 +64,21 @@ export function AppSidebar({ company, activeSection, ...props }: AppSidebarProps
         value: "ingredients" satisfies DashboardSection,
         icon: Wheat,
       },
+      {
+        title: "QR Code",
+        value: "qrcode" satisfies DashboardSection,
+        icon: QrCode,
+      },
     ]
   };
   const navigate = useNavigate();
 
   function handleNavigate(section: DashboardSection) {
     if (section === "/") {
-      navigate("/");
+      navigate("/dashboard");
       return;
     }
-    navigate(`/${section}`);
+    navigate(`/dashboard/${section}`);
   }
 
   return (

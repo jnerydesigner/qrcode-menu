@@ -6,6 +6,7 @@ import Login from "@/pages/login";
 import Register from "@/pages/register";
 import Products from "@/pages/products";
 import ProductPage from "@/pages/products/[productId]";
+import QrCodePage from "@/pages/qrcode";
 import { createBrowserRouter } from "react-router";
 
 export const router = createBrowserRouter([
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
       { path: "products/:productId", element: <ProductPage /> },
       { path: "categories", element: <Categories /> },
       { path: "ingredients", element: <Ingredients /> },
+      { path: "qrcode", element: <QrCodePage /> },
     ],
   },
 ]);
