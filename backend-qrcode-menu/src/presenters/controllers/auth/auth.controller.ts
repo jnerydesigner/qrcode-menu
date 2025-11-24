@@ -1,10 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from '@application/services/auth.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from '@application/dtos/auth/login.dto';
 import { RegisterDto } from '@application/dtos/auth/register.dto';
 import { ForgotPasswordDto } from '@application/dtos/auth/forgot-password.dto';
 import { ResetPasswordDto } from '@application/dtos/auth/reset-password.dto';
+import { AuthGuard } from '@infra/guard/auth.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -27,10 +28,16 @@ export class AuthController {
     @ApiResponse({ status: 201, description: 'User registered successfully.' })
     @ApiResponse({ status: 400, description: 'Bad Request.' })
     async register(@Body() data: RegisterDto) {
-        // Assuming register logic uses validateUser for now as per previous code, 
-        // but typically it would call a register method in AuthService.
-        // Keeping it consistent with previous implementation but using DTO.
         return this.authService.validateUser(data.email, data.password);
+    }
+
+    @Get('profile')
+    @ApiOperation({ summary: 'Get user profile' })
+    @ApiResponse({ status: 200, description: 'User profile retrieved successfully.' })
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
+    async profile(@Request() req) {
+        return req.user;
     }
 
     @Post('logout')

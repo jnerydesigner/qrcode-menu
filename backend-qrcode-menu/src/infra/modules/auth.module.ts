@@ -5,11 +5,12 @@ import { UsersService } from '@application/services/users.service';
 import { AuthController } from '@presenters/controllers/auth/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from './users.module';
+import { jwtConstants } from '@infra/constants/constant';
 
 @Module({
     imports: [UsersModule, JwtModule.register({
         global: true,
-        secret: process.env.QR_CODE_SECRET_KEY,
+        secret: jwtConstants.secret,
         signOptions: { expiresIn: '1h' },
     })],
     providers: [AuthService, UsersService],
