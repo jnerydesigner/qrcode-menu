@@ -1,4 +1,4 @@
-import { PutObjectCommand, DeleteObjectCommand, S3Client, HeadObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, DeleteObjectCommand, S3Client, HeadObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { S3ConfigService } from "@infra/config/s3.config";
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { randomUUID } from "node:crypto";
@@ -104,6 +104,31 @@ export class S3UploadService {
         } catch (error) {
             console.error('S3 Delete Error:', error);
             throw new InternalServerErrorException('Error deleting file from S3');
+        }
+    }
+
+    async getFile(fileKey: string) {
+        // Extract key if full URL is provided
+        const bucketUrl = `https://${this.bucketName}.s3.${this.region}.amazonaws.com/`;
+        if (fileKey.startsWith(bucketUrl)) {
+            fileKey = fileKey.replace(bucketUrl, '');
+        }
+
+        const params = {
+            Bucket: this.bucketName,
+            Key: fileKey,
+        };
+
+        try {
+            const command = new GetObjectCommand(params);
+            const response = await this.s3Client.send(command);
+            return {
+                stream: response.Body,
+                contentType: response.ContentType,
+            };
+        } catch (error) {
+            console.error('S3 Get Error:', error);
+            throw new InternalServerErrorException('Error getting file from S3');
         }
     }
 
