@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from '@infra/guard/jwt-auth.guard';
 import { AppModule } from '@infra/modules/app.module';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -9,6 +10,8 @@ async function bootstrap() {
   app.enableCors({
     origin: '*',
   });
+
+  app.useGlobalGuards(app.get(JwtAuthGuard));
   const configSwager = new DocumentBuilder()
     .setTitle('QR Code Menu')
     .setDescription(
