@@ -5,7 +5,8 @@ import { LoginDto } from '@application/dtos/auth/login.dto';
 import { RegisterDto } from '@application/dtos/auth/register.dto';
 import { ForgotPasswordDto } from '@application/dtos/auth/forgot-password.dto';
 import { ResetPasswordDto } from '@application/dtos/auth/reset-password.dto';
-import { AuthGuard } from '@infra/guard/auth.guard';
+import { JwtAuthGuard } from '@infra/guard/jwt-auth.guard';
+import { User } from '@infra/decorators/user.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -34,10 +35,9 @@ export class AuthController {
     @Get('profile')
     @ApiOperation({ summary: 'Get user profile' })
     @ApiResponse({ status: 200, description: 'User profile retrieved successfully.' })
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard)
-    async profile(@Request() req) {
-        return req.user;
+    @UseGuards(JwtAuthGuard)
+    async profile(@User() user) {
+        return user;
     }
 
     @Post('logout')

@@ -1,5 +1,6 @@
 import { CreateProductRequest } from '@application/dtos/create-product.request';
 import { UpdateProductIngredientRequest } from '@application/dtos/update-product-ingredient.request';
+import { Role } from '@application/enums/roles.enum';
 import { S3UploadService } from '@application/services/s3-upload.service';
 import { CreateManyProductUseCase } from '@application/use-case/product/create-many-product.usecase';
 import {
@@ -15,6 +16,9 @@ import {
   type UpdateProductInput,
   UpdateProductUseCase,
 } from '@application/use-case/product/update-product.usecase';
+import { Roles } from '@infra/decorators/role.decorator';
+import { JwtAuthGuard } from '@infra/guard/jwt-auth.guard';
+import { RolesGuard } from '@infra/guard/roles.guard';
 import {
   Body,
   Controller,
@@ -24,6 +28,7 @@ import {
   Patch,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -52,6 +57,8 @@ export class ProductController {
   }
 
   @Get()
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   findAll() {
     return this.findAllProductsUseCase.execute();
   }
