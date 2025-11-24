@@ -7,6 +7,7 @@ import { ForgotPasswordDto } from '@application/dtos/auth/forgot-password.dto';
 import { ResetPasswordDto } from '@application/dtos/auth/reset-password.dto';
 import { JwtAuthGuard } from '@infra/guard/jwt-auth.guard';
 import { User } from '@infra/decorators/user.decorator';
+import { IsPublic } from '@infra/decorators/is-public.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -16,6 +17,7 @@ export class AuthController {
     ) { }
 
     @Post('login')
+    @IsPublic()
     @ApiOperation({ summary: 'Login user' })
     @ApiResponse({ status: 200, description: 'User logged in successfully.' })
     @ApiResponse({ status: 401, description: 'Unauthorized.' })

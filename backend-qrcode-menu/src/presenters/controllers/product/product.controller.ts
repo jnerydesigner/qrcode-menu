@@ -16,6 +16,7 @@ import {
   type UpdateProductInput,
   UpdateProductUseCase,
 } from '@application/use-case/product/update-product.usecase';
+import { IsPublic } from '@infra/decorators/is-public.decorator';
 import { Roles } from '@infra/decorators/role.decorator';
 import { JwtAuthGuard } from '@infra/guard/jwt-auth.guard';
 import { RolesGuard } from '@infra/guard/roles.guard';
@@ -57,8 +58,7 @@ export class ProductController {
   }
 
   @Get()
-  @Roles(Role.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @IsPublic()
   findAll() {
     return this.findAllProductsUseCase.execute();
   }
