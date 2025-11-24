@@ -42,6 +42,8 @@ export default function Dashboard() {
         return "Lista de categorias";
       case "ingredients":
         return "Lista de ingredientes";
+      case "qrcode":
+        return "QR Code do Menu";
       default:
         return "Tela Inicial";
     }
@@ -59,7 +61,7 @@ export default function Dashboard() {
     <SidebarProvider>
       <AppSidebar
         company={company}
-        activeSection={(currentPath === "home" ? "/" : currentPath) as "/" | "products" | "categories" | "ingredients"}
+        activeSection={(currentPath === "home" ? "/" : currentPath) as "/" | "products" | "categories" | "ingredients" | "qrcode"}
       />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 w-full">
