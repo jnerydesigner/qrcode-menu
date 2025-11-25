@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, Res, UseGuards } from '@nestjs/common';
+import type { Response } from 'express';
 import { AuthService } from '@application/services/auth.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from '@application/dtos/auth/login.dto';
@@ -21,9 +22,17 @@ export class AuthController {
     @ApiOperation({ summary: 'Login user' })
     @ApiResponse({ status: 200, description: 'User logged in successfully.' })
     @ApiResponse({ status: 401, description: 'Unauthorized.' })
-    async login(@Body() data: LoginDto) {
-        console.log(data)
-        return this.authService.login(data.email, data.password);
+    async login(@Body() data: LoginDto, @Res({ passthrough: true }) response: Response) {
+        const { accessToken } = await this.authService.login(data.email, data.password);
+
+        response.cookie('access_token', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax', // or 'strict'
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
+        });
+
+        return { message: 'Login successful' };
     }
 
     @Post('register')
@@ -45,8 +54,9 @@ export class AuthController {
     @Post('logout')
     @ApiOperation({ summary: 'Logout user' })
     @ApiResponse({ status: 200, description: 'User logged out successfully.' })
-    async logout() {
-        return 'logout';
+    async logout(@Res({ passthrough: true }) response: Response) {
+        response.clearCookie('access_token');
+        return { message: 'Logout successful' };
     }
 
     @Post('refresh')

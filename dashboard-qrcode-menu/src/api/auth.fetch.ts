@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { api } from ".";
 
 export const loginSchema = z.object({
     email: z.string().email("Email inválido"),
@@ -22,13 +23,21 @@ export const registerSchema = z
 export type RegisterData = z.infer<typeof registerSchema>;
 
 export const login = async (data: LoginData) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Login Data:", data);
-    return { token: "mock-token", user: { name: "User", email: data.email } };
+    const response = await api.post('/auth/login', data);
+
+    if (response.status !== 200) {
+        throw new Error("Erro ao realizar login");
+    }
+
+    return response.data;
 };
 
 export const register = async (data: RegisterData) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Register Data:", data);
-    return { token: "mock-token", user: { name: data.name, email: data.email } };
+    const response = await api.post('/auth/register', data);
+
+    if (response.status !== 201) {
+        throw new Error("Erro ao realizar cadastro");
+    }
+
+    return response.data;
 };

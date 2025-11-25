@@ -1,4 +1,5 @@
 import Categories from "@/pages/categories";
+import { ProtectedRoute } from "@/components/protected-route";
 import Dashboard from "@/pages/dashboard";
 import DashboardHome from "@/pages/dashboard/home";
 import Ingredients from "@/pages/ingredients";
@@ -20,7 +21,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: <ProtectedRoute><Dashboard /></ProtectedRoute>,
     children: [
       { index: true, element: <DashboardHome /> },
       { path: "products", element: <Products /> },
