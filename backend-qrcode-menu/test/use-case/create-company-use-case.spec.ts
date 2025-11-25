@@ -1,14 +1,11 @@
-import { SlugEntity } from './../../src/domain/value-objects/slug-entity.value';
 import {
   CreateCompanyInputUseCase,
   CreateCompanyUseCase,
 } from '@application/use-case/company/create-company.usecase';
-import { Company } from '@domain/entities/company.entity';
 import {
   COMPANY_REPOSITORY,
   CompanyRepository,
 } from '@domain/repositories/company.repository';
-import { UniqueEntityId } from '@domain/value-objects/unique-entity-id.value';
 import { Test, TestingModule } from '@nestjs/testing';
 
 describe('CreateCompanyUseCase', () => {
@@ -23,6 +20,11 @@ describe('CreateCompanyUseCase', () => {
           provide: COMPANY_REPOSITORY,
           useValue: {
             create: jest.fn(),
+            findAll: jest.fn(),
+            findCompanyBySlug: jest.fn(),
+            findCompanyById: jest.fn(),
+            updateCompany: jest.fn(),
+            deleteCompany: jest.fn(),
           } as jest.Mocked<CompanyRepository>,
         },
       ],
@@ -35,9 +37,24 @@ describe('CreateCompanyUseCase', () => {
 
   it('deve criar uma nova empresa', async () => {
     const input: CreateCompanyInputUseCase = {
-      name: 'Restaurante Copilot',
+      name: 'Restaurante Comida no Bucho',
     };
 
-    const companyCreate = createCompanyUseCase.create(input);
+    companyRepository.create.mockResolvedValue({
+      id: '123',
+      name: input.name,
+      slug: 'restaurante-comida-no-bucho',
+      createdAt: new Date(),
+      image: '',
+      image_small: '',
+      products: [],
+    });
+
+    const companyCreate = await createCompanyUseCase.create(input);
+
+    expect(companyCreate.slug).toEqual('restaurante-comida-no-bucho');
+    expect(companyCreate.name).toEqual('Restaurante Comida no Bucho');
+    expect(companyCreate.createdAt).toBeInstanceOf(Date);
+
   });
 });
