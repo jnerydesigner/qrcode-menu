@@ -6,6 +6,7 @@ export interface CategoryRepository {
   deleteCategory(categoryId: string): Promise<void | ErrorMessage>;
   findCategory(categoryId: string): Promise<CategoryEntity>;
   updateCategory(data: CategoryEntity): Promise<CategoryEntity>;
+  findOneById(categoryId: string): Promise<CategoryEntity>;
 }
 
-export const CATEGORY_REPOSITORY = Symbol('CATEGORY_REPOSITORY');
+export const CATEGORY_REPOSITORY = 'CATEGORY_REPOSITORY'

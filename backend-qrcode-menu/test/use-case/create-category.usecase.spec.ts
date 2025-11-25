@@ -22,6 +22,7 @@ describe('CreateCategoryUsecase', () => {
                         findCategory: jest.fn(),
                         updateCategory: jest.fn(),
                         deleteCategory: jest.fn(),
+                        findOneById: jest.fn(),
                     } as jest.Mocked<CategoryRepository>,
                 },
             ],

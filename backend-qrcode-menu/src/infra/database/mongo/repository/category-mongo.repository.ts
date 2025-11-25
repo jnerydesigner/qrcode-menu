@@ -7,6 +7,7 @@ import { Model } from 'mongoose';
 import { CategoryMapper } from '@domain/mappers/category.mapper';
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Product as ProductMongo } from '../schema/product.schema';
+import { toObjectId } from '@infra/utils/objectid-converter.util';
 
 @Injectable()
 export class CategoryMongoRepository implements CategoryRepository {
@@ -16,7 +17,8 @@ export class CategoryMongoRepository implements CategoryRepository {
 
     @InjectModel(ProductMongo.name)
     private readonly productModel: Model<ProductMongo>,
-  ) {}
+  ) { }
+
 
   async create(data: CategoryEntity): Promise<any> {
     const categoryMapper = CategoryMapper.toMongo(data);
@@ -86,6 +88,20 @@ export class CategoryMongoRepository implements CategoryRepository {
 
     return CategoryMapper.fromMongo(
       updatedCategory as CategoryMongo & { created_at?: Date },
+    );
+  }
+
+  async findOneById(categoryId: string): Promise<CategoryEntity> {
+    console.log(categoryId);
+    const findCategory = await this.categoryModel.findById(toObjectId(categoryId)).lean();
+    console.log(findCategory);
+
+    if (!findCategory) {
+      throw new NotFoundException('Category Not Exists');
+    }
+
+    return CategoryMapper.fromMongo(
+      findCategory as CategoryMongo & { created_at?: Date },
     );
   }
 }

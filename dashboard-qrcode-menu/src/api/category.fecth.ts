@@ -16,3 +16,9 @@ export const createCategory = async (name: string, description: string) => {
 
   return data;
 };
+
+export const findCategoryById = async (id: string) => {
+  const response = await api.get(`/categories/${id}`);
+  const data: CategoryType = response.data;
+  return data;
+};

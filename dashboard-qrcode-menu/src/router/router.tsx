@@ -1,4 +1,6 @@
 import Categories from "@/pages/categories";
+import CreateCategory from "@/pages/categories/create";
+import UpdateCategory from "@/pages/categories/[categoryId]";
 import { ProtectedRoute } from "@/components/protected-route";
 import Dashboard from "@/pages/dashboard";
 import DashboardHome from "@/pages/dashboard/home";
@@ -27,6 +29,8 @@ export const router = createBrowserRouter([
       { path: "products", element: <Products /> },
       { path: "products/:productId", element: <ProductPage /> },
       { path: "categories", element: <Categories /> },
+      { path: "categories/new", element: <CreateCategory /> },
+      { path: "categories/:categoryId", element: <UpdateCategory /> },
       { path: "ingredients", element: <Ingredients /> },
       { path: "qrcode", element: <QrCodePage /> },
     ],

@@ -27,11 +27,13 @@ type CategoryFormValues = z.infer<typeof categorySchema>;
 type FormCategoriesProps = {
   selectedCategory?: CategoryType | null;
   onClearSelection?: () => void;
+  onSuccess?: () => void;
 };
 
 export const FormCategories = ({
   selectedCategory,
   onClearSelection,
+  onSuccess,
 }: FormCategoriesProps) => {
   const queryClient = useQueryClient();
   const form = useForm<CategoryFormValues>({
@@ -68,6 +70,7 @@ export const FormCategories = ({
     onSuccess: () => {
       form.reset();
       if (onClearSelection) onClearSelection();
+      if (onSuccess) onSuccess();
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
   });
