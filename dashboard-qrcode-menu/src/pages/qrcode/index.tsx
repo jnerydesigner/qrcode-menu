@@ -2,12 +2,12 @@
 import { findCompany } from "@/api/companies.fetch";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { QRCodeSVG } from "qrcode.react";
-import { QrCode, Download } from "lucide-react";
+import { Download } from "lucide-react";
 
 import { useRef } from "react";
 import { toast } from "sonner";
 import { useExport } from "@/hooks/use-export";
+import { QrCodeFolder } from "@/components/qrcode-folder";
 
 export default function QrCodePage() {
 
@@ -59,56 +59,7 @@ export default function QrCodePage() {
                 </Button>
 
                 <div className="flex justify-center">
-                    <div
-                        ref={folderRef}
-                        className="w-[400px] h-[600px] bg-white text-black shadow-2xl flex flex-col relative p-2"
-                        style={{
-                            background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)"
-                        }}
-                    >
-                        {/* IMAGEM */}
-                        <div className="h-48 w-full overflow-hidden">
-                            {company.image || company.image_small ? (
-                                <img
-                                    src={company.image || company.image_small}
-                                    alt={company.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                                    <span className="text-gray-500">Sem imagem</span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* NOME DO COMÉRCIO */}
-                        <div className="py-3 text-center bg-white/90">
-                            <h2 className="text-2xl font-bold text-gray-800">
-                                {company.name}
-                            </h2>
-                        </div>
-
-                        <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 space-y-6 bg-white/80 backdrop-blur-sm mx-4 my-4 rounded-xl shadow-sm">
-                            <div className="text-center space-y-2">
-                                <h3 className="text-xl font-semibold text-gray-800">Acesse nosso Menu</h3>
-                                <p className="text-sm text-gray-600">Escaneie o QR Code abaixo</p>
-                            </div>
-
-                            <div className="p-4 bg-white rounded-xl shadow-md">
-                                {url ? (
-                                    <QRCodeSVG value={url} size={150} level="H" includeMargin={false} />
-                                ) : (
-                                    <div className="w-[150px] h-[150px] bg-gray-100 flex items-center justify-center rounded-md">
-                                        <QrCode className="h-12 w-12 text-gray-400" />
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="text-center">
-                                <p className="text-xs text-gray-500 font-medium">Bom apetite!</p>
-                            </div>
-                        </div>
-                    </div>
+                    <QrCodeFolder ref={folderRef} company={company} url={url} size="large" />
                 </div>
             </div>
         </div>
