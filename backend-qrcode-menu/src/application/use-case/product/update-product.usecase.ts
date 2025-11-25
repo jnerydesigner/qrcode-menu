@@ -33,19 +33,21 @@ export class UpdateProductUseCase {
       return null;
     }
 
-    const requestedIngredientIds =
-      updateProductInput.productIngredient?.map((p) => p.ingredientId) ?? [];
-    const productIngredientMany = await Promise.all(
-      requestedIngredientIds.map(async (ingredientId) => {
-        const ingredient = await this.ingredientRepository.findId(ingredientId);
-
-        if (!ingredient) {
-          throw new Error(`Ingrediente com ID ${ingredientId} não encontrado.`);
-        }
-
-        return ingredient;
-      }),
-    );
+    const requestedIngredientIds = updateProductInput.productIngredient?.map(p => p.ingredientId) ?? [];
+    // Fetch all requested ingredients in a single batch
+    const ingredients = await this.ingredientRepository.findManyByIds(requestedIngredientIds);
+    // Validate that all requested ingredients exist
+    const missingIds = requestedIngredientIds.filter(id => !ingredients.find(ing => ing.id === id));
+    if (missingIds.length) {
+      throw new Error(`Ingrediente(s) com ID ${missingIds.join(', ')} não encontrado(s).`);
+    }
+    const existingIngredients = product.ingredients ?? [];
+    // Merge existing ingredients with newly fetched ones, avoiding duplicates
+    const mergedIngredients = [
+      ...existingIngredients,
+      ...ingredients.filter(ing => !existingIngredients.some(e => e.id === ing.id)),
+    ];
+    const productIngredientMany = mergedIngredients;
 
     const updatedProduct = new ProductEntity(
       updateProductInput.name ?? product.name,

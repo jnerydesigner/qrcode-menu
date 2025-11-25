@@ -17,6 +17,7 @@ export class CompanyMongoRepository implements CompanyRepository {
   ) { }
 
 
+
   async create(data: Company): Promise<Company> {
     const companyMapper = CompanyMapper.toMongo(data);
     const created = new this.companyModel(companyMapper);
@@ -80,5 +81,28 @@ export class CompanyMongoRepository implements CompanyRepository {
     console.log("Company with products:", companyWithProducts);
 
     return CompanyMapper.fromMongo(companyWithProducts as any as CompanyMongo & { created_at?: Date });
+  }
+
+
+  async findCompanyById(companyId: string): Promise<Company> {
+    const findCompany = await this.companyModel.findById(companyId);
+    if (!findCompany) {
+      throw new Error('Company not found');
+    }
+    return CompanyMapper.fromMongo(findCompany.toObject());
+  }
+  async updateCompany(companyId: string, data: Company): Promise<Company> {
+    await this.findCompanyById(companyId);
+    const companyMongo = await this.companyModel.findByIdAndUpdate(companyId, data);
+
+    if (!companyMongo) {
+      throw new Error('Company not found');
+    }
+
+    return CompanyMapper.fromMongo(companyMongo.toObject());
+  }
+
+  async deleteCompany(companyId: string): Promise<void> {
+    await this.companyModel.findByIdAndDelete(companyId);
   }
 }
