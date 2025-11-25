@@ -36,6 +36,7 @@ export class AuthController {
     }
 
     @Post('register')
+    @IsPublic()
     @ApiOperation({ summary: 'Register new user' })
     @ApiResponse({ status: 201, description: 'User registered successfully.' })
     @ApiResponse({ status: 400, description: 'Bad Request.' })
@@ -44,15 +45,15 @@ export class AuthController {
     }
 
     @Get('profile')
-    @ApiOperation({ summary: 'Get user profile' })
+    @ApiOperation({ summary: 'Get user profile from cookie-based session' })
     @ApiResponse({ status: 200, description: 'User profile retrieved successfully.' })
-    @UseGuards(JwtAuthGuard)
+    @ApiResponse({ status: 401, description: 'Unauthorized - No valid session cookie.' })
     async profile(@User() user) {
         return user;
     }
 
     @Post('logout')
-    @ApiOperation({ summary: 'Logout user' })
+    @ApiOperation({ summary: 'Logout user and clear session cookie' })
     @ApiResponse({ status: 200, description: 'User logged out successfully.' })
     async logout(@Res({ passthrough: true }) response: Response) {
         response.clearCookie('access_token');
@@ -67,6 +68,7 @@ export class AuthController {
     }
 
     @Post('forgot')
+    @IsPublic()
     @ApiOperation({ summary: 'Forgot password' })
     @ApiResponse({ status: 200, description: 'Password reset email sent.' })
     async forgot(@Body() data: ForgotPasswordDto) {
@@ -74,6 +76,7 @@ export class AuthController {
     }
 
     @Post('reset')
+    @IsPublic()
     @ApiOperation({ summary: 'Reset password' })
     @ApiResponse({ status: 200, description: 'Password reset successfully.' })
     async reset(@Body() data: ResetPasswordDto) {
