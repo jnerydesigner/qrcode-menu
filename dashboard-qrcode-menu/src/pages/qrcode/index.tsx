@@ -70,8 +70,7 @@ export default function QrCodePage() {
                         <div className="h-48 w-full overflow-hidden">
                             {company.image || company.image_small ? (
                                 <img
-                                    src={`http://localhost:3399/upload/proxy?url=${encodeURIComponent(company.image || company.image_small || "")}`}
-                                    crossOrigin="anonymous"
+                                    src={company.image || company.image_small}
                                     alt={company.name}
                                     className="w-full h-full object-cover"
                                 />
