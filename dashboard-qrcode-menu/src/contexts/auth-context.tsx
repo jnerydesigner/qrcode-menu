@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { api } from '@/api';
 
@@ -18,7 +18,7 @@ interface AuthContextProps {
   isLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+export const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
@@ -31,28 +31,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const response = await api.get<User>('/auth/profile');
         setUser(response.data);
         setIsAuthenticated(true);
-      } catch (error) {
+      } catch {
         setUser(null);
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
       }
     };
+
     checkAuth();
   }, []);
 
-  const login = () => {
-    setIsAuthenticated(true);
-  };
+  const login = () => setIsAuthenticated(true);
 
   const logout = async () => {
     try {
       await api.post('/auth/logout');
-    } catch (e) {
-      console.error('Logout error', e);
+    } finally {
+      setUser(null);
+      setIsAuthenticated(false);
     }
-    setUser(null);
-    setIsAuthenticated(false);
   };
 
   return (
@@ -60,12 +58,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };

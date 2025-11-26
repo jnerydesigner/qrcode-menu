@@ -198,7 +198,7 @@ export const TableProducts = () => {
                   data-state={row.getIsSelected() && "selected"}
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => {
-                    navigate(`/products/${row.original.id}`);
+                    navigate(`/dashboard/products/${row.original.id}`);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (

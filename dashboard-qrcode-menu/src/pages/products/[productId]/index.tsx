@@ -3,34 +3,12 @@ import { ProductIngredientsSheet } from "@/components/product-ingredients-sheet"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { ImageUploadDropzone } from "@/components/image-upload-dropzone";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Edit, Upload, Loader2, CloudUpload } from "lucide-react";
+import { ArrowLeft, Edit, Upload, Loader2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
-import { useState } from "react";
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-
-const imageUploadSchema = z.object({
-    file: z
-        .instanceof(FileList)
-        .refine((files) => files.length > 0, "Por favor, selecione uma imagem.")
-        .refine(
-            (files) => files[0]?.size <= MAX_FILE_SIZE,
-            "A imagem deve ter no máximo 5MB."
-        )
-        .refine(
-            (files) => ACCEPTED_IMAGE_TYPES.includes(files[0]?.type),
-            "Apenas arquivos .jpg, .jpeg, .png e .webp são aceitos."
-        ),
-});
-
-type ImageUploadFormData = z.infer<typeof imageUploadSchema>;
+import { useState, useEffect } from "react";
 
 export default function ProductPage() {
     const { productId } = useParams();
@@ -38,6 +16,7 @@ export default function ProductPage() {
     const queryClient = useQueryClient();
     const [isUploadMode, setIsUploadMode] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const {
         data: product,
@@ -50,24 +29,39 @@ export default function ProductPage() {
         staleTime: 1000 * 60 * 5, // 5 minutes
     });
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-    } = useForm<ImageUploadFormData>({
-        resolver: zodResolver(imageUploadSchema),
-    });
+    // Cleanup preview URL on unmount
+    useEffect(() => {
+        return () => {
+            if (imagePreview) {
+                URL.revokeObjectURL(imagePreview);
+            }
+        };
+    }, [imagePreview]);
+
+    const handleImageChange = (file: File | null) => {
+        if (file) {
+            // Create preview URL
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+            setSelectedFile(file);
+        } else {
+            // Clear preview
+            if (imagePreview) {
+                URL.revokeObjectURL(imagePreview);
+            }
+            setImagePreview(null);
+            setSelectedFile(null);
+        }
+    };
 
     const uploadMutation = useMutation({
         mutationFn: ({ productId, file }: { productId: string; file: File }) =>
             updateProductImage(productId, file),
         onSuccess: () => {
-            console.log()
             toast.success("Imagem atualizada com sucesso!");
             queryClient.invalidateQueries({ queryKey: ["product", productId] });
-            reset();
             setSelectedFile(null);
+            setImagePreview(null);
             setIsUploadMode(false);
         },
         onError: (error: any) => {
@@ -75,16 +69,9 @@ export default function ProductPage() {
         },
     });
 
-    const onSubmit = (data: ImageUploadFormData) => {
+    const handleUpload = () => {
         if (!productId || !selectedFile) return;
         uploadMutation.mutate({ productId, file: selectedFile });
-    };
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setSelectedFile(file);
-        }
     };
 
     if (isLoading) {
@@ -100,7 +87,7 @@ export default function ProductPage() {
     return (
         <section className="space-y-6">
             <div className="flex items-center gap-4">
-                <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
+                <Button variant="outline" size="icon" onClick={() => navigate('/dashboard/products')}>
                     <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div>
@@ -118,21 +105,30 @@ export default function ProductPage() {
             </div>
 
             <div className="flex flex-col items-center gap-4">
-                <div className="flex w-full items-center justify-center bg-muted/20 py-4 rounded-lg">
-                    {product.image ? (
-                        <img
-                            src={product.images?.image_small}
-                            alt={product.name}
-                            className="h-[250px] w-auto object-contain rounded-md"
+                {!isUploadMode ? (
+                    <div className="flex w-full items-center justify-center bg-muted/20 py-4 rounded-lg">
+                        {product.image ? (
+                            <img
+                                src={product.images?.image_small}
+                                alt={product.name}
+                                className="h-[250px] w-auto object-contain rounded-md"
+                            />
+                        ) : (
+                            <div className="flex h-[250px] w-full items-center justify-center text-muted-foreground">
+                                Sem imagem
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="w-full max-w-2xl">
+                        <ImageUploadDropzone
+                            value={product.images?.image_full}
+                            preview={imagePreview || undefined}
+                            onChange={handleImageChange}
+                            disabled={uploadMutation.isPending}
                         />
-                    ) : (
-                        <div className="flex h-[250px] w-full items-center justify-center text-muted-foreground">
-                            Sem imagem
-                        </div>
-                    )}
-                </div>
-
-
+                    </div>
+                )}
 
                 {!isUploadMode ? (
                     <Button
@@ -144,68 +140,39 @@ export default function ProductPage() {
                         Alterar Imagem
                     </Button>
                 ) : (
-                    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-2xl">
-                        <div className="flex justify-center items-center gap-3">
-                            <Label
-                                htmlFor="file"
-                                className="flex items-center gap-2 px-4 py-2 border border-input rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
-                            >
-                                <input
-                                    id="file"
-                                    type="file"
-                                    accept="image/jpeg,image/jpg,image/png,image/webp"
-                                    {...register("file")}
-                                    onChange={(e) => {
-                                        register("file").onChange(e);
-                                        handleFileChange(e);
-                                    }}
-                                    disabled={uploadMutation.isPending}
-                                    className="hidden"
-                                />
-                                <CloudUpload className="h-5 w-5" />
-                                <span className="text-sm font-medium">
-                                    {selectedFile ? selectedFile.name : "Escolher arquivo"}
-                                </span>
-                            </Label>
+                    <div className="flex gap-3">
+                        <Button
+                            onClick={handleUpload}
+                            disabled={uploadMutation.isPending || !selectedFile}
+                            className="cursor-pointer"
+                        >
+                            {uploadMutation.isPending ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Enviando...
+                                </>
+                            ) : (
+                                <>
+                                    <Upload className="mr-2 h-4 w-4" />
+                                    Enviar
+                                </>
+                            )}
+                        </Button>
 
-                            <Button
-                                type="submit"
-                                disabled={uploadMutation.isPending || !selectedFile}
-                                className="cursor-pointer"
-                            >
-                                {uploadMutation.isPending ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Enviando...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Upload className="mr-2 h-4 w-4" />
-                                        Enviar
-                                    </>
-                                )}
-                            </Button>
-
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => {
-                                    setIsUploadMode(false);
-                                    setSelectedFile(null);
-                                    reset();
-                                }}
-                                disabled={uploadMutation.isPending}
-                                className="cursor-pointer"
-                            >
-                                Cancelar
-                            </Button>
-                        </div>
-                        {errors.file && (
-                            <p className="text-sm text-red-500 mt-2">
-                                {errors.file.message?.toString()}
-                            </p>
-                        )}
-                    </form>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                                setIsUploadMode(false);
+                                setSelectedFile(null);
+                                setImagePreview(null);
+                            }}
+                            disabled={uploadMutation.isPending}
+                            className="cursor-pointer"
+                        >
+                            Cancelar
+                        </Button>
+                    </div>
                 )}
             </div>
 

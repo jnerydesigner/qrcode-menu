@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router";
 import type { CompanyType } from "@/types/company.type";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/contexts/use-auth";
 
 export type DashboardSection = "/" | "products" | "categories" | "ingredients" | "qrcode";
 

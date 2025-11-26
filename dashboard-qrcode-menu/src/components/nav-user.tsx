@@ -36,7 +36,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Link } from "react-router"
-import { useAuth } from "@/contexts/auth-context"
+import { useAuth } from "@/contexts/use-auth"
 import { useTheme } from "next-themes"
 
 export function NavUser() {

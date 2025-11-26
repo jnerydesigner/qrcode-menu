@@ -10,7 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { loginSchema, type LoginData } from "@/api/auth.fetch";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/contexts/use-auth";
 import { loginApiFetch } from "@/api/login.fetch";
 
 export default function Login() {
