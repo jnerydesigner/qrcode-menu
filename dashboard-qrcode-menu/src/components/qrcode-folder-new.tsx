@@ -8,7 +8,7 @@ interface QrCodeFolderProps {
     size?: "small" | "large";
 }
 
-export const QrCodeFolder = forwardRef<HTMLDivElement, QrCodeFolderProps>(
+export const QrCodeFolderNew = forwardRef<HTMLDivElement, QrCodeFolderProps>(
     ({ company, url, size = "large" }, ref) => {
         const dimensions = size === "small"
             ? { width: 300, height: 450, imageHeight: 36, qrSize: 150 }
@@ -50,33 +50,27 @@ export const QrCodeFolder = forwardRef<HTMLDivElement, QrCodeFolderProps>(
                 </div>
 
                 <div className="flex flex-col items-center justify-center flex-1 p-2 relative">
-                    <h3 className={`${size === "small" ? "text-base" : "text-2xl"} font-bold text-white uppercase tracking-wide mb-2 absolute top-60 z-20 [text-shadow:_2px_2px_4px_rgb(0_0_0_/_0.8)]`}>
+                    <h3 className={`${size === "small" ? "text-sm absolute top-32" : "text-2xl absolute top-60"} font-bold text-white uppercase tracking-wide mb-2 z-20 [text-shadow:_2px_2px_4px_rgb(0_0_0_/_0.8)]`}>
                         SCANEIE O QR CODE
                     </h3>
-                    <QrCodeGenerate url={url} size={size} dimensions={dimensions} className="w-[220px] bg-white p-2 flex justify-center items-center z-11 absolute -top-12" />
+                    <QrCodeGenerate
+                        url={url}
+                        size={size}
+                        dimensions={dimensions}
+                        className={`${size === "small" ? "w-[180px]" : "w-[220px]"} bg-white p-2 flex justify-center items-center z-20 absolute -top-12`}
+                    />
 
-
-
-
-
-                    <div
-                        className="w-full h-full z-10 flex items-center justify-center absolute"
-                    >
-
-
+                    <div className="w-full h-full z-10 flex items-center justify-center absolute">
                         <img
                             src="https://qr-code-menu-seligadev.s3.us-east-1.amazonaws.com/hamburguer-frango-crispy/hamburguer-frango-crispy_medium-7ec1c971-749b-444f-a08a-403a9272f6cc-1763909050396.png"
                             alt={company.name}
                             className="w-full h-full object-cover border-4 border-white"
                         />
-
                     </div>
-
-
                 </div>
             </div>
         );
     }
 );
 
-QrCodeFolder.displayName = "QrCodeFolder";
+QrCodeFolderNew.displayName = "QrCodeFolderNew";

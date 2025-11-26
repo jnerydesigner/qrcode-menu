@@ -1,17 +1,11 @@
 import { findCompany } from "@/api/companies.fetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { Building2, Calendar, Download, QrCode } from "lucide-react";
-import { useRef } from "react";
-import { toast } from "sonner";
-import { useExport } from "@/hooks/use-export";
-import { QrCodeFolder } from "@/components/qrcode-folder-new";
+import { Building2, Calendar } from "lucide-react";
+import { QrCodeDownloadCard } from "@/components/qr-code-download-card";
 
 
 export default function DashboardHome() {
-    const folderRef = useRef<HTMLDivElement>(null);
-    const { exportAsPDF } = useExport();
 
     const { data: company, isLoading, isError } = useQuery({
         queryKey: ["company"],
@@ -19,16 +13,6 @@ export default function DashboardHome() {
     });
 
     console.log("Company Principal", company)
-
-    const handleDownload = async () => {
-        try {
-            await exportAsPDF(folderRef.current, `${company?.name || "qrcode"}-folder.pdf`);
-            toast.success("Folder baixado com sucesso!");
-        } catch (error) {
-            console.error("Erro ao baixar folder:", error);
-            toast.error("Erro ao gerar o folder. Tente novamente.");
-        }
-    };
 
     if (isLoading) {
         return <div className="p-8 text-center">Carregando empresas...</div>;
@@ -53,9 +37,9 @@ export default function DashboardHome() {
                 </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
-                {/* CARD DA EMPRESA */}
-                <Card key={company.id} className="hover:shadow-lg transition-shadow">
+
+            <div className="flex justify-center">
+                <Card key={company.id} className="hover:shadow-lg transition-shadow max-w-2xl w-full">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-xl font-bold">
                             {company.name}
@@ -83,29 +67,12 @@ export default function DashboardHome() {
                         </div>
                     </CardContent>
                 </Card>
+            </div>
 
-                {/* FOLDER QR CODE */}
-                <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-xl font-bold">
-                            QR Code do Menu
-                        </CardTitle>
-                        <QrCode className="h-5 w-5 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex flex-col gap-4 mt-4">
-                            <Button onClick={handleDownload} className="w-full cursor-pointer">
-                                <Download className="mr-2 h-4 w-4" />
-                                Baixar Folder
-                            </Button>
-
-                            <div className="flex justify-center">
-                                <QrCodeFolder ref={folderRef} company={company} url={url} size="small" />
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
+            <div className="grid gap-6 md:grid-cols-3">
+                <QrCodeDownloadCard company={company} url={url} variant="new" />
+                <QrCodeDownloadCard company={company} url={url} variant="original" />
+                <QrCodeDownloadCard company={company} url={url} variant="new" />
             </div>
         </div>
     );

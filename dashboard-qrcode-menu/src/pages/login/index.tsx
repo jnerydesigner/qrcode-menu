@@ -27,10 +27,10 @@ export default function Login() {
 
     const { mutate: handleLogin, isPending } = useMutation({
         mutationFn: loginApiFetch,
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
             console.log("Login success:", data);
 
-            login(); // Agora pode usar o hook COM SEGURANÇA
+            await login(); // Agora pode usar o hook COM SEGURANÇA
 
             toast.success("Login realizado com sucesso!");
             navigate("/dashboard");
