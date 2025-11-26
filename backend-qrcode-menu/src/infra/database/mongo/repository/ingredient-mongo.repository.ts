@@ -83,9 +83,10 @@ export class IngredientMongoRepository implements IngredientRepository {
     if (ingredientIds.length === 0) {
       return [];
     }
+    const ingredientIdsObjectIds = ingredientIds.map((id) => toObjectId(id));
 
     const ingredientDocs = await this.ingredientModel
-      .find({ _id: { $in: ingredientIds } })
+      .find({ _id: { $in: ingredientIdsObjectIds } })
       .lean();
 
 
