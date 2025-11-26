@@ -1,10 +1,12 @@
 import { CATEGORY_REPOSITORY } from '@domain/repositories/category.repository';
 import { COMPANY_REPOSITORY } from '@domain/repositories/company.repository';
+import { ICONS_REPOSITORY } from '@domain/repositories/icons.repository';
 import { INGREDIENT_REPOSITORY } from '@domain/repositories/ingredient.repository';
 import { PRODUCT_REPOSITORY } from '@domain/repositories/product.repository';
 import { USERS_REPOSITORY } from '@domain/repositories/users.repository';
 import { CategoryMongoRepository } from '@infra/database/mongo/repository/category-mongo.repository';
 import { CompanyMongoRepository } from '@infra/database/mongo/repository/company-mongo.repository';
+import { IconsMongoRepository } from '@infra/database/mongo/repository/icons-mongo.repository';
 import { IngredientMongoRepository } from '@infra/database/mongo/repository/ingredient-mongo.repository';
 import { ProductMongoRepository } from '@infra/database/mongo/repository/product-mongo.repository';
 import { UsersMongoRepository } from '@infra/database/mongo/repository/users-mongo.repository';
@@ -16,6 +18,7 @@ import {
   Company,
   CompanySchema,
 } from '@infra/database/mongo/schema/company.schema';
+import { Icons, IconsSchema } from '@infra/database/mongo/schema/icons.schema';
 import {
   Ingredient,
   IngredientSchema,
@@ -38,6 +41,7 @@ const mongooseFeatureModules = [
     { name: Product.name, schema: ProductSchema },
     { name: ProductImage.name, schema: ProductImageSchema },
     { name: User.name, schema: UserSchema },
+    { name: Icons.name, schema: IconsSchema },
   ]),
 ];
 
@@ -46,6 +50,11 @@ const repositoryProviders = [
     provide: USERS_REPOSITORY,
     useFactory: (userModel: Model<User>) => new UsersMongoRepository(userModel),
     inject: [getModelToken(User.name)],
+  },
+  {
+    provide: ICONS_REPOSITORY,
+    useFactory: (iconsModel: Model<Icons>) => new IconsMongoRepository(iconsModel),
+    inject: [getModelToken(Icons.name)],
   },
   {
     provide: COMPANY_REPOSITORY,
@@ -99,7 +108,8 @@ const repositoryProviders = [
     CATEGORY_REPOSITORY,
     PRODUCT_REPOSITORY,
     INGREDIENT_REPOSITORY,
-    USERS_REPOSITORY
+    USERS_REPOSITORY,
+    ICONS_REPOSITORY
   ],
 })
 export class DatabaseModule { }

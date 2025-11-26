@@ -12,6 +12,7 @@ import { SeedModule } from './seed.module';
 import { UploadModule } from './upload.module';
 import { AuthModule } from './auth.module';
 import { UsersModule } from './users.module';
+import { IconsModule } from './icons.module';
 
 
 @Module({
@@ -38,6 +39,7 @@ import { UsersModule } from './users.module';
     UploadModule,
     AuthModule,
     UsersModule,
+    IconsModule
   ],
   controllers: [AppController],
   providers: [AppService],
