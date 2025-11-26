@@ -1,6 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { jwtConstants } from '../constants/constant';
 
 @Injectable()
@@ -13,17 +13,35 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 },
             ]),
             ignoreExpiration: false,
-            secretOrKey: jwtConstants.secret || 'secret',
+            secretOrKey: jwtConstants.secret,
         });
     }
 
-    async validate(payload: any) {
+    async validate(payload: PayloadUserInput): Promise<PayloadUserOutput> {
+        if (!payload || !payload.sub || !payload.role) {
+            throw new UnauthorizedException();
+        }
         return {
             userId: payload.sub,
             username: payload.username,
-            name: payload.name || payload.username?.split('@')[0] || 'User',
+            name: payload.name,
             email: payload.username,
             role: payload.role
         };
     }
+}
+
+interface PayloadUserInput {
+    username: string;
+    sub: string;
+    role: string;
+    name: string;
+}
+
+interface PayloadUserOutput {
+    userId: string;
+    username: string;
+    name: string;
+    email: string;
+    role: string;
 }

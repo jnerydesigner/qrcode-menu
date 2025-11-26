@@ -21,8 +21,11 @@ export class UsersService {
         return this.usersRepository.create(userEntity);
     }
 
-    async findOne(email: string): Promise<any> {
-        return this.usersRepository.findOne(email);
+    async findOne(email: string): Promise<UserEntity> {
+        const findUser = await this.usersRepository.findOne(email);
+        if (!findUser) throw new Error('User not found');
+
+        return findUser;
     }
 
     async find(data: any): Promise<any> {

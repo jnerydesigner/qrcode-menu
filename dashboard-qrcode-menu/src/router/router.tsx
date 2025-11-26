@@ -8,7 +8,8 @@ import Ingredients from "@/pages/ingredients";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import Products from "@/pages/products";
-import ProductPage from "@/pages/products/[productId]";
+import CreateProduct from "@/pages/products/create";
+import UpdateProduct from "@/pages/products/[productId]";
 import QrCodePage from "@/pages/qrcode";
 import { createBrowserRouter } from "react-router";
 
@@ -27,7 +28,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <DashboardHome /> },
       { path: "products", element: <Products /> },
-      { path: "products/:productId", element: <ProductPage /> },
+      { path: "products/new", element: <CreateProduct /> },
+      { path: "products/:productId", element: <UpdateProduct /> },
       { path: "categories", element: <Categories /> },
       { path: "categories/new", element: <CreateCategory /> },
       { path: "categories/:categoryId", element: <UpdateCategory /> },
