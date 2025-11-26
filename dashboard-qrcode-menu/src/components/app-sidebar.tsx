@@ -26,12 +26,12 @@ import { useNavigate } from "react-router";
 import type { CompanyType } from "@/types/company.type";
 import { useAuth } from "@/contexts/use-auth";
 
-export type DashboardSection = "/" | "products" | "categories" | "ingredients" | "qrcode";
+export type DashboardSection = "/" | "products" | "categories" | "ingredients" | "qrcode" | "qrcode-new";
 
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   company: CompanyType | undefined
-  activeSection: "/" | "products" | "categories" | "ingredients" | "qrcode";
+  activeSection: "/" | "products" | "categories" | "ingredients" | "qrcode" | "qrcode-new";
 }
 
 export function AppSidebar({ company, activeSection, ...props }: AppSidebarProps) {
@@ -69,6 +69,11 @@ export function AppSidebar({ company, activeSection, ...props }: AppSidebarProps
       {
         title: "QR Code",
         value: "qrcode" satisfies DashboardSection,
+        icon: QrCode,
+      },
+      {
+        title: "QR Code New",
+        value: "qrcode-new" satisfies DashboardSection,
         icon: QrCode,
       },
     ]

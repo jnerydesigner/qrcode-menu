@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { useExport } from "@/hooks/use-export";
 import { QrCodeFolder } from "@/components/qrcode-folder-new";
 
-export default function QrCodePage() {
+export default function QrCodePageNew() {
 
     const folderRef = useRef<HTMLDivElement>(null);
     const { exportAsImage, exportAsPDF } = useExport();

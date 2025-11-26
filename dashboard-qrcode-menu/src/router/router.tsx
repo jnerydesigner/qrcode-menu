@@ -12,6 +12,7 @@ import CreateProduct from "@/pages/products/create";
 import UpdateProduct from "@/pages/products/[productId]";
 import QrCodePage from "@/pages/qrcode";
 import { createBrowserRouter } from "react-router";
+import QrCodePageNew from "@/pages/qurcode-new";
 
 export const router = createBrowserRouter([
   {
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
       { path: "categories/:categoryId", element: <UpdateCategory /> },
       { path: "ingredients", element: <Ingredients /> },
       { path: "qrcode", element: <QrCodePage /> },
+      { path: "qrcode-new", element: <QrCodePageNew /> },
     ],
   },
 ]);

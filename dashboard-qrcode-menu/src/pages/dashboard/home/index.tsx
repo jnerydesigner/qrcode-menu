@@ -6,7 +6,7 @@ import { Building2, Calendar, Download, QrCode } from "lucide-react";
 import { useRef } from "react";
 import { toast } from "sonner";
 import { useExport } from "@/hooks/use-export";
-import { QrCodeFolder } from "@/components/qrcode-folder";
+import { QrCodeFolder } from "@/components/qrcode-folder-new";
 
 
 export default function DashboardHome() {
