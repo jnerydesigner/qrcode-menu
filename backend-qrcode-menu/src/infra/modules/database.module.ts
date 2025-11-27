@@ -3,12 +3,14 @@ import { COMPANY_REPOSITORY } from '@domain/repositories/company.repository';
 import { ICONS_REPOSITORY } from '@domain/repositories/icons.repository';
 import { INGREDIENT_REPOSITORY } from '@domain/repositories/ingredient.repository';
 import { PRODUCT_REPOSITORY } from '@domain/repositories/product.repository';
+import { SOCIAL_MEDIA_REPOSITORY } from '@domain/repositories/social-media.repository';
 import { USERS_REPOSITORY } from '@domain/repositories/users.repository';
 import { CategoryMongoRepository } from '@infra/database/mongo/repository/category-mongo.repository';
 import { CompanyMongoRepository } from '@infra/database/mongo/repository/company-mongo.repository';
 import { IconsMongoRepository } from '@infra/database/mongo/repository/icons-mongo.repository';
 import { IngredientMongoRepository } from '@infra/database/mongo/repository/ingredient-mongo.repository';
 import { ProductMongoRepository } from '@infra/database/mongo/repository/product-mongo.repository';
+import { SocialMediaMongoRepository } from '@infra/database/mongo/repository/social-media-mongo.repository';
 import { UsersMongoRepository } from '@infra/database/mongo/repository/users-mongo.repository';
 import {
   Category,
@@ -28,6 +30,11 @@ import {
   ProductSchema,
 } from '@infra/database/mongo/schema/product.schema';
 import { ProductImage, ProductImageSchema } from '@infra/database/mongo/schema/product_image.schema';
+import {
+  SocialMedia,
+  SocialMediaSchema,
+} from '@infra/database/mongo/schema/social-media.schema';
+
 import { User, UserSchema } from '@infra/database/mongo/schema/user.schema';
 import { Global, Module } from '@nestjs/common';
 import { MongooseModule, getModelToken } from '@nestjs/mongoose';
@@ -40,6 +47,7 @@ const mongooseFeatureModules = [
     { name: Ingredient.name, schema: IngredientSchema },
     { name: Product.name, schema: ProductSchema },
     { name: ProductImage.name, schema: ProductImageSchema },
+    { name: SocialMedia.name, schema: SocialMediaSchema },
     { name: User.name, schema: UserSchema },
     { name: Icons.name, schema: IconsSchema },
   ]),
@@ -58,9 +66,9 @@ const repositoryProviders = [
   },
   {
     provide: COMPANY_REPOSITORY,
-    useFactory: (companyModel: Model<Company>, productModel: Model<Product>) =>
-      new CompanyMongoRepository(companyModel, productModel),
-    inject: [getModelToken(Company.name), getModelToken(Product.name)],
+    useFactory: (companyModel: Model<Company>, productModel: Model<Product>, socialMediaModel: Model<SocialMedia>) =>
+      new CompanyMongoRepository(companyModel, productModel, socialMediaModel),
+    inject: [getModelToken(Company.name), getModelToken(Product.name), getModelToken(SocialMedia.name)],
   },
   {
     provide: CATEGORY_REPOSITORY,
@@ -97,6 +105,12 @@ const repositoryProviders = [
       new IngredientMongoRepository(ingredientModel),
     inject: [getModelToken(Ingredient.name)],
   },
+  {
+    provide: SOCIAL_MEDIA_REPOSITORY,
+    useFactory: (socialMediaModel: Model<SocialMedia>) =>
+      new SocialMediaMongoRepository(socialMediaModel),
+    inject: [getModelToken(SocialMedia.name)],
+  },
 ];
 
 @Global()
@@ -108,6 +122,7 @@ const repositoryProviders = [
     CATEGORY_REPOSITORY,
     PRODUCT_REPOSITORY,
     INGREDIENT_REPOSITORY,
+    SOCIAL_MEDIA_REPOSITORY,
     USERS_REPOSITORY,
     ICONS_REPOSITORY
   ],

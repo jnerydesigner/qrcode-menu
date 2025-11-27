@@ -6,6 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Company as CompanyMongo } from '../schema/company.schema';
 import { Product as ProductMongo } from '../schema/product.schema';
+import { SocialMedia } from '../schema/social-media.schema';
 
 @Injectable()
 export class CompanyMongoRepository implements CompanyRepository {
@@ -14,6 +15,8 @@ export class CompanyMongoRepository implements CompanyRepository {
     private readonly companyModel: Model<CompanyMongo>,
     @InjectModel(ProductMongo.name)
     private readonly productModel: Model<ProductMongo>,
+    @InjectModel(SocialMedia.name)
+    private readonly socialMediaModel: Model<SocialMedia>,
   ) { }
 
 
@@ -36,7 +39,9 @@ export class CompanyMongoRepository implements CompanyRepository {
           { path: 'ingredients' }
         ]
       })
+      .populate('social_medias')
       .lean();
+
 
     return companies.map((company) =>
       CompanyMapper.fromMongo(company as CompanyMongo & { created_at?: Date }),
@@ -54,7 +59,13 @@ export class CompanyMongoRepository implements CompanyRepository {
       throw new Error('Company not found');
     }
 
-    console.log("Company:", company);
+    const socialMedias = await this.socialMediaModel
+      .find({ company: company._id })
+      .lean();
+
+
+
+
 
     const products = await this.productModel
       .find({ company: company._id })
@@ -71,21 +82,20 @@ export class CompanyMongoRepository implements CompanyRepository {
       .lean();
 
 
-
-
     const companyWithProducts = {
       ...company,
-      products: products
+      social_medias: socialMedias,
+      products: products,
     };
 
-    console.log("Company with products:", companyWithProducts);
+
 
     return CompanyMapper.fromMongo(companyWithProducts as any as CompanyMongo & { created_at?: Date });
   }
 
 
   async findCompanyById(companyId: string): Promise<Company> {
-    const findCompany = await this.companyModel.findById(companyId);
+    const findCompany = await this.companyModel.findById(companyId).populate('social_medias');
     if (!findCompany) {
       throw new Error('Company not found');
     }
@@ -93,7 +103,8 @@ export class CompanyMongoRepository implements CompanyRepository {
   }
   async updateCompany(companyId: string, data: Company): Promise<Company> {
     await this.findCompanyById(companyId);
-    const companyMongo = await this.companyModel.findByIdAndUpdate(companyId, data);
+    const companyMapper = CompanyMapper.toMongo(data);
+    const companyMongo = await this.companyModel.findByIdAndUpdate(companyId, companyMapper, { new: true }).populate('social_medias');
 
     if (!companyMongo) {
       throw new Error('Company not found');

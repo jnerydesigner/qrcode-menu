@@ -13,6 +13,7 @@ import { UploadModule } from './upload.module';
 import { AuthModule } from './auth.module';
 import { UsersModule } from './users.module';
 import { IconsModule } from './icons.module';
+import { SocialMediaModule } from './social-media.module';
 
 
 @Module({
@@ -39,7 +40,8 @@ import { IconsModule } from './icons.module';
     UploadModule,
     AuthModule,
     UsersModule,
-    IconsModule
+    IconsModule,
+    SocialMediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

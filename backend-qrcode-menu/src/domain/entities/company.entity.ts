@@ -1,5 +1,6 @@
 import { SlugEntity } from '@domain/value-objects/slug-entity.value';
 import { UniqueEntityId } from '@domain/value-objects/unique-entity-id.value';
+import { SocialMediaEntity } from './social-media.entity';
 
 export class Company {
   id: string;
@@ -8,7 +9,8 @@ export class Company {
   createdAt: Date;
   image: string;
   image_small: string;
-  products?: any[]; // Array de produtos relacionados
+  products?: any[];
+  socialMedias?: SocialMediaEntity[];
 
   constructor(
     name: string,
@@ -18,6 +20,7 @@ export class Company {
     image?: string | null,
     image_small?: string | null,
     products?: any[],
+    socialMedias?: SocialMediaEntity[],
   ) {
     this.id = id !== null ? id : new UniqueEntityId().toString();
     this.name = name;
@@ -26,5 +29,6 @@ export class Company {
     this.image = image !== null && image !== undefined ? image : '';
     this.image_small = image_small !== null && image_small !== undefined ? image_small : '';
     this.products = products ?? [];
+    this.socialMedias = socialMedias ?? [];
   }
 }

@@ -1,3 +1,5 @@
+import type { SocialMediaType } from "./social-media.type";
+
 export interface CompanyType {
     id: string;
     name: string;
@@ -6,4 +8,5 @@ export interface CompanyType {
     image_small?: string;
     createdAt: string;
     updatedAt: string;
+    socialMedias: SocialMediaType[]
 }

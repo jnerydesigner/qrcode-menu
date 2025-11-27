@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { SocialMedia } from './social-media.schema';
 
 @Schema({
   collection: 'companies',
@@ -30,6 +31,14 @@ export class Company extends Document {
     default: [],
   })
   products: Types.ObjectId[];
+
+  @Prop({
+    type: [{ type: Types.ObjectId, ref: 'SocialMedias' }],
+    default: [],
+  })
+  social_medias: Types.ObjectId[];
+
+
 }
 
 export const CompanySchema = SchemaFactory.createForClass(Company);
