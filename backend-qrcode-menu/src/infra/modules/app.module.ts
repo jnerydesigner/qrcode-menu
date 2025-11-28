@@ -46,5 +46,6 @@ import { LoggerService } from '@application/services/logger.service';
   ],
   controllers: [AppController],
   providers: [AppService, LoggerService],
+  exports: [LoggerService],
 })
 export class AppModule { }

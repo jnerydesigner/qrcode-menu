@@ -1,3 +1,4 @@
+import { LoggerService } from '@application/services/logger.service';
 import { CATEGORY_REPOSITORY } from '@domain/repositories/category.repository';
 import { COMPANY_REPOSITORY } from '@domain/repositories/company.repository';
 import { ICONS_REPOSITORY } from '@domain/repositories/icons.repository';
@@ -66,9 +67,9 @@ const repositoryProviders = [
   },
   {
     provide: COMPANY_REPOSITORY,
-    useFactory: (companyModel: Model<Company>, productModel: Model<Product>, socialMediaModel: Model<SocialMedia>) =>
-      new CompanyMongoRepository(companyModel, productModel, socialMediaModel),
-    inject: [getModelToken(Company.name), getModelToken(Product.name), getModelToken(SocialMedia.name)],
+    useFactory: (companyModel: Model<Company>, productModel: Model<Product>, socialMediaModel: Model<SocialMedia>, logger: LoggerService) =>
+      new CompanyMongoRepository(companyModel, productModel, socialMediaModel, logger),
+    inject: [getModelToken(Company.name), getModelToken(Product.name), getModelToken(SocialMedia.name), LoggerService],
   },
   {
     provide: CATEGORY_REPOSITORY,
@@ -116,7 +117,7 @@ const repositoryProviders = [
 @Global()
 @Module({
   imports: [...mongooseFeatureModules],
-  providers: [...repositoryProviders],
+  providers: [...repositoryProviders, LoggerService],
   exports: [
     COMPANY_REPOSITORY,
     CATEGORY_REPOSITORY,

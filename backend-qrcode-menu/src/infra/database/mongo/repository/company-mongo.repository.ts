@@ -7,10 +7,10 @@ import { Model } from 'mongoose';
 import { Company as CompanyMongo } from '../schema/company.schema';
 import { Product as ProductMongo } from '../schema/product.schema';
 import { SocialMedia } from '../schema/social-media.schema';
+import { LoggerService } from '@application/services/logger.service';
 
 @Injectable()
 export class CompanyMongoRepository implements CompanyRepository {
-  private logger = new Logger(CompanyMongoRepository.name);
   constructor(
     @InjectModel(CompanyMongo.name)
     private readonly companyModel: Model<CompanyMongo>,
@@ -18,7 +18,10 @@ export class CompanyMongoRepository implements CompanyRepository {
     private readonly productModel: Model<ProductMongo>,
     @InjectModel(SocialMedia.name)
     private readonly socialMediaModel: Model<SocialMedia>,
-  ) { }
+    private readonly logger: LoggerService,
+  ) {
+    this.logger.setContext(CompanyMongoRepository.name);
+  }
 
 
 
@@ -44,7 +47,7 @@ export class CompanyMongoRepository implements CompanyRepository {
       .lean();
 
 
-    this.logger.log(companies);
+    this.logger.log(JSON.stringify(companies));
     return companies.map((company) =>
       CompanyMapper.fromMongo(company as CompanyMongo & { created_at?: Date }),
     );
@@ -56,7 +59,7 @@ export class CompanyMongoRepository implements CompanyRepository {
       .lean();
 
 
-    this.logger.log(company);
+    this.logger.log(JSON.stringify(company));
 
     if (!company) {
       throw new Error('Company not found');

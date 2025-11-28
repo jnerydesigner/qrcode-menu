@@ -9,4 +9,4 @@ export interface CompanyRepository {
   deleteCompany(companyId: string): Promise<void>;
 }
 
-export const COMPANY_REPOSITORY = Symbol('COMPANY_REPOSITORY');
+export const COMPANY_REPOSITORY = 'COMPANY_REPOSITORY';
