@@ -25,7 +25,6 @@ export default function Register() {
     const { mutate: handleRegister, isPending } = useMutation({
         mutationFn: registerUser,
         onSuccess: (data) => {
-            console.log("Register success:", data);
             toast.success("Conta criada com sucesso!");
             navigate("/dashboard");
         },

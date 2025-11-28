@@ -82,7 +82,6 @@ export default function ProductPage() {
         return <div>Erro ao carregar produto.</div>;
     }
 
-    console.log("Product", product)
 
     return (
         <section className="space-y-6">

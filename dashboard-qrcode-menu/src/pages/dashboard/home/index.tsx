@@ -14,8 +14,6 @@ export default function DashboardHome() {
         queryFn: () => findCompany("hamburgueria-da-vila"),
     });
 
-    console.log("Company Principal", company?.socialMedias)
-
     if (isLoading) {
         return <div className="p-8 text-center">Carregando empresas...</div>;
     }

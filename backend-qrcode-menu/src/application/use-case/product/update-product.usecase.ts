@@ -24,10 +24,9 @@ export class UpdateProductUseCase {
     productId: string,
     updateProductInput: UpdateProductInput,
   ): Promise<ProductEntity | null> {
-    console.log(updateProductInput)
+
     const product = await this.findProductOrNull(productId);
 
-    console.log(product)
 
     if (!product) {
       return null;

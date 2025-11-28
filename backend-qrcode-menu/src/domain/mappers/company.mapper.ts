@@ -13,6 +13,7 @@ export class CompanyMapper {
       slug,
       image: '',
       image_small: '',
+      status: company.status,
     };
   }
 
@@ -23,21 +24,18 @@ export class CompanyMapper {
       SocialMediaMapper.fromMongo(sm as any)
     );
 
-    console.log("SocialMedias: ", socialMedias)
-
 
     const companyEntity = new Company(
       companyMongo.name,
       companyMongo._id.toString(),
       companyMongo.created_at || new Date(),
       companyMongo.slug,
+      companyMongo.status,
       companyMongo.image,
       companyMongo.image_small,
       companyMongo.products || [],
       socialMedias,
     );
-
-    console.log("Company Entity: ", companyEntity)
     return companyEntity;
   }
 }

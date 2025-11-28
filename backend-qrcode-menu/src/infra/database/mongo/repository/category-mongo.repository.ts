@@ -92,9 +92,7 @@ export class CategoryMongoRepository implements CategoryRepository {
   }
 
   async findOneById(categoryId: string): Promise<CategoryEntity> {
-    console.log(categoryId);
     const findCategory = await this.categoryModel.findById(toObjectId(categoryId)).lean();
-    console.log(findCategory);
 
     if (!findCategory) {
       throw new NotFoundException('Category Not Exists');

@@ -1,6 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { SocialMedia } from './social-media.schema';
+
+
+export enum CompanyStatusEnum {
+  DISABLED = 'DISABLED',
+  ENABLED = 'ENABLED',
+}
 
 @Schema({
   collection: 'companies',
@@ -22,6 +27,8 @@ export class Company extends Document {
   @Prop({ required: false })
   image_small: string;
 
+  @Prop({ required: true, enum: CompanyStatusEnum, default: CompanyStatusEnum.DISABLED })
+  status: CompanyStatusEnum;
 
   @Prop()
   created_at: Date;

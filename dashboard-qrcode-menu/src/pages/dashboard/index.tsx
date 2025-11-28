@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/sidebar";
 import { findCompany } from "@/api/companies.fetch";
 import { useQuery } from "@tanstack/react-query";
-import { MenuBar } from "@/components/menu-bar";
 
 export default function Dashboard() {
   const { data: company, isLoading, isError } = useQuery({
@@ -26,7 +25,6 @@ export default function Dashboard() {
     queryFn: () => findCompany("hamburgueria-da-vila"),
   });
 
-  console.log("Company Principal", company)
   const location = useLocation();
 
   const currentPath =

@@ -21,7 +21,6 @@ export const findOneProduct = async (productId: string) => {
   const response = await api.get(`/products/${productId}`);
   const data: ProductType = response.data;
 
-  console.log(data)
 
   return data;
 };

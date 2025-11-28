@@ -1,7 +1,7 @@
 import { Company } from '@domain/entities/company.entity';
 import { CompanyMapper } from '@domain/mappers/company.mapper';
 import { CompanyRepository } from '@domain/repositories/company.repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Company as CompanyMongo } from '../schema/company.schema';
@@ -10,6 +10,7 @@ import { SocialMedia } from '../schema/social-media.schema';
 
 @Injectable()
 export class CompanyMongoRepository implements CompanyRepository {
+  private logger = new Logger(CompanyMongoRepository.name);
   constructor(
     @InjectModel(CompanyMongo.name)
     private readonly companyModel: Model<CompanyMongo>,
@@ -43,6 +44,7 @@ export class CompanyMongoRepository implements CompanyRepository {
       .lean();
 
 
+    this.logger.log(companies);
     return companies.map((company) =>
       CompanyMapper.fromMongo(company as CompanyMongo & { created_at?: Date }),
     );
@@ -54,6 +56,7 @@ export class CompanyMongoRepository implements CompanyRepository {
       .lean();
 
 
+    this.logger.log(company);
 
     if (!company) {
       throw new Error('Company not found');
@@ -101,6 +104,7 @@ export class CompanyMongoRepository implements CompanyRepository {
     }
     return CompanyMapper.fromMongo(findCompany.toObject());
   }
+
   async updateCompany(companyId: string, data: Company): Promise<Company> {
     await this.findCompanyById(companyId);
     const companyMapper = CompanyMapper.toMongo(data);

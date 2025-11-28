@@ -341,8 +341,6 @@ export class ProductMongoRepository implements ProductRepository {
       .populate('images')
       .lean<PopulatedProductMongo>();
 
-    console.log("updatedProduct", updatedProduct)
-
     if (!updatedProduct) {
       throw new NotFoundProductError(
         `Produto com ID ${productId} não encontrado para atualização de imagem.`,
@@ -356,7 +354,6 @@ export class ProductMongoRepository implements ProductRepository {
     const productImage = await this.productImageModel.findOne({ product: toObjectId(productId) });
 
 
-    console.log(productImage)
     if (!productImage) {
       return null
     }

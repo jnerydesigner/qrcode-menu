@@ -28,7 +28,6 @@ export default function Login() {
     const { mutate: handleLogin, isPending } = useMutation({
         mutationFn: loginApiFetch,
         onSuccess: async (data) => {
-            console.log("Login success:", data);
 
             await login(); // Agora pode usar o hook COM SEGURANÇA
 
@@ -42,7 +41,6 @@ export default function Login() {
     });
 
     const onSubmit = (data: LoginData) => {
-        console.log("Login data:", data);
         handleLogin(data);
     };
 

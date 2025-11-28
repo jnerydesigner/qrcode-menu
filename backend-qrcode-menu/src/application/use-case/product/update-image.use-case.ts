@@ -43,9 +43,6 @@ export class UpdateImageProductUseCase {
     const smallUrl = await this.uploadService.uploadFile(images.file_small, product.slug, "small");
 
     const response = await this.productRepository.updateImage(productId, fullUrl.url, mediumUrl.url, smallUrl.url);
-
-
-    console.log("Response", response)
     return response;
   }
 }

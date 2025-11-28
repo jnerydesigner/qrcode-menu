@@ -175,7 +175,6 @@ export class ProductMapper {
       productMongo.company?.toString?.();
 
     const imagesData = productMongo.images;
-    console.log('ProductMapper imagesData:', JSON.stringify(imagesData, null, 2));
     let mappedImages: { image_full: string; image_medium: string; image_small: string } | undefined;
 
     if (Array.isArray(imagesData) && imagesData.length > 0) {

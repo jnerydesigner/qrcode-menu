@@ -57,7 +57,6 @@ export class CategoryController {
   findOneCategory(
     @Param('categoryId') categoryId: string,
   ) {
-    console.log(categoryId);
     return this.findOneCategoryUseCase.execute(categoryId);
   }
 

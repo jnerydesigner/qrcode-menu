@@ -40,7 +40,6 @@ describe("FindOneCategory", () => {
         categoryRepository.findOneById.mockResolvedValue(category);
         const result = await findOneCategoryUseCase.execute(categoryId);
 
-        console.log(result)
         expect(result).toEqual(category);
     });
 });

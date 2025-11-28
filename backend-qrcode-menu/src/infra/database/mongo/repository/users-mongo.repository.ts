@@ -16,7 +16,6 @@ export class UsersMongoRepository implements UsersRepository {
     ) { }
     async create(data: UserEntity): Promise<any> {
         const userMapper = UserMapper.toMongo(data)
-        console.log(userMapper)
         const created = new this.userModel(userMapper);
         const saved = await created.save();
 

@@ -17,7 +17,6 @@ export class SocialMediaMapper {
                 throw new Error('Company ID is required');
             })()
 
-        console.log(socialMediaCompanyObjectId, socialMediaObjectId)
         return {
             _id: socialMediaObjectId,
             name: socialMedia.name,
