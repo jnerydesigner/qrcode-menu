@@ -1,4 +1,6 @@
+import { LoggerService } from '@application/services/logger.service';
 import { JwtAuthGuard } from '@infra/guard/jwt-auth.guard';
+import { LoggingInterceptor } from '@infra/interceptors/logging.interceptor';
 import { AppModule } from '@infra/modules/app.module';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -10,6 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(cookieParser());
+  app.useGlobalInterceptors(new LoggingInterceptor(app.get(LoggerService)));
 
   // 🔥 CORS correto e suficiente
   app.enableCors({

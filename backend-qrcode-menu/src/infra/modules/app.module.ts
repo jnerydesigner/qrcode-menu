@@ -14,6 +14,7 @@ import { AuthModule } from './auth.module';
 import { UsersModule } from './users.module';
 import { IconsModule } from './icons.module';
 import { SocialMediaModule } from './social-media.module';
+import { LoggerService } from '@application/services/logger.service';
 
 
 @Module({
@@ -44,6 +45,6 @@ import { SocialMediaModule } from './social-media.module';
     SocialMediaModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, LoggerService],
 })
 export class AppModule { }
