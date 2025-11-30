@@ -24,6 +24,7 @@ describe('UpdateProductUseCase', () => {
           slug: 'cheese',
         },
       ],
+      '6910c8887042b03fc68ba3ac', // Added ID to the product entity
     );
 
   it('should ignore updates when the product does not exist', async () => {
@@ -35,8 +36,8 @@ describe('UpdateProductUseCase', () => {
     const productRepository: ProductRepository = {
       save: jest.fn(),
       findProductBySlug: jest.fn(),
-      findOne: jest.fn().mockRejectedValue(notFoundError),
-      findOneSlug: jest.fn(),
+      findOne: jest.fn(),
+      findOneSlug: jest.fn().mockRejectedValue(notFoundError),
       saveMany: jest.fn(),
       findAll: jest.fn(),
       updateProduct: jest.fn(),
@@ -55,7 +56,7 @@ describe('UpdateProductUseCase', () => {
       ingredientRepository,
     );
 
-    const result = await useCase.execute('missing-id', {});
+    const result = await useCase.execute('missing-slug', {});
 
     expect(result).toBeNull();
     expect(ingredientRepository.findManyByIds).not.toHaveBeenCalled();
@@ -75,8 +76,8 @@ describe('UpdateProductUseCase', () => {
     const productRepository: ProductRepository = {
       save: jest.fn(),
       findProductBySlug: jest.fn(),
-      findOne: jest.fn().mockResolvedValue(product),
-      findOneSlug: jest.fn(),
+      findOne: jest.fn(),
+      findOneSlug: jest.fn().mockResolvedValue(product),
       saveMany: jest.fn(),
       findAll: jest.fn(),
       updateProduct: jest
@@ -97,7 +98,7 @@ describe('UpdateProductUseCase', () => {
       ingredientRepository,
     );
 
-    const result = await useCase.execute(product.id, {
+    const result = await useCase.execute(product.slug, {
       productIngredient: [
         {
           ingredientId: newIngredient.id,
@@ -105,7 +106,7 @@ describe('UpdateProductUseCase', () => {
       ],
     });
 
-    expect(productRepository.findOne).toHaveBeenCalledWith(product.id);
+    expect(productRepository.findOneSlug).toHaveBeenCalledWith(product.slug);
     expect(ingredientRepository.findManyByIds).toHaveBeenCalledWith([
       newIngredient.id,
     ]);
