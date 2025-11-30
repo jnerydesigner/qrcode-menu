@@ -17,6 +17,8 @@ import {
 } from '@infra/database/mongo/schema/company.schema';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { SocialMedia, SocialMediaSchema } from '@infra/database/mongo/schema/social-media.schema';
+import { ProductImage, ProductImageSchema } from '@infra/database/mongo/schema/product_image.schema';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { MongooseModule } from '@nestjs/mongoose';
       { name: Ingredient.name, schema: IngredientSchema },
       { name: Product.name, schema: ProductSchema },
       { name: Company.name, schema: CompanySchema },
+      { name: SocialMedia.name, schema: SocialMediaSchema },
+      { name: ProductImage.name, schema: ProductImageSchema },
     ]),
   ],
   providers: [SeedService],

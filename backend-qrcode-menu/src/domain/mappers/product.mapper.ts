@@ -63,16 +63,13 @@ export class ProductMapper {
       }
       | Types.ObjectId;
       images?:
-      | (
-        | {
-          _id?: Types.ObjectId;
-          image_full: string;
-          image_medium: string;
-          image_small: string;
-        }
-        | Types.ObjectId
-      )
-      | Types.ObjectId[];
+      | {
+        _id?: Types.ObjectId;
+        image_full: string;
+        image_medium: string;
+        image_small: string;
+      }
+      | Types.ObjectId;
       ingredients?: (
         | {
           _id?: Types.ObjectId;
@@ -177,16 +174,13 @@ export class ProductMapper {
     const imagesData = productMongo.images;
     let mappedImages: { image_full: string; image_medium: string; image_small: string } | undefined;
 
-    if (Array.isArray(imagesData) && imagesData.length > 0) {
-      const firstImage = imagesData[0];
-      if (firstImage && !(firstImage instanceof Types.ObjectId) && 'image_full' in (firstImage as any)) {
-        const img = firstImage as any;
-        mappedImages = {
-          image_full: img.image_full,
-          image_medium: img.image_medium,
-          image_small: img.image_small,
-        };
-      }
+    if (imagesData && !(imagesData instanceof Types.ObjectId) && 'image_full' in (imagesData as any)) {
+      const img = imagesData as any;
+      mappedImages = {
+        image_full: img.image_full,
+        image_medium: img.image_medium,
+        image_small: img.image_small,
+      };
     }
 
     return new ProductEntity(

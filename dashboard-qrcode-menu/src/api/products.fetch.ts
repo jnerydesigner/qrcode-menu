@@ -17,19 +17,19 @@ export const createProduct = async (product: CreateProductType) => {
   return data;
 };
 
-export const findOneProduct = async (productId: string) => {
-  const response = await api.get(`/products/${productId}`);
+export const findOneProduct = async (slug: string) => {
+  const response = await api.get(`/products/${slug}`);
   const data: ProductType = response.data;
 
 
   return data;
 };
 
-export const updateProductImage = async (productId: string, file: File) => {
+export const updateProductImage = async (slug: string, file: File) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await api.patch(`/products/upload/${productId}`, formData, {
+  const response = await api.patch(`/products/upload/${slug}`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -42,10 +42,10 @@ export const updateProductImage = async (productId: string, file: File) => {
 };
 
 export const updateProduct = async (
-  productId: string,
+  slug: string,
   product: Partial<CreateProductType> & { productIngredient?: { ingredientId: string }[] }
 ) => {
-  const response = await api.patch(`/products/${productId}`, product);
+  const response = await api.patch(`/products/${slug}`, product);
   const data: ProductType = response.data;
 
   return data;

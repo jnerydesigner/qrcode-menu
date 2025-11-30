@@ -76,12 +76,12 @@ export const columns: ColumnDef<ProductType>[] = [
     ),
   },
   {
-    accessorKey: "images.image_small",
-    id: "image_small",
+    accessorKey: "image",
+    id: "image",
     header: "Imagem",
     cell: ({ row }) => (
       <div className="w-15 h-15  flex justify-center items-center">
-        <img src={row.getValue("image_small")} alt="" className="max-w-full max-h-full object-cover" />
+        <img src={row.getValue("image")} alt="" className="max-w-full max-h-full object-cover" />
       </div>
     ),
   },
@@ -103,6 +103,8 @@ export const TableProducts = () => {
     queryKey: ["products"],
     queryFn: async () => await findAllProducts(),
   });
+
+  console.log(data)
 
   // ⚠️ Hook useReactTable também precisa vir antes de qualquer return
   const table = useReactTable({
@@ -198,7 +200,7 @@ export const TableProducts = () => {
                   data-state={row.getIsSelected() && "selected"}
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => {
-                    navigate(`/dashboard/products/${row.original.id}`);
+                    navigate(`/dashboard/products/${row.original.slug}`);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (

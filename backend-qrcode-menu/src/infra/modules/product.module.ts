@@ -1,3 +1,4 @@
+import { LoggerService } from '@application/services/logger.service';
 import { ResizeImageService } from '@application/services/resize-image.service';
 import { S3UploadService } from '@application/services/s3-upload.service';
 import { CreateManyProductUseCase } from '@application/use-case/product/create-many-product.usecase';
@@ -25,7 +26,8 @@ import { ProductController } from '@presenters/controllers/product/product.contr
     S3UploadService,
     S3ConfigService,
     UpdateImageProductUseCase,
-    ResizeImageService
+    ResizeImageService,
+    LoggerService
   ],
 })
 export class ProductModule { }

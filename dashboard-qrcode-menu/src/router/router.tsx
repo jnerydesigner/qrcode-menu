@@ -9,7 +9,7 @@ import Login from "@/pages/login";
 import Register from "@/pages/register";
 import Products from "@/pages/products";
 import CreateProduct from "@/pages/products/create";
-import UpdateProduct from "@/pages/products/[productId]";
+import UpdateProduct from "@/pages/products/[slug]";
 import QrCodePage from "@/pages/qrcode";
 import { createBrowserRouter } from "react-router";
 import QrCodePageNew from "@/pages/qurcode-new";
@@ -30,10 +30,10 @@ export const router = createBrowserRouter([
       { index: true, element: <DashboardHome /> },
       { path: "products", element: <Products /> },
       { path: "products/new", element: <CreateProduct /> },
-      { path: "products/:productId", element: <UpdateProduct /> },
+      { path: "products/:slug", element: <UpdateProduct /> },
       { path: "categories", element: <Categories /> },
       { path: "categories/new", element: <CreateCategory /> },
-      { path: "categories/:categoryId", element: <UpdateCategory /> },
+      { path: "categories/:slug", element: <UpdateCategory /> },
       { path: "ingredients", element: <Ingredients /> },
       { path: "qrcode", element: <QrCodePage /> },
       { path: "qrcode-new", element: <QrCodePageNew /> },

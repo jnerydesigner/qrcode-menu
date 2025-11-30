@@ -21,11 +21,11 @@ export class UpdateProductUseCase {
   ) { }
 
   async execute(
-    productId: string,
+    slug: string,
     updateProductInput: UpdateProductInput,
   ): Promise<ProductEntity | null> {
 
-    const product = await this.findProductOrNull(productId);
+    const product = await this.findProductOrNull(slug);
 
 
     if (!product) {
@@ -67,14 +67,14 @@ export class UpdateProductUseCase {
   }
 
   private async findProductOrNull(
-    productId: string,
+    slug: string,
   ): Promise<ProductEntity | null> {
     try {
-      const product = await this.productRepository.findOne(productId);
+      const product = await this.productRepository.findOneSlug(slug);
       return product;
     } catch (error) {
       if (this.isNotFoundError(error)) {
-        console.warn('⚠️ Product not found:', productId);
+        console.warn('⚠️ Product not found:', slug);
         return null;
       }
 

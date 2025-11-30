@@ -9,6 +9,7 @@ import { jwtConstants } from '@infra/constants/constant';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from '@infra/strategies/jwt.strategy';
 import { RolesGuard } from '@infra/guard/roles.guard';
+import { LoggerService } from '@application/services/logger.service';
 
 @Module({
     imports: [
@@ -20,7 +21,7 @@ import { RolesGuard } from '@infra/guard/roles.guard';
             signOptions: { expiresIn: '1h' },
         }),
     ],
-    providers: [AuthService, JwtStrategy, RolesGuard],
+    providers: [AuthService, JwtStrategy, RolesGuard, LoggerService],
     exports: [AuthService],
     controllers: [AuthController],
 })

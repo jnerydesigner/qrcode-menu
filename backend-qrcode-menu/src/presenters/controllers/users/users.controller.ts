@@ -1,5 +1,6 @@
 import { CreateUserDto } from '@application/dtos/create-user.dto';
 import { UsersService } from '@application/services/users.service';
+import { IsPublic } from '@infra/decorators/is-public.decorator';
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -11,6 +12,7 @@ export class UsersController {
     ) { }
 
     @Post()
+    @IsPublic()
     @ApiOperation({ summary: 'Create a new user' })
     @ApiResponse({ status: 201, description: 'The user has been successfully created.' })
     @ApiResponse({ status: 400, description: 'Bad Request.' })

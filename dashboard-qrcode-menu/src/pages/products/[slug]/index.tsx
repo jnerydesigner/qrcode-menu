@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useState, useEffect } from "react";
 
 export default function ProductPage() {
-    const { productId } = useParams();
+    const { slug } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [isUploadMode, setIsUploadMode] = useState(false);
@@ -23,9 +23,9 @@ export default function ProductPage() {
         isLoading,
         isError,
     } = useQuery({
-        queryKey: ["product", productId],
-        queryFn: () => findOneProduct(productId!),
-        enabled: !!productId,
+        queryKey: ["product", slug],
+        queryFn: () => findOneProduct(slug!),
+        enabled: !!slug,
         staleTime: 1000 * 60 * 5, // 5 minutes
     });
 
@@ -55,11 +55,11 @@ export default function ProductPage() {
     };
 
     const uploadMutation = useMutation({
-        mutationFn: ({ productId, file }: { productId: string; file: File }) =>
-            updateProductImage(productId, file),
+        mutationFn: ({ slug, file }: { slug: string; file: File }) =>
+            updateProductImage(slug, file),
         onSuccess: () => {
             toast.success("Imagem atualizada com sucesso!");
-            queryClient.invalidateQueries({ queryKey: ["product", productId] });
+            queryClient.invalidateQueries({ queryKey: ["product", slug] });
             setSelectedFile(null);
             setImagePreview(null);
             setIsUploadMode(false);
@@ -70,8 +70,8 @@ export default function ProductPage() {
     });
 
     const handleUpload = () => {
-        if (!productId || !selectedFile) return;
-        uploadMutation.mutate({ productId, file: selectedFile });
+        if (!slug || !selectedFile) return;
+        uploadMutation.mutate({ slug, file: selectedFile });
     };
 
     if (isLoading) {
@@ -82,6 +82,7 @@ export default function ProductPage() {
         return <div>Erro ao carregar produto.</div>;
     }
 
+    console.log("product", product)
 
     return (
         <section className="space-y-6">

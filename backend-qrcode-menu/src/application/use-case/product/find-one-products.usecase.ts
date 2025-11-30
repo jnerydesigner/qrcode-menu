@@ -8,9 +8,9 @@ export class FindOneProductUseCase {
   constructor(
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
-  ) {}
-  execute(productId: string) {
-    return this.productRepository.findOne(productId);
+  ) { }
+  execute(slug: string) {
+    return this.productRepository.findOneSlug(slug);
   }
 }
 

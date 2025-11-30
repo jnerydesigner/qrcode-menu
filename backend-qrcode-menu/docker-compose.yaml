@@ -1,37 +1,20 @@
 version: "3.5"
 
 services:
-  db:
-    image: postgres
-    container_name: postgres_online_menu
-    volumes:
-      - ./data/postgres:/data/postgres
-    environment:
-      POSTGRES_PASSWORD: 123456
-      POSTGRES_USER: root
-      POSTGRES_DB: menu_online
-      PGDATA: /data/postgres
-    ports:
-      - "5482:5432"
-    restart: unless-stopped
-
-  mongo:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  mongodb_container:
     container_name: mongo_online_menu
+    image: mongo:latest
     environment:
-      MONGO_REPLICA_HOST: localhost
-      MONGO_REPLICA_PORT: 27017
-      MONGO_REPLICA_SET: rs0
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
     ports:
-      - "27017:27017"
+      - 27018:27017
     volumes:
-      - ./data/mongo:/data/db
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "mongosh", "--host", "localhost", "--port", "27017", "--eval", "db.runCommand({ ping: 1 })"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+      - mongodb_data_container:/data/db
+
+
+
+volumes:
+  mongodb_data_container:
+    driver: local
+

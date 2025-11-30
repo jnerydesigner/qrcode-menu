@@ -31,15 +31,14 @@ type PopulatedProductMongo = ProductMongo & {
       slug: string;
     }
   )[];
-  images?: (
-    | Types.ObjectId
-    | {
-      _id?: Types.ObjectId;
-      image_full: string;
-      image_medium: string;
-      image_small: string;
-    }
-  )[];
+  images?:
+  | Types.ObjectId
+  | {
+    _id?: Types.ObjectId;
+    image_full: string;
+    image_medium: string;
+    image_small: string;
+  };
 };
 
 @Injectable()
@@ -120,6 +119,7 @@ export class ProductMongoRepository implements ProductRepository {
       .populate('images')
       .lean<PopulatedProductMongo>();
 
+
     if (!product) {
       throw new NotFoundProductError(`Product id ${prodId} not exists`);
     }
@@ -141,14 +141,23 @@ export class ProductMongoRepository implements ProductRepository {
         options: { virtuals: false },
       })
       .populate('ingredients')
-      .populate('images')
       .lean<PopulatedProductMongo>();
 
     if (!product) {
       throw new NotFoundProductError(`Product slug ${slug} not exists`);
     }
 
-    return ProductMapper.fromMongo(product);
+    const images = await this.productImageModel.findOne({ product: product._id }).lean();
+
+
+
+    console.log("product", images);
+    const productMap = {
+      ...product,
+      images: images
+    }
+
+    return ProductMapper.fromMongo(productMap as unknown as PopulatedProductMongo);
   }
 
   async saveMany(products: ProductEntity[]): Promise<ProductEntity[]> {
@@ -331,8 +340,7 @@ export class ProductMongoRepository implements ProductRepository {
       .findByIdAndUpdate(
         toObjectId(productId),
         {
-          $set: { image },
-          $addToSet: { images: productImage._id },
+          $set: { image, images: productImage._id },
         },
         { new: true },
       )

@@ -1,3 +1,4 @@
+import { LoggerService } from '@application/services/logger.service';
 import {
   PRODUCT_REPOSITORY,
   type ProductRepository,
@@ -5,14 +6,17 @@ import {
 import { Inject, Logger } from '@nestjs/common';
 
 export class FindAllProductUseCase {
-  private logger = new Logger('FindAllProductUseCase');
+
   constructor(
     @Inject(PRODUCT_REPOSITORY)
     private readonly productRepository: ProductRepository,
-  ) {}
+    private readonly loggerService: LoggerService,
+  ) {
+    this.loggerService.setContext(FindAllProductUseCase.name);
+  }
   async execute() {
     const products = await this.productRepository.findAll();
-    this.logger.log(products);
+    this.loggerService.info(JSON.stringify(products));
     return products;
   }
 }

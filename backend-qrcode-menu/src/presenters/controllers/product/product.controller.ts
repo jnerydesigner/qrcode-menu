@@ -63,19 +63,21 @@ export class ProductController {
     return this.findAllProductsUseCase.execute();
   }
 
-  @Get('/:productId')
-  findOne(@Param('productId') productId: string) {
-    return this.findOneProductUseCase.execute(productId);
+  @Get('/:slug')
+  findOne(@Param('slug') slug: string) {
+    console.log(slug);
+    return this.findOneProductUseCase.execute(slug);
   }
 
-  @Patch('/:productId')
+  @Patch('/:slug')
   @ApiOperation({ summary: 'Atualiza um Produto' })
   @ApiBody({ type: UpdateProductIngredientRequest })
   updateProduct(
-    @Param('productId') productId: string,
+    @Param('slug') slug: string,
     @Body() updateProductBody: UpdateProductInput,
   ) {
-    return this.updateProductsUseCase.execute(productId, updateProductBody);
+
+    return this.updateProductsUseCase.execute(slug, updateProductBody);
   }
 
   @Post('/many-products')
