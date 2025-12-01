@@ -73,8 +73,8 @@ export class LoggerService {
         this.logger.info(message, this.attachContext(meta));
     }
 
-    log(message: string, meta?: any) {
-        this.logger.info(message, this.attachContext(meta));
+    log(message: any) {
+        this.logger.info(message);
     }
 
     warn(message: string, meta?: any) {

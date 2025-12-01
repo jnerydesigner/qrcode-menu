@@ -15,6 +15,9 @@ import { UsersModule } from './users.module';
 import { IconsModule } from './icons.module';
 import { SocialMediaModule } from './social-media.module';
 import { LoggerService } from '@application/services/logger.service';
+import { MailModule } from './mail.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { env } from '@infra/config/env';
 
 
 @Module({
@@ -22,6 +25,17 @@ import { LoggerService } from '@application/services/logger.service';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+    }),
+    MailerModule.forRoot({
+      transport: {
+        host: env.MAIL_HOST,
+        port: env.MAIL_PORT,
+        secure: env.MAIL_SSL,
+        auth: {
+          user: env.MAIL_USER,
+          pass: env.MAIL_PASS,
+        },
+      },
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -43,6 +57,7 @@ import { LoggerService } from '@application/services/logger.service';
     UsersModule,
     IconsModule,
     SocialMediaModule,
+    MailModule
   ],
   controllers: [AppController],
   providers: [AppService, LoggerService],

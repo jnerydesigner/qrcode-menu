@@ -22,144 +22,95 @@
                         <td style="background-color: #f7f7f7; padding: 20px; text-align: center;">
                             <img src="https://qr-code-menu-seligadev.s3.us-east-1.amazonaws.com/logo.png" alt="Logo"
                                 width="80" style="display: block; margin: 0 auto 15px; border-radius: 8px;">
-                            <h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #333333;">Sistema de Gestão
-                                de Criação de Conta
+                            <h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #333333;">
+                                Sistema de Gestão de Criação de Conta
                             </h1>
                         </td>
                     </tr>
 
-                    <!-- TIMELINE DE STEPS -->
+                    <!-- TIMELINE - STEP 2 -->
                     <tr>
-                        <td style="padding: 40px 20px 30px;">
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <td style="padding: 40px 40px 10px;">
+
+                            <!-- Linha -->
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <!-- Linha etapa 1 (verde) -->
+                                    <td width="33%" style="height: 4px; background-color: #22c55e;"></td>
+
+                                    <!-- Linha etapa 2 (azul) -->
+                                    <td width="34%" style="height: 4px; background-color: #3b82f6;"></td>
+
+                                    <!-- Linha etapa 3 (cinza) -->
+                                    <td width="33%" style="height: 4px; background-color: #e5e7eb;"></td>
+                                </tr>
+                            </table>
+
+                            <!-- Bolinhas -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:-12px;">
                                 <tr>
 
-                                    <!-- STEP 1 (Ativo) -->
-                                    <td width="33.33%"
-                                        style="text-align: center; vertical-align: top; position: relative;">
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                            width="100%">
-                                            <tr>
-                                                <td style="padding: 0 10px;">
-                                                    <div
-                                                        style="position: relative; height: 4px; background-color: #e5e7eb; margin-bottom: 15px;">
-                                                        <div style="
-                                                            position: absolute;
-                                                            left: 50%;
-                                                            transform: translateX(-50%);
-                                                            top: -10px;
-                                                            width: 24px;
-                                                            height: 24px;
-                                                            border-radius: 50%;
-                                                            background-color: #00b894;
-                                                            border: 3px solid #00b894;
-                                                            display: flex;
-                                                            align-items: center;
-                                                            justify-content: center;
-                                                        ">
-                                                            <!-- Check Icon -->
-                                                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                                                                <path d="M6 10L3.5 7.5L2 9L6 13L14 5L12.5 3.5L6 10Z"
-                                                                    fill="#ffffff" />
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-
-                                                    <div
-                                                        style="font-size: 12px; color: #00b894; font-weight: bold; margin-top: 10px;">
-                                                        Etapa 1
-                                                    </div>
-                                                    <div style="font-size: 11px; color: #00b894; margin-top: 3px;">
-                                                        Concluído
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                    <!-- Etapa 1 (verde - concluído) -->
+                                    <td width="33%" align="left">
+                                        <div style="
+                        width: 20px; height: 20px;
+                        border-radius: 50%;
+                        background: #22c55e;
+                        border: 2px solid #22c55e;
+                        display: inline-block;">
+                                        </div>
                                     </td>
 
-                                    <!-- STEP 2 (Atual) -->
-                                    <td width="33.33%" style="text-align: center; vertical-align: top;">
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                            width="100%">
-                                            <tr>
-                                                <td style="padding: 0 10px;">
-                                                    <div
-                                                        style="position: relative; height: 4px; background-color: #e5e7eb; margin-bottom: 15px;">
-                                                        <div style="
-                                                            position: absolute;
-                                                            left: 50%;
-                                                            transform: translateX(-50%);
-                                                            top: -10px;
-                                                            width: 24px;
-                                                            height: 24px;
-                                                            border-radius: 50%;
-                                                            background-color: #4f46e5;
-                                                            border: 3px solid #4f46e5;
-                                                            display: flex;
-                                                            align-items: center;
-                                                            justify-content: center;
-                                                        ">
-                                                            <!-- Arrow Icon -->
-                                                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                                                                <path d="M4 3L11 8L4 13V3Z" fill="#ffffff" />
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-
-                                                    <div
-                                                        style="font-size: 12px; color: #4f46e5; font-weight: bold; margin-top: 10px;">
-                                                        Etapa 2
-                                                    </div>
-                                                    <div style="font-size: 11px; color: #666666; margin-top: 3px;">
-                                                        Iniciado
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                    <!-- Etapa 2 (azul - iniciado) -->
+                                    <td width="34%" align="center">
+                                        <div style="
+                        width: 20px; height: 20px;
+                        border-radius: 50%;
+                        background:#3b82f6;
+                        border:2px solid #3b82f6;
+                        display:inline-block;">
+                                        </div>
                                     </td>
 
-                                    <!-- STEP 3 (Pendente) -->
-                                    <td width="33.33%" style="text-align: center; vertical-align: top;">
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                            width="100%">
-                                            <tr>
-                                                <td style="padding: 0 10px;">
-                                                    <div
-                                                        style="position: relative; height: 4px; background-color: #e5e7eb; margin-bottom: 15px;">
-                                                        <div style="
-                                                            position: absolute;
-                                                            left: 50%;
-                                                            transform: translateX(-50%);
-                                                            top: -10px;
-                                                            width: 24px;
-                                                            height: 24px;
-                                                            border-radius: 50%;
-                                                            background-color: #ffffff;
-                                                            border: 3px solid #e5e7eb;
-                                                            display: flex;
-                                                            align-items: center;
-                                                            justify-content: center;
-                                                        ">
+                                    <!-- Etapa 3 (cinza - pendente) -->
+                                    <td width="33%" align="right">
+                                        <div style="
+                        width: 20px; height: 20px;
+                        border-radius: 50%;
+                        background:#ffffff;
+                        border:2px solid #e5e7eb;
+                        display:inline-block;">
+                                        </div>
+                                    </td>
 
-                                                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                                                                <circle cx="8" cy="8" r="6" stroke="#9ca3af"
-                                                                    stroke-width="2" />
-                                                                <path d="M8 4V8L10.5 9.5" stroke="#9ca3af"
-                                                                    stroke-width="2" stroke-linecap="round" />
-                                                            </svg>
-                                                        </div>
-                                                    </div>
+                                </tr>
+                            </table>
 
-                                                    <div
-                                                        style="font-size: 12px; color: #9ca3af; font-weight: bold; margin-top: 10px;">
-                                                        Etapa 3
-                                                    </div>
-                                                    <div style="font-size: 11px; color: #999999; margin-top: 3px;">
-                                                        Pendente
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
+                        </td>
+                    </tr>
+
+                    <!-- TEXTOS STEP 2 -->
+                    <tr>
+                        <td style="padding: 0 40px 30px;">
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+
+                                    <!-- Etapa 1 - Concluído -->
+                                    <td width="33%" align="left">
+                                        <div style="font-size:12px; color:#22c55e; font-weight:bold;">Etapa 1</div>
+                                        <div style="font-size:11px; color:#22c55e;">Concluído</div>
+                                    </td>
+
+                                    <!-- Etapa 2 - Iniciado -->
+                                    <td width="34%" align="center">
+                                        <div style="font-size:12px; color:#3b82f6; font-weight:bold;">Etapa 2</div>
+                                        <div style="font-size:11px; color:#3b82f6;">Iniciado</div>
+                                    </td>
+
+                                    <!-- Etapa 3 - Pendente -->
+                                    <td width="33%" align="right">
+                                        <div style="font-size:12px; color:#9ca3af; font-weight:bold;">Etapa 3</div>
+                                        <div style="font-size:11px; color:#9ca3af;">Pendente</div>
                                     </td>
 
                                 </tr>
@@ -167,11 +118,14 @@
                         </td>
                     </tr>
 
+
+
                     <!-- CONTEÚDO PRINCIPAL -->
                     <tr>
                         <td style="padding: 0 40px 40px; text-align: center;">
-                            <h2 style="margin: 0 0 20px; font-size: 22px; color: #1f2937; font-weight: bold;">Bem-vindo
-                                ao Segundo Passo!</h2>
+                            <h2 style="margin: 0 0 20px; font-size: 22px; color: #1f2937; font-weight: bold;">
+                                Bem-vindo ao Segundo Passo!
+                            </h2>
                             <p style="margin: 0 0 15px; font-size: 15px; line-height: 1.6; color: #4b5563;">
                                 Estamos muito felizes em tê-lo conosco. Este é o início de uma jornada incrível.
                                 Complete esta etapa para desbloquear novos recursos e avançar no processo de
@@ -188,7 +142,9 @@
                                 <tr>
                                     <td style="border-radius: 6px; background-color: #4f46e5;">
                                         <a href="#"
-                                            style="display: inline-block; padding: 14px 32px; font-size: 15px; color: #ffffff; text-decoration: none; font-weight: bold;">Continuar</a>
+                                            style="display: inline-block; padding: 14px 32px; font-size: 15px; color: #ffffff; text-decoration: none; font-weight: bold;">
+                                            Continuar
+                                        </a>
                                     </td>
                                 </tr>
                             </table>
@@ -199,10 +155,13 @@
                     <tr>
                         <td style="background-color: #f1f1f1; padding: 30px 20px; text-align: center;">
                             <p style="margin: 0 0 8px; font-size: 15px; font-weight: bold; color: #333333;">
-                                TechSolutions Ltda.</p>
-                            <p style="margin: 0 0 5px; font-size: 13px; color: #555555;">Rua das Inovações, 1234 -
-                                Centro</p>
-                            <p style="margin: 0 0 5px; font-size: 13px; color: #555555;">São Paulo - SP, CEP 01000-000
+                                TechSolutions Ltda.
+                            </p>
+                            <p style="margin: 0 0 5px; font-size: 13px; color: #555555;">
+                                Rua das Inovações, 1234 - Centro
+                            </p>
+                            <p style="margin: 0 0 5px; font-size: 13px; color: #555555;">
+                                São Paulo - SP, CEP 01000-000
                             </p>
                             <p style="margin: 0 0 15px; font-size: 13px; color: #555555;">
                                 Tel: (11) 3456-7890 | E-mail: contato@techsolutions.com.br
