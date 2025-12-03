@@ -6,6 +6,9 @@ import * as path from 'node:path';
 import { ConfigService } from '@nestjs/config';
 import * as fsNew from 'fs';
 import { LoggerService } from './logger.service';
+import { replaceManyWordsTemplate } from '@infra/utils/replace-many-words-template.util';
+import { env } from '@infra/config/env';
+import { TemplateResolver } from './template-resolver.service';
 
 @Injectable()
 export class MailService {
@@ -14,33 +17,79 @@ export class MailService {
         private readonly mailSenderService: MailerService,
         private readonly config: ConfigService,
         private readonly loggerService: LoggerService,
+        private readonly templateResolver: TemplateResolver,
     ) {
         this.logger = this.loggerService.setContext(MailService.name);
+    }
+
+    async sendOnboardingStep(step: number, context: any): Promise<void> {
+        // 1. Renderiza template baseado no step
+        const html = await this.templateResolver.render(step, context);
+
+        // 2. Salva preview do template (igual você faz hoje)
+        const pathResult = path.join(
+            'src',
+            'application',
+            'templates',
+            'result',
+            `template-step-${step}.html`,
+        );
+
+        await fs.writeFile(pathResult, html);
+
+        this.loggerService.info("Email preview salvo em: " + pathResult);
+
+        // 3. Se envio estiver habilitado, envia
+        if (env.SEND_MAIL) {
+            await this.sendEmail(html, context.email);
+        }
     }
 
     async loadTemplate(step: number): Promise<void> {
         let template: string;
 
+
+        const replacementsArr: string[] = [];
+
         switch (step) {
             case 1:
                 template = await this.loadTemplateStepOne();
+                template = replaceManyWordsTemplate(template, ['Empresa X', 'Passo 1']);
                 break;
 
             case 2:
                 template = await this.loadTemplateStepTwo();
+                template = replaceManyWordsTemplate(template, ['Empresa X', 'Passo 2']);
                 break;
 
             case 3:
                 template = await this.loadTemplateStepThree();
+                template = replaceManyWordsTemplate(template, ['Empresa X', 'Passo 3']);
                 break;
 
             default:
                 template = await this.loadTemplateStepOne();
+                template = replaceManyWordsTemplate(template, ['Empresa X', 'Passo 1']);
                 break;
         }
 
-        console.log(step);
-        await this.prepareEmailMessage(template);
+        const pathResult = path.join(
+            'src',
+            'application',
+            'templates',
+            'result',
+            'template.result.html',
+        );
+        console.log("RAW:", process.env.SEND_MAIL);
+
+        this.loggerService.info(JSON.stringify(env.SEND_MAIL));
+        await fs.writeFile(pathResult, template);
+
+        if (env.SEND_MAIL) {
+            await this.prepareEmailMessage(template);
+        }
+
+
     }
 
     async loadTemplateStepOne(): Promise<string> {
@@ -100,16 +149,13 @@ export class MailService {
     }
 
     async prepareEmailMessage(template: string) {
-
-
-        await this.sendEmail(template);
+        await this.sendEmail(template, 'jander.webmaster@gmail.com');
     }
 
-    private async sendEmail(htmlContent: string) {
-
+    private async sendEmail(htmlContent: string, to: string) {
 
         this.mailSenderService.sendMail({
-            to: 'jander.webmaster@gmail.com',
+            to,
             subject: 'Teste',
             html: htmlContent,
             context: {

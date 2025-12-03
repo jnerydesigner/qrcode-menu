@@ -11,7 +11,11 @@ export class MailController {
 
     @Post()
     async sendMail(@Res() response: Response, @Body() body: MailRequest) {
-        const send = this.mailService.loadTemplate(1);
+        const send = this.mailService.sendOnboardingStep(3, {
+            userName: "Jander",
+            companyName: "TechSolutions",
+            email: "jander.webmaster@gmail.com"
+        });
 
         return response.status(200).json({
             message: 'Mail sent successfully',
