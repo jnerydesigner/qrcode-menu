@@ -1,0 +1,37 @@
+flowchart TD
+
+A([Start]) --> B[User enters email]
+
+B --> C{Email valid?}
+C -- No --> Z([End])
+C -- Yes --> D[Generate Magic Link]
+
+D --> E[Send Step 1 Email]
+E --> F{User clicks Magic Link?}
+
+F -- Yes --> G[Show Company Form]
+F -- No --> E
+
+G --> H{Form Complete?}
+H -- No --> G
+H -- Yes --> I[Create Company - DISABLED]
+
+I --> J[Send Step 2 Email]
+
+J --> K{User activates company?}
+K -- Yes --> L[Activate Company - ENABLED]
+K -- No --> J
+
+L --> M[Create AdminTemp]
+M --> N[Send Step 3 Email]
+
+N --> O{AdminTemp Login?}
+O -- Yes --> P[Show Real Admin Form]
+O -- No --> N
+
+P --> Q{Real Admin Form Complete?}
+Q -- Yes --> R[Create Real Admin]
+Q -- No --> P
+
+R --> S[Disable AdminTemp]
+S --> T([Onboarding Complete])

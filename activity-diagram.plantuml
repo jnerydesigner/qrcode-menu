@@ -1,0 +1,45 @@
+@startuml
+start
+
+:Usuário insere e-mail;
+if (Email válido?) then (Sim)
+  :Gerar link mágico;
+  :Enviar email Step 1;
+else (Não)
+  :Erro: email inválido;
+  stop
+endif
+
+:Usuário clica no magic link;
+:Exibir formulário da empresa;
+
+repeat
+  :Usuário preenche formulário;
+repeat while (Form incompleto?)
+
+:Validar dados;
+:Criar empresa (DISABLED);
+:Enviar e-mail Step 2;
+
+:Usuário ativa empresa;
+:Atualizar para ENABLED;
+
+:Criar AdminTemp;
+:Enviar e-mail Step 3;
+
+repeat
+  :AdminTemp tenta login;
+repeat while (Ainda não logou?)
+
+:Exibir criação do Admin Real;
+
+repeat
+  :Usuário preenche admin real;
+repeat while (Form errado?)
+
+:Criar Admin Real;
+:Desativar AdminTemp;
+:Liberar sistema;
+
+stop
+@enduml

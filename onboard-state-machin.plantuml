@@ -1,0 +1,79 @@
+@startuml
+skinparam state {
+  BackgroundColor #F7F7F7
+  BorderColor #444
+  FontColor #222
+  FontSize 14
+}
+
+[*] --> STEP_1_REQUEST_MAGIC_LINK : User enters email
+
+state STEP_1_REQUEST_MAGIC_LINK {
+    [*] --> GENERATE_MAGIC_TOKEN
+    GENERATE_MAGIC_TOKEN --> SEND_MAGIC_LINK_EMAIL : send step 1 email
+    SEND_MAGIC_LINK_EMAIL --> WAIT_FOR_CLICK : waiting user
+}
+
+WAIT_FOR_CLICK --> STEP_2_COMPANY_FORM : User clicks magic link
+
+' --------------------------------------------------------------
+' STEP 2 - COMPANY CREATION
+' --------------------------------------------------------------
+
+state STEP_2_COMPANY_FORM {
+    [*] --> FORM_EMPTY
+    FORM_EMPTY --> FORM_FILLED : user types data
+    FORM_FILLED --> COMPANY_CREATED : submit form
+}
+
+COMPANY_CREATED --> SEND_COMPANY_STATUS_TOKEN : create company (status=DISABLED)
+SEND_COMPANY_STATUS_TOKEN --> STEP_2_WAIT_CONFIRM : send step 2 email
+
+STEP_2_WAIT_CONFIRM --> STEP_3_COMPANY_ENABLED : user clicks activation link
+
+' --------------------------------------------------------------
+' STEP 3 - COMPANY ACTIVATION
+' --------------------------------------------------------------
+
+state STEP_3_COMPANY_ENABLED {
+    [*] --> VALIDATE_COMPANY_TOKEN
+    VALIDATE_COMPANY_TOKEN --> COMPANY_STATUS_UPDATED : set ENABLED
+}
+
+COMPANY_STATUS_UPDATED --> STEP_4_TEMP_ADMIN_ISSUED : create admin_temp
+STEP_4_TEMP_ADMIN_ISSUED --> SEND_ADMIN_TEMP_EMAIL : send step 3 email
+SEND_ADMIN_TEMP_EMAIL --> STEP_4_WAIT_TEMP_LOGIN
+
+' --------------------------------------------------------------
+' STEP 4 - TEMP ADMIN LOGIN
+' --------------------------------------------------------------
+
+state STEP_4_WAIT_TEMP_LOGIN {
+    [*] --> AWAIT_LOGIN
+    AWAIT_LOGIN --> FORCE_CREATE_REAL_ADMIN : admin temp logs in
+}
+
+FORCE_CREATE_REAL_ADMIN --> STEP_5_CREATE_REAL_ADMIN
+
+' --------------------------------------------------------------
+' STEP 5 - REAL ADMIN CREATION
+' --------------------------------------------------------------
+
+state STEP_5_CREATE_REAL_ADMIN {
+    [*] --> FORM_REAL_ADMIN
+    FORM_REAL_ADMIN --> REAL_ADMIN_CREATED : submit real admin
+}
+
+REAL_ADMIN_CREATED --> DISABLE_ADMIN_TEMP : remove temp credentials
+DISABLE_ADMIN_TEMP --> STEP_6_FINISH_ONBOARDING
+
+' --------------------------------------------------------------
+' STEP 6 - FINAL
+' --------------------------------------------------------------
+
+state STEP_6_FINISH_ONBOARDING {
+    [*] --> ENABLE_FULL_ACCESS
+    ENABLE_FULL_ACCESS --> [*] : onboarding completed
+}
+
+@enduml

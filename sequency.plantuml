@@ -1,0 +1,39 @@
+@startuml
+actor User
+participant Frontend
+participant Backend
+participant MailService
+participant TemplateEngine
+participant DB
+
+User -> Frontend: Enter email
+Frontend -> Backend: POST /magic-link
+Backend -> DB: Create temp onboarding session
+Backend -> TemplateEngine: render(step1)
+TemplateEngine --> Backend: HTML
+Backend -> MailService: send email
+MailService -> User: Email Step 1
+
+User -> Backend: GET /magic-link?token=XYZ
+Backend -> Frontend: Company form HTML
+
+User -> Backend: POST /company
+Backend -> DB: Create company DISABLED
+Backend -> TemplateEngine: render(step2)
+Backend -> MailService: send email
+
+User -> Backend: GET /activate-company?token=ABC
+Backend -> DB: Update company ENABLED
+Backend -> DB: Create AdminTemp
+Backend -> TemplateEngine: render(step3)
+Backend -> MailService: send email
+
+User -> Backend: POST /login-temp
+Backend -> Frontend: Show Admin Real Form
+
+User -> Backend: POST /create-admin-real
+Backend -> DB: Create AdminReal
+Backend -> DB: Disable AdminTemp
+
+Backend -> User: Access to full dashboard
+@enduml

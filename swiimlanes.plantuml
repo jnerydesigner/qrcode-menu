@@ -1,0 +1,48 @@
+@startuml
+|Usuário|
+start
+:Informar email;
+
+|Sistema|
+if (email válido?) then (Sim)
+  :Gerar magic link;
+  :Enviar email Step 1;
+endif
+
+|Usuário|
+:Clicar no magic link;
+
+|Sistema|
+:Exibir form empresa;
+
+|Usuário|
+:Preencher form;
+
+|Sistema|
+:Criar empresa DISABLED;
+:Enviar email Step 2;
+
+|Usuário|
+:Clicar ativação;
+
+|Sistema|
+:Ativar empresa ENABLED;
+:Criar AdminTemp;
+:Enviar email Step 3;
+
+|Usuário|
+:Login com admin temp;
+
+|Sistema|
+:Exigir criação admin real;
+
+|Usuário|
+:Enviar form admin real;
+
+|Sistema|
+:Criar admin real;
+:Desativar admin temp;
+:Liberar sistema;
+
+stop
+@enduml

@@ -1,0 +1,52 @@
+@startuml
+skinparam shadowing false
+skinparam arrowColor #333
+skinparam diamondColor #FDE2E1
+skinparam rectangle {
+  BackgroundColor #F7F7F7
+  BorderColor #555
+}
+
+start
+
+:Usuário informa e-mail;
+if (E-mail válido?) then (Sim)
+  :Gerar Magic Link Token;
+  :Enviar e-mail Step 1;
+  :Aguardar clique do usuário;
+else (Não)
+  stop
+endif
+
+:Usuário clica no Magic Link;
+:Exibir formulário da empresa;
+
+if (Formulário preenchido?) then (Sim)
+  :Criar empresa (DISABLED);
+  :Gerar token de ativação;
+  :Enviar e-mail Step 2;
+  :Aguardar ativação;
+else (Não)
+  :Manter usuário no formulário;
+endif
+
+:Usuário ativa empresa;
+:Atualizar empresa para ENABLED;
+
+:Criar Admin Temporário;
+:Enviar e-mail Step 3;
+:Aguardar login admin temp;
+
+:Admin temp loga;
+:Form para criar Admin Real;
+
+if (Form real admin OK?) then (Sim)
+  :Criar Admin Real;
+  :Desabilitar Admin Temp;
+else (Não)
+  :Voltar ao formulário;
+endif
+
+:Finalizar onboarding;
+stop
+@enduml
