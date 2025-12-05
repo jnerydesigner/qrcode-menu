@@ -23,6 +23,8 @@ const envSchema = z.object({
     MAIL_PASS: z.string(),
     MAIL_SSL: z.string().transform((v) => v === 'true'),
     SEND_MAIL: z.string().transform((v) => v === 'true'),
+    RABBITMQ_DEFAULT_USER: z.string(),
+    RABBITMQ_DEFAULT_PASS: z.string(),
 });
 
 // Faz o parse e valida

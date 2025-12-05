@@ -18,7 +18,8 @@ import { LoggerService } from '@application/services/logger.service';
 import { MailModule } from './mail.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { env } from '@infra/config/env';
-
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { QueueModule } from './queue.module';
 
 @Module({
   imports: [
@@ -57,7 +58,8 @@ import { env } from '@infra/config/env';
     UsersModule,
     IconsModule,
     SocialMediaModule,
-    MailModule
+    MailModule,
+    QueueModule
   ],
   controllers: [AppController],
   providers: [AppService, LoggerService],

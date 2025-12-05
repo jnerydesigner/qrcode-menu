@@ -5,11 +5,29 @@ import { AppModule } from '@infra/modules/app.module';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const configService = app.get(ConfigService);
+  const user = configService.get<string>('RABBITMQ_DEFAULT_USER');
+  const pass = configService.get<string>('RABBITMQ_DEFAULT_PASS');
+
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [`amqp://${user}:${pass}@localhost:5672`],
+      queue: 'state_machine_queue',
+      queueOptions: {
+        durable: false,
+      },
+    },
+  });
+
+  await app.startAllMicroservices();
 
   app.use(cookieParser());
   app.useGlobalInterceptors(new LoggingInterceptor(app.get(LoggerService)));

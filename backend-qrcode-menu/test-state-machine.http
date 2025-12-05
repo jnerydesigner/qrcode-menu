@@ -1,0 +1,39 @@
+### Login
+POST http://localhost:3399/auth/login
+Content-Type: application/json
+
+{
+    "email": "jander.webmaster@gmail.com",
+    "password": "123456"
+}
+
+
+
+### Test Email Submitted State
+POST http://localhost:3399/state-machine/email-submitted
+Content-Type: application/json
+
+{
+    "userId": "user-123"
+}
+
+### Test Verify State
+POST http://localhost:3399/test/state-machine/verify
+Content-Type: application/json
+
+{
+    "userId": "user-123"
+}
+
+### Test Generic Transition
+POST http://localhost:3399/test/state-machine/transition
+Content-Type: application/json
+
+{
+    "userId": "user-123",
+    "from": "UNREGISTERED",
+    "to": "EMAIL_SUBMITTED",
+    "meta": {
+        "source": "manual_test"
+    }
+}
