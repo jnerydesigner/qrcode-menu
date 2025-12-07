@@ -4,14 +4,17 @@ import { StateMachineEventsService } from "@application/services/state-machine-e
 import { OnboardingStateMachine } from "@application/services/state-machine/onboarding-state-machine.service";
 import { TemplateEngine } from "@application/services/template-engine.service";
 import { TemplateResolver } from "@application/services/template-resolver.service";
-import { Module } from "@nestjs/common";
+import { Global, Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DiscoveryService } from "@nestjs/core";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { StateMachineController } from "@presenters/controllers/state-machine.controller";
 import { StateMachineListener } from "@presenters/listeners/state-machine.listner";
 import { env } from "process";
+import { RabbitMQEventEmitter } from "@infra/services/queue/rabbitmq-event.emitter";
 
+
+@Global()
 @Module({
     imports: [
         ClientsModule.registerAsync([
@@ -34,8 +37,8 @@ import { env } from "process";
             },
         ]),
     ],
-    providers: [StateMachineEventsService, OnboardingStateMachine, MailService, LoggerService, TemplateResolver, DiscoveryService, TemplateEngine],
-    exports: [],
+    providers: [StateMachineEventsService, OnboardingStateMachine, MailService, LoggerService, TemplateResolver, DiscoveryService, TemplateEngine, RabbitMQEventEmitter],
+    exports: [RabbitMQEventEmitter, ClientsModule],
     controllers: [StateMachineListener, StateMachineController]
 })
 export class QueueModule { }

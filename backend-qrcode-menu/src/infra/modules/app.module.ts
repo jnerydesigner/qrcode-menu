@@ -20,6 +20,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { env } from '@infra/config/env';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { QueueModule } from './queue.module';
+import { MagicLinkModule } from './magic-link.module';
 
 @Module({
   imports: [
@@ -59,7 +60,8 @@ import { QueueModule } from './queue.module';
     IconsModule,
     SocialMediaModule,
     MailModule,
-    QueueModule
+    QueueModule,
+    MagicLinkModule
   ],
   controllers: [AppController],
   providers: [AppService, LoggerService],

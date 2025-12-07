@@ -15,5 +15,6 @@ import { MailController } from '@presenters/controllers/mail/mail.controller';
 @Module({
     providers: [MailService, ConfigService, LoggerService, TemplateEngine, TemplateResolver, DiscoveryService, Step1WelcomeEmail, Step2WelcomeEmail, Step3WelcomeEmail],
     controllers: [MailController],
+    exports: [MailService]
 })
 export class MailModule { }

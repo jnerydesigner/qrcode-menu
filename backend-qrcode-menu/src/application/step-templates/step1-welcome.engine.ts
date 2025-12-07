@@ -20,7 +20,7 @@ export class Step1WelcomeEmail implements StepStrategy {
             TITLE: '🎉 Bem-vindo ao QR Code Menu!',
             USER: context.userName,
             COMPANY: this.company,
-            ACTION_URL: context.confirmUrl,
+            ACTION_URL: context.magicLink,
             DESCRIPTION: `Estamos muito felizes aqui na ${this.company} em tê-lo conosco. Este é o início de uma jornada incrível.
                             Click no botão abaixo para começar a jornada de configuração da sua abertura de Conta.
                             Complete esta etapa para desbloquear novos recursos e avançar no processo de configuração.`,

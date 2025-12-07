@@ -45,6 +45,14 @@ export class MailService {
         }
     }
 
+    async sendMagicLinkEmail(email: string, magicLink: string): Promise<void> {
+        await this.sendOnboardingStep(1, {
+            userName: email.split('@')[0],
+            email,
+            magicLink
+        });
+    }
+
     async loadTemplate(step: number): Promise<void> {
         let template: string;
 
@@ -86,7 +94,7 @@ export class MailService {
         await fs.writeFile(pathResult, template);
 
         if (env.SEND_MAIL) {
-            await this.prepareEmailMessage(template);
+            await this.prepareEmailMessage(template, 'jander.webmaster@gmail.com');
         }
 
 
@@ -148,15 +156,15 @@ export class MailService {
         }
     }
 
-    async prepareEmailMessage(template: string) {
-        await this.sendEmail(template, 'jander.webmaster@gmail.com');
+    async prepareEmailMessage(template: string, to: string) {
+        await this.sendEmail(template, to);
     }
 
     private async sendEmail(htmlContent: string, to: string) {
 
         this.mailSenderService.sendMail({
             to,
-            subject: 'Teste',
+            subject: 'Bem-vindo ao QrCode Menu',
             html: htmlContent,
             context: {
                 name: 'Jander',

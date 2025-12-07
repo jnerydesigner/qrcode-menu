@@ -25,8 +25,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const PUBLIC_ROUTES = ['/companies/new', '/login', '/register'];
+
   useEffect(() => {
     const checkAuth = async () => {
+      // Check if current route is public
+      const isPublicRoute = PUBLIC_ROUTES.some(route => window.location.pathname.startsWith(route));
+
+      if (isPublicRoute) {
+        setIsLoading(false);
+        // We can optionally set isAuthenticated to false here if we want to be explicit,
+        // but keeping it as is (default true) might be risky if we rely on it for UI.
+        // However, the state initializes as true. Let's set it to false to be safe for public routes
+        // so we don't show "logged in" UI elements momentarily.
+        // Actually, if we are on a public route, we might not care about auth state, 
+        // but if we want to avoid the 401 call, we should probably assume not authenticated 
+        // or just not check.
+        // Let's set it to false to be safe, assuming public routes don't need user data.
+        setIsAuthenticated(false);
+        return;
+      }
+
       try {
         const response = await api.get<User>('/auth/profile');
         setUser(response.data);

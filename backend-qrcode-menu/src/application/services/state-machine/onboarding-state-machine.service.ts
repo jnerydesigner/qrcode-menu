@@ -30,6 +30,10 @@ export class OnboardingStateMachine {
         return to;
     }
 
+    async receivedMagicLink() {
+        return null;
+    }
+
     async emailSubmitted(userId: string) {
         return this.transition(
             userId,

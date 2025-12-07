@@ -25,6 +25,8 @@ const envSchema = z.object({
     SEND_MAIL: z.string().transform((v) => v === 'true'),
     RABBITMQ_DEFAULT_USER: z.string(),
     RABBITMQ_DEFAULT_PASS: z.string(),
+    PATH_BACKEND: z.string(),
+    PATH_FRONTEND: z.string(),
 });
 
 // Faz o parse e valida

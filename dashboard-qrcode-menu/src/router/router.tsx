@@ -13,6 +13,7 @@ import UpdateProduct from "@/pages/products/[slug]";
 import QrCodePage from "@/pages/qrcode";
 import { createBrowserRouter } from "react-router";
 import QrCodePageNew from "@/pages/qurcode-new";
+import CreateCompany from "@/pages/companies/create-company";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ export const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
+  },
+  {
+    path: "/companies/new",
+    element: <CreateCompany />,
   },
   {
     path: "/dashboard",
