@@ -4,12 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
+import { createCompany } from '@/api/companies.fetch';
 
 // Schema validation
 const createCompanySchema = z.object({
   name: z.string().min(3, 'O nome da empresa deve ter pelo menos 3 caracteres'),
   cnpj: z.string().min(14, 'CNPJ inválido').max(18, 'CNPJ inválido'), // Basic length check
-  status: z.enum(['ENABLED', 'DISABLED']),
   image: z.any()
     .refine((files) => files?.length === 1, "A imagem é obrigatória")
     .refine((files) => files?.[0]?.size <= 5000000, `O tamanho máximo é 5MB.`)
@@ -35,20 +35,15 @@ export default function CreateCompany() {
     defaultValues: {
       name: '',
       cnpj: '',
-      status: 'DISABLED',
     }
   });
 
   // Simulated mutation
-  const createCompanyMutation = useMutation({
-    mutationFn: async (data: CreateCompanyFormData) => {
+  const { mutate: createCompanyMutation, isPending } = useMutation({
+    mutationFn: async (data: FormData) => {
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await createCompany(data);
 
-      console.log('Simulating API call with data:', {
-        ...data,
-        image: data.image[0].name
-      });
 
       return { success: true };
     },
@@ -62,21 +57,42 @@ export default function CreateCompany() {
   });
 
   const onSubmit = (data: CreateCompanyFormData) => {
-    console.log(data)
-    // createCompanyMutation.mutate(data);
+
+    const formData = new FormData();
+
+    formData.append("name", data.name);
+    formData.append("cnpj", data.cnpj);
+    formData.append("image", data.image[0]);
+
+
+    for (const pair of formData.entries()) {
+      console.log(pair);
+    }
+
+
+    createCompanyMutation(formData);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setValue('image', e.target.files, { shouldValidate: true });
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    setValue("image", e.target.files, { shouldValidate: true });
+
+    if (file.type === "image/svg+xml") {
+      // Preview específico para SVG
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      return;
     }
+
+    // Outros formatos usam FileReader
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   const formatCnpj = (value: string) => {
@@ -142,9 +158,10 @@ export default function CreateCompany() {
             <input
               type="file"
               id="image"
-              accept="image/*"
+              accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml"
               onChange={handleFileChange}
-              className={`w-full px-4 py-2 border rounded-md outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${errors.image ? 'border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-transparent focus:ring-2'}`}
+              className={`w-full px-4 py-2 border rounded-md outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 ${errors.image ? "border-red-500" : "border-gray-300 focus:ring-blue-500 focus:border-transparent focus:ring-2"
+                }`}
             />
             <p className="text-xs text-gray-500 mt-1">Formatos aceitos: PNG, JPG, JPEG, WEBP (Max 5MB)</p>
             {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image.message as string}</p>}
@@ -161,28 +178,14 @@ export default function CreateCompany() {
             </div>
           )}
 
-          {/* Status */}
-          <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
-              Status
-            </label>
-            <select
-              id="status"
-              {...register('status')}
-              className="text-gray-800 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-white"
-            >
-              <option value="DISABLED">Desabilitado</option>
-              <option value="ENABLED">Habilitado</option>
-            </select>
-          </div>
 
           {/* Botão de Submit */}
           <button
             type="submit"
-            disabled={createCompanyMutation.isPending}
+            disabled={isPending}
             className="w-full bg-blue-600 text-white font-semibold py-3 rounded-md hover:bg-blue-700 transition duration-200 shadow-md flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
           >
-            {createCompanyMutation.isPending ? (
+            {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Criando...

@@ -42,6 +42,32 @@ export class S3UploadService {
         });
     }
 
+    async uploadImageWithFolder(file: FileType, folder: string, slug: string, sizeTag?: string): Promise<{ url: string }> {
+        const fileExtension = file.originalname.split('.').pop();
+        const tag = sizeTag ? `_${sizeTag}` : ""; // "_small", "_medium", "_full"
+
+        const uniqueFileName = `${slug}${tag}-${randomUUID()}-${Date.now()}.${fileExtension}`;
+
+        const params = {
+            Bucket: this.bucketName,
+            Key: `${folder}/${slug}/${uniqueFileName}`,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+        };
+
+        try {
+            const command = new PutObjectCommand(params);
+            await this.s3Client.send(command);
+
+            return {
+                url: `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${folder}/${slug}/${uniqueFileName}`,
+            };
+        } catch (error) {
+            console.error('S3 Upload Error:', error);
+            throw new InternalServerErrorException('Error uploading file to S3');
+        }
+    }
+
     async uploadFile(file: FileType, slug: string, sizeTag?: string): Promise<{ url: string }> {
         const fileExtension = file.originalname.split('.').pop();
         const tag = sizeTag ? `_${sizeTag}` : ""; // "_small", "_medium", "_full"
@@ -68,6 +94,43 @@ export class S3UploadService {
         }
     }
 
+
+
+    async uploadFileWithFolder(file: FileType, folderPath: string, alias: string, sizeTag?: string): Promise<{ url: string } | null> {
+        const fileExtension = file.originalname.split('.').pop();
+        const tag = sizeTag ? `${sizeTag}` : ""; // "_small", "_medium", "_full"
+
+        const uniqueFileName = `${alias}-${tag}-${randomUUID()}-${Date.now()}.${fileExtension}`;
+
+        console.log(uniqueFileName)
+
+        const cleanFolderPath = folderPath.startsWith('/') ? folderPath.substring(1) : folderPath;
+
+        console.log(cleanFolderPath)
+
+        const params = {
+            Bucket: this.bucketName,
+            Key: `${cleanFolderPath}/${alias}/${uniqueFileName}`,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+        };
+
+        console.log(params)
+
+        // return null
+
+        try {
+            const command = new PutObjectCommand(params);
+            await this.s3Client.send(command);
+
+            return {
+                url: `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${cleanFolderPath}/${alias}/${uniqueFileName}`,
+            };
+        } catch (error) {
+            console.error('S3 Upload Error:', error);
+            throw new InternalServerErrorException('Error uploading file to S3');
+        }
+    }
 
     async deleteFile(fileKey: string): Promise<boolean> {
         // Extract key if full URL is provided

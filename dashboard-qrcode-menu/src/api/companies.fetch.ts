@@ -1,5 +1,5 @@
 import { api } from ".";
-import type { CompanyType } from "@/types/company.type";
+import type { CompanyType, CreateCompanyType } from "@/types/company.type";
 
 export const findAllCompanies = async () => {
     const response = await api.get("/company");
@@ -13,4 +13,15 @@ export const findCompany = async (slug: string) => {
     const data: CompanyType = response.data;
 
     return data;
+};
+
+export const createCompany = async (company: FormData) => {
+
+    const response = await api.post("/company", company, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+
+    return response.data;
 };

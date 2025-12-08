@@ -21,6 +21,7 @@ import {
   Company,
   CompanySchema,
 } from '@infra/database/mongo/schema/company.schema';
+import { CompanyImage, CompanyImageSchema } from '@infra/database/mongo/schema/company_image.schema';
 import { Icons, IconsSchema } from '@infra/database/mongo/schema/icons.schema';
 import {
   Ingredient,
@@ -51,6 +52,7 @@ const mongooseFeatureModules = [
     { name: SocialMedia.name, schema: SocialMediaSchema },
     { name: User.name, schema: UserSchema },
     { name: Icons.name, schema: IconsSchema },
+    { name: CompanyImage.name, schema: CompanyImageSchema },
   ]),
 ];
 
@@ -67,9 +69,9 @@ const repositoryProviders = [
   },
   {
     provide: COMPANY_REPOSITORY,
-    useFactory: (companyModel: Model<Company>, productModel: Model<Product>, socialMediaModel: Model<SocialMedia>, logger: LoggerService) =>
-      new CompanyMongoRepository(companyModel, productModel, socialMediaModel, logger),
-    inject: [getModelToken(Company.name), getModelToken(Product.name), getModelToken(SocialMedia.name), LoggerService],
+    useFactory: (companyModel: Model<Company>, productModel: Model<Product>, socialMediaModel: Model<SocialMedia>, companyImageModel: Model<CompanyImage>, logger: LoggerService) =>
+      new CompanyMongoRepository(companyModel, productModel, socialMediaModel, companyImageModel, logger),
+    inject: [getModelToken(Company.name), getModelToken(Product.name), getModelToken(SocialMedia.name), getModelToken(CompanyImage.name), LoggerService],
   },
   {
     provide: CATEGORY_REPOSITORY,

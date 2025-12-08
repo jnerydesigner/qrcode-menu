@@ -38,7 +38,6 @@ export class Company {
 
   static create(
     name: string,
-
   ) {
 
     const idObject = new UniqueEntityId().toString();

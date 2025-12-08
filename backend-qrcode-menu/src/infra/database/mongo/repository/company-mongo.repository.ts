@@ -8,6 +8,8 @@ import { Company as CompanyMongo } from '../schema/company.schema';
 import { Product as ProductMongo } from '../schema/product.schema';
 import { SocialMedia } from '../schema/social-media.schema';
 import { LoggerService } from '@application/services/logger.service';
+import { CompanyImageSchema, CompanyImage } from '../schema/company_image.schema';
+import { toObjectId } from '@infra/utils/objectid-converter.util';
 
 @Injectable()
 export class CompanyMongoRepository implements CompanyRepository {
@@ -18,6 +20,8 @@ export class CompanyMongoRepository implements CompanyRepository {
     private readonly productModel: Model<ProductMongo>,
     @InjectModel(SocialMedia.name)
     private readonly socialMediaModel: Model<SocialMedia>,
+    @InjectModel(CompanyImage.name)
+    private readonly companyImageModel: Model<CompanyImage>,
     private readonly logger: LoggerService,
   ) {
     this.logger.setContext(CompanyMongoRepository.name);
@@ -25,8 +29,12 @@ export class CompanyMongoRepository implements CompanyRepository {
 
 
 
-  async create(data: Company): Promise<Company> {
+
+  async create(data: Company, imageCompany: { fullUrl: string, mediumUrl: string, smallUrl: string }): Promise<Company> {
     const companyMapper = CompanyMapper.toMongo(data);
+
+    companyMapper.image = imageCompany.fullUrl;
+    companyMapper.image_small = imageCompany.smallUrl;
     const created = new this.companyModel(companyMapper);
     const saved = await created.save();
 
@@ -122,5 +130,10 @@ export class CompanyMongoRepository implements CompanyRepository {
 
   async deleteCompany(companyId: string): Promise<void> {
     await this.companyModel.findByIdAndDelete(companyId);
+  }
+
+  async createImagesCompany(image_full: string, image_medium: string, image_small: string, companyId: string): Promise<void> {
+    const companyIdObject = toObjectId(companyId)
+    await this.companyImageModel.create({ company: companyIdObject, image_full, image_medium, image_small });
   }
 }

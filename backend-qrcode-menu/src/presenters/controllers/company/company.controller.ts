@@ -5,7 +5,9 @@ import {
 } from '@application/use-case/company/create-company.usecase';
 import { FindAllCompanyUseCase } from '@application/use-case/company/find-all-company.usecase';
 import { FindCompanyBySlugUseCase } from '@application/use-case/company/find-company-by-slug.use-case';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { IsPublic } from '@infra/decorators/is-public.decorator';
+import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 @Controller('company')
@@ -20,8 +22,10 @@ export class CompanyController {
   @Post()
   @ApiTags('Create Company')
   @ApiBody({ type: CreateCompanyInputDto })
-  createCompany(@Body() company: CreateCompanyInputUseCase) {
-    return this.createCompanyUseCase.create(company);
+  @IsPublic()
+  @UseInterceptors(FileInterceptor('image'))
+  createCompany(@Body() company: CreateCompanyInputDto, @UploadedFile() file: Express.Multer.File) {
+    return this.createCompanyUseCase.create(company, file);
   }
 
   @Get()

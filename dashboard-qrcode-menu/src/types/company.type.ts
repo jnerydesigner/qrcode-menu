@@ -10,3 +10,9 @@ export interface CompanyType {
     updatedAt: string;
     socialMedias: SocialMediaType[]
 }
+
+export interface CreateCompanyType {
+    name: string;
+    cnpj: string;
+    image: File;
+}
