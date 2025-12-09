@@ -18,11 +18,12 @@ export class CompanyMapper {
   }
 
   static fromMongo(
-    companyMongo: CompanyMongo & { created_at?: Date, social_medias?: any[], updated_at?: Date },
+    companyMongo: CompanyMongo & { created_at?: Date, social_medias?: any[], updated_at?: Date }
   ): Company {
-    const socialMedias = (companyMongo.social_medias || []).map((sm) =>
-      SocialMediaMapper.fromMongo(sm as any)
-    );
+
+
+
+    const socialMediasMapper = companyMongo.social_medias.map((socialMedia) => SocialMediaMapper.fromMongo(socialMedia as any));
 
 
     const companyEntity = new Company(
@@ -34,7 +35,7 @@ export class CompanyMapper {
       companyMongo.image,
       companyMongo.image_small,
       companyMongo.products || [],
-      socialMedias,
+      socialMediasMapper,
     );
     return companyEntity;
   }

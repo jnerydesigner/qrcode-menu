@@ -38,10 +38,16 @@ export class CompanyMongoRepository implements CompanyRepository {
     const created = new this.companyModel(companyMapper);
     const saved = await created.save();
 
-    return CompanyMapper.fromMongo(saved.toObject());
+    const companyObject = saved.toObject();
+    const companyWithSocialMedia = {
+      ...companyObject,
+      social_medias: [],
+    };
+
+    return CompanyMapper.fromMongo(companyWithSocialMedia as any);
   }
 
-  async findAll(): Promise<Company[]> {
+  async findAll(): Promise<Company[] | null> {
     const companies = await this.companyModel
       .find()
       .populate({
@@ -51,13 +57,30 @@ export class CompanyMongoRepository implements CompanyRepository {
           { path: 'ingredients' }
         ]
       })
-      .populate('social_medias')
       .lean();
 
+    if (!companies || companies.length === 0) {
+      return null;
+    }
 
-    this.logger.log(JSON.stringify(companies));
-    return companies.map((company) =>
-      CompanyMapper.fromMongo(company as CompanyMongo & { created_at?: Date }),
+    // Fetch social media for each company
+    const companiesWithSocialMedia = await Promise.all(
+      companies.map(async (company) => {
+        const socialMedias = await this.socialMediaModel
+          .find({ company: company._id })
+          .lean();
+
+        return {
+          ...company,
+          social_medias: socialMedias,
+        };
+      })
+    );
+
+    this.logger.log(`Found ${companiesWithSocialMedia.length} companies`);
+
+    return companiesWithSocialMedia.map((company) =>
+      CompanyMapper.fromMongo(company as any),
     );
   }
 
@@ -104,28 +127,47 @@ export class CompanyMongoRepository implements CompanyRepository {
 
 
 
-    return CompanyMapper.fromMongo(companyWithProducts as any as CompanyMongo & { created_at?: Date });
+    return CompanyMapper.fromMongo(companyWithProducts as any);
   }
 
 
   async findCompanyById(companyId: string): Promise<Company> {
-    const findCompany = await this.companyModel.findById(companyId).populate('social_medias');
+    const findCompany = await this.companyModel.findById(companyId).lean();
     if (!findCompany) {
       throw new Error('Company not found');
     }
-    return CompanyMapper.fromMongo(findCompany.toObject());
+
+    const socialMedias = await this.socialMediaModel
+      .find({ company: findCompany._id })
+      .lean();
+
+    const companyWithSocialMedia = {
+      ...findCompany,
+      social_medias: socialMedias,
+    };
+
+    return CompanyMapper.fromMongo(companyWithSocialMedia as any);
   }
 
   async updateCompany(companyId: string, data: Company): Promise<Company> {
     await this.findCompanyById(companyId);
     const companyMapper = CompanyMapper.toMongo(data);
-    const companyMongo = await this.companyModel.findByIdAndUpdate(companyId, companyMapper, { new: true }).populate('social_medias');
+    const companyMongo = await this.companyModel.findByIdAndUpdate(companyId, companyMapper, { new: true }).lean().exec();
 
     if (!companyMongo) {
       throw new Error('Company not found');
     }
 
-    return CompanyMapper.fromMongo(companyMongo.toObject());
+    const socialMedias = await this.socialMediaModel
+      .find({ company: companyMongo._id })
+      .lean();
+
+    const companyWithSocialMedia = {
+      ...companyMongo,
+      social_medias: socialMedias,
+    };
+
+    return CompanyMapper.fromMongo(companyWithSocialMedia as any);
   }
 
   async deleteCompany(companyId: string): Promise<void> {

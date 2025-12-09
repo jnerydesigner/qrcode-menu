@@ -29,8 +29,9 @@ export class CompanyController {
   }
 
   @Get()
+  @IsPublic()
   findAll() {
-    return this.findAllCompanyUseCase.findAll();
+    return this.findAllCompanyUseCase.execute();
   }
 
   @Get("/:companySlug")

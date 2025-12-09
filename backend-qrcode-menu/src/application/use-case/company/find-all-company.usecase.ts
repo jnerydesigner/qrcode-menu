@@ -10,8 +10,13 @@ export class FindAllCompanyUseCase {
   constructor(
     @Inject(COMPANY_REPOSITORY)
     private readonly companyRepository: CompanyRepository,
-  ) {}
-  async findAll(): Promise<Company[]> {
-    return await this.companyRepository.findAll();
+  ) { }
+  async execute(): Promise<Company[]> {
+    const response = await this.companyRepository.findAll();
+
+    if (!response) {
+      throw new Error('Nenhuma empresa encontrada');
+    }
+    return response;
   }
 }
