@@ -61,7 +61,7 @@ export default function Header() {
                             Acessar painel
                         </Link>
                         <Link
-                            href="/auth/register"
+                            href="/create-account"
                             className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg"
                         >
                             Criar conta

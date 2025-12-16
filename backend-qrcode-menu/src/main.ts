@@ -34,12 +34,13 @@ async function bootstrap() {
 
   // 🔥 CORS correto e suficiente
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Set-Cookie'],
-  });
+  },
+  );
 
   // 🔥 Guard global corretamente configurado
   app.useGlobalGuards(new JwtAuthGuard(app.get(Reflector)));

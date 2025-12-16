@@ -3,6 +3,7 @@ import { CATEGORY_REPOSITORY } from '@domain/repositories/category.repository';
 import { COMPANY_REPOSITORY } from '@domain/repositories/company.repository';
 import { ICONS_REPOSITORY } from '@domain/repositories/icons.repository';
 import { INGREDIENT_REPOSITORY } from '@domain/repositories/ingredient.repository';
+import { MAGIC_LINK_REPOSITORY } from '@domain/repositories/magic-link.repository';
 import { PRODUCT_REPOSITORY } from '@domain/repositories/product.repository';
 import { SOCIAL_MEDIA_REPOSITORY } from '@domain/repositories/social-media.repository';
 import { USERS_REPOSITORY } from '@domain/repositories/users.repository';
@@ -10,6 +11,7 @@ import { CategoryMongoRepository } from '@infra/database/mongo/repository/catego
 import { CompanyMongoRepository } from '@infra/database/mongo/repository/company-mongo.repository';
 import { IconsMongoRepository } from '@infra/database/mongo/repository/icons-mongo.repository';
 import { IngredientMongoRepository } from '@infra/database/mongo/repository/ingredient-mongo.repository';
+import { MagicLinkMongoRepository } from '@infra/database/mongo/repository/magic-link-mongo.repository';
 import { ProductMongoRepository } from '@infra/database/mongo/repository/product-mongo.repository';
 import { SocialMediaMongoRepository } from '@infra/database/mongo/repository/social-media-mongo.repository';
 import { UsersMongoRepository } from '@infra/database/mongo/repository/users-mongo.repository';
@@ -27,6 +29,7 @@ import {
   Ingredient,
   IngredientSchema,
 } from '@infra/database/mongo/schema/ingredient.schema';
+import { MagicLink, MagicLinkSchema } from '@infra/database/mongo/schema/magic-link.schema';
 import {
   Product,
   ProductSchema,
@@ -53,10 +56,16 @@ const mongooseFeatureModules = [
     { name: User.name, schema: UserSchema },
     { name: Icons.name, schema: IconsSchema },
     { name: CompanyImage.name, schema: CompanyImageSchema },
+    { name: MagicLink.name, schema: MagicLinkSchema },
   ]),
 ];
 
 const repositoryProviders = [
+  {
+    provide: MAGIC_LINK_REPOSITORY,
+    useFactory: (magicLinkModel: Model<MagicLink>) => new MagicLinkMongoRepository(magicLinkModel),
+    inject: [getModelToken(MagicLink.name)],
+  },
   {
     provide: USERS_REPOSITORY,
     useFactory: (userModel: Model<User>) => new UsersMongoRepository(userModel),
@@ -127,7 +136,8 @@ const repositoryProviders = [
     INGREDIENT_REPOSITORY,
     SOCIAL_MEDIA_REPOSITORY,
     USERS_REPOSITORY,
-    ICONS_REPOSITORY
+    ICONS_REPOSITORY,
+    MAGIC_LINK_REPOSITORY
   ],
 })
 export class DatabaseModule { }
